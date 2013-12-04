@@ -1,20 +1,14 @@
 var canvas = document.getElementById('game');
-var context = canvas.getContext("2d");
 
-var lastTimestamp = -1;
-function mainLoop(timestamp) {
-	if (lastTimestamp === -1) {
-		lastTimestamp = timestamp;
-	}
-	var timeDiff = timestamp - lastTimestamp;
-	lastTimestamp = timestamp;
-
-	simulation(timeDiff);
-	draw();
-
-	window.requestAnimationFrame(mainLoop);
-}
-window.requestAnimationFrame(mainLoop);
+var game = new Game(canvas, simulation, draw);
+game.mapKeys({
+	32: "space",
+	37: "left",
+	38: "up",
+	39: "right",
+	40: "down"
+});
+game.start();
 
 var player = { x: 50, y: 50, width: 50, height: 50, xaccel: 70, yaccel: 0 };
 
@@ -56,10 +50,10 @@ function simulation(timeDiffMillis) {
 
 	moveBuildings(elapsedSec);
 
-	if (keys["left"]) {
+	if (game.keys["left"]) {
 		player.x -= elapsedSec * 70;
 	}
-	if (keys["right"]) {
+	if (game.keys["right"]) {
 		player.x += elapsedSec * 70;
 	}
 	var gravityAccel = 50;
@@ -83,13 +77,13 @@ function simulation(timeDiffMillis) {
 
 	}
 
-	if (keys["space"] && onGround) {
+	if (game.keys["space"] && onGround) {
 		player.yaccel = -150;
 	}
 
 }
 
-function draw() {
+function draw(context) {
 	context.fillStyle = "#87ceeb";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -109,28 +103,4 @@ function draw() {
 	context.font = "bold 24px mono";
 	var dist = Math.round(distance / player.width * 100) / 100;
 	context.fillText(dist, 20, 40);
-}
-
-var keys = {};
-var keyMap = { 
-	32: "space",
-	37: "left", 
-	38: "up",
-	39: "right",
-	40: "down"
-};
-for (var kc in keyMap) {
-	keys[keyMap[kc]] = false;
-}
-window.onkeydown = function(event) {
-	// console.log("keydown " + event.keyCode);
-	if (keyMap.hasOwnProperty(event.keyCode)) {
-		keys[keyMap[event.keyCode]] = true;
-	}
-}
-window.onkeyup = function(event) {
-	// console.log("keyup " + event.keyCode);
-	if (keyMap.hasOwnProperty(event.keyCode)) {
-		keys[keyMap[event.keyCode]] = false;
-	}
 }
