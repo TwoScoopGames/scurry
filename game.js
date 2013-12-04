@@ -16,39 +16,74 @@ function mainLoop(timestamp) {
 }
 window.requestAnimationFrame(mainLoop);
 
-var player = { x: 50, y: 50, width: 50, height: 50, xaccel: 0, yaccel: 0 };
+var player = { x: 50, y: 50, width: 50, height: 50, xaccel: 70, yaccel: 0 };
 
-var buildings = [
-	{ x: 30, y: 400, width: 200 },
-	{ x: 400, y: 300, width: 200 }
-];
+function getRandomArbitrary(min, max) {
+	return Math.random() * (max - min) + min;
+}
 
+var buildings = [];
+
+function moveBuildings(elapsedSec) {
+	for (var i in buildings) {
+		var building = buildings[i];
+		building.x -= elapsedSec * player.xaccel;
+	}
+	// delete invisible buildings off the left edge
+	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
+		buildings.shift();
+	}
+	// add new buildings on the right edge
+	while (buildings.length == 0 || buildings[buildings.length - 1].x + buildings[buildings.length - 1].width < canvas.width) {
+		var x = 0;
+		if (buildings.length > 0) {
+			var last = buildings[buildings.length - 1];
+			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
+		}
+		buildings.push({ x: x, y: getRandomArbitrary(200, 400), width: getRandomArbitrary(300, 700) });
+	}
+}
+
+moveBuildings(0);
+player.y = buildings[0].y - player.height;
 
 function simulation(timeDiffMillis) {
 	//var fps = 1000 / timeDiffMillis;
 	var elapsedSec = timeDiffMillis / 100;
+
+	moveBuildings(elapsedSec);
+
 	if (keys["left"]) {
 		player.x -= elapsedSec * 70;
 	}
 	if (keys["right"]) {
 		player.x += elapsedSec * 70;
 	}
-	if (keys["space"]) {
-		player.yaccel = -100;
-	}
 	var gravityAccel = 50;
 	player.yaccel += elapsedSec * gravityAccel;
 	player.y += elapsedSec * player.yaccel;
+
+	if (player.y > canvas.height) {
+		player.xaccel = 0;
+	}
+
+	var onGround = false;
 	for (var i in buildings) {
 		var building = buildings[i];
 		if (player.x + player.width > building.x && player.x < building.x + building.width) {
 			if (player.y + player.height > building.y) {
 				player.y = building.y - player.height;
 				player.yaccel = 0;
+				onGround = true;
 			}
 		}
 
 	}
+
+	if (keys["space"] && onGround) {
+		player.yaccel = -150;
+	}
+
 }
 
 function draw() {
@@ -60,7 +95,6 @@ function draw() {
 
 	for (var i in buildings) {
 		var building = buildings[i];
-		console.log(building);
 		context.fillStyle = "#666666";
 		context.fillRect(building.x, building.y, building.width, canvas.height - building.y);
 	}
