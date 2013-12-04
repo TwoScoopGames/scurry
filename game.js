@@ -23,6 +23,7 @@ function getRandomArbitrary(min, max) {
 }
 
 var buildings = [];
+var distance = 0;
 
 function moveBuildings(elapsedSec) {
 	for (var i in buildings) {
@@ -50,6 +51,8 @@ player.y = buildings[0].y - player.height;
 function simulation(timeDiffMillis) {
 	//var fps = 1000 / timeDiffMillis;
 	var elapsedSec = timeDiffMillis / 100;
+
+	distance += elapsedSec * player.xaccel;
 
 	moveBuildings(elapsedSec);
 
@@ -101,6 +104,11 @@ function draw() {
 
 	context.fillStyle = "#ff0000";
 	context.fillRect(player.x, player.y, player.width, player.height);
+
+	context.fillStyle = "#ffffff";
+	context.font = "bold 24px mono";
+	var dist = Math.round(distance / player.width * 100) / 100;
+	context.fillText(dist, 20, 40);
 }
 
 var keys = {};
