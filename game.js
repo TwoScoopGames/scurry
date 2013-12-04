@@ -2,33 +2,36 @@ var canvas = document.getElementById('game');
 
 var game = new Game(canvas, simulation, draw);
 game.mapKeys({
+	27: "pause",
 	32: "space",
 	37: "left",
 	38: "up",
 	39: "right",
-	40: "down"
+	40: "down",
 });
 game.start();
-
-var player = { x: 50, y: 50, width: 50, height: 50, xaccel: 70, yaccel: 0 };
 
 function getRandomArbitrary(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
+var player = {};
 var buildings = [];
 var distance = 0;
+var state = "start";
+var stateMessages = {
+	"start": "Press space to start",
+	"paused": "Paused. Space starts",
+	"dead": "You died. Space restarts"
+};
 
-function moveBuildings(elapsedSec) {
-	for (var i in buildings) {
-		var building = buildings[i];
-		building.x -= elapsedSec * player.xaccel;
-	}
-	// delete invisible buildings off the left edge
+function deleteInvisibleBuildings() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
 		buildings.shift();
 	}
-	// add new buildings on the right edge
+}
+
+function populateBuildings() {
 	while (buildings.length == 0 || buildings[buildings.length - 1].x + buildings[buildings.length - 1].width < canvas.width) {
 		var x = 0;
 		if (buildings.length > 0) {
@@ -39,11 +42,44 @@ function moveBuildings(elapsedSec) {
 	}
 }
 
-moveBuildings(0);
-player.y = buildings[0].y - player.height;
+function moveBuildings(elapsedSec) {
+	for (var i in buildings) {
+		var building = buildings[i];
+		building.x -= elapsedSec * player.xaccel;
+	}
+	deleteInvisibleBuildings();
+	populateBuildings();
+}
+
+function reset() {
+	buildings = [];
+	distance = 0;
+	populateBuildings();
+	player = { x: 50, y: 50, width: 50, height: 50, xaccel: 70, yaccel: 0 }
+	player.y = buildings[0].y - player.height;
+}
+reset();
 
 function simulation(timeDiffMillis) {
-	//var fps = 1000 / timeDiffMillis;
+	if (game.keys["pause"]) {
+		game.keys["pause"] = false;
+		if (state === "paused") {
+			state = "running";
+		} else if (state === "running") {
+			state = "paused";
+		}
+	}
+	if (state === "paused" || state === "start" || state === "dead") {
+		if (game.keys["space"]) {
+			if (state === "dead") {
+				reset();
+			}
+			state = "running";
+			game.keys["space"] = false;
+		} else {
+			return;
+		}
+	}
 	var elapsedSec = timeDiffMillis / 100;
 
 	distance += elapsedSec * player.xaccel;
@@ -61,7 +97,7 @@ function simulation(timeDiffMillis) {
 	player.y += elapsedSec * player.yaccel;
 
 	if (player.y > canvas.height) {
-		player.xaccel = 0;
+		state = "dead";
 	}
 
 	var onGround = false;
@@ -74,13 +110,11 @@ function simulation(timeDiffMillis) {
 				onGround = true;
 			}
 		}
-
 	}
 
 	if (game.keys["space"] && onGround) {
 		player.yaccel = -150;
 	}
-
 }
 
 function draw(context) {
@@ -103,4 +137,10 @@ function draw(context) {
 	context.font = "bold 24px mono";
 	var dist = Math.round(distance / player.width * 100) / 100;
 	context.fillText(dist, 20, 40);
+
+	if (state != "running") {
+		context.fillStyle = "#ffffff";
+		context.font = "bold 36px mono";
+		context.fillText(stateMessages[state], 100, 200);
+	}
 }
