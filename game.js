@@ -41,7 +41,7 @@ function populateBuildings() {
 		}
 		var y = getRandomArbitrary(200, 400);
 		var b = new Entity(x, y, getRandomArbitrary(300, 700), canvas.height - y);
-		b.xaccel = -70;
+		b.vx = -70;
 		buildings.push(b);
 	}
 }
@@ -86,7 +86,7 @@ function simulation(timeDiffMillis) {
 	}
 	var elapsedSec = timeDiffMillis / 100;
 
-	distance -= elapsedSec * buildings[0].xaccel;
+	distance -= elapsedSec * buildings[0].vx;
 	if (distance > max_distance) {
 		max_distance = distance;
 	}
@@ -100,7 +100,7 @@ function simulation(timeDiffMillis) {
 		player.x += elapsedSec * 70;
 	}
 	var gravityAccel = 50;
-	player.yaccel += elapsedSec * gravityAccel;
+	player.vy += elapsedSec * gravityAccel;
 	player.move(elapsedSec);
 
 	if (player.y > canvas.height) {
@@ -114,19 +114,19 @@ function simulation(timeDiffMillis) {
 		if (player.collides(building)) {
 			if (player.didOverlapVert(building) && !player.didOverlapHoriz(building)) {
 				for (var j in buildings) {
-					buildings[j].xaccel = 0;
+					buildings[j].vx = 0;
 				}
 				player.x = building.x - player.width;
 				return;
 			}
 			player.y = building.y - player.height;
-			player.yaccel = 0;
+			player.vy = 0;
 			onGround = true;
 		}
 	}
 
 	if (game.keys["space"] && onGround) {
-		player.yaccel = -150;
+		player.vy = -150;
 	}
 }
 

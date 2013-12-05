@@ -52,16 +52,16 @@ function Entity(x, y, width, height) {
 	this.y = y;
 	this.width = width;
 	this.height = height;
-	this.xaccel = 0;
-	this.yaccel = 0;
+	this.vx = 0;
+	this.vy = 0;
 	this.lastx = 0;
 	this.lasty = 0;
 }
 Entity.prototype.move = function(elapsedSec) {
 	this.lastx = this.x;
 	this.lasty = this.y;
-	this.x += elapsedSec * this.xaccel;
-	this.y += elapsedSec * this.yaccel;
+	this.x += elapsedSec * this.vx;
+	this.y += elapsedSec * this.vy;
 }
 Entity.prototype.overlapsHoriz = function(other) {
 	return this.x + this.width > other.x && this.x < other.x + other.width;
