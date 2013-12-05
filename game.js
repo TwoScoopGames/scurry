@@ -18,6 +18,7 @@ function getRandomArbitrary(min, max) {
 var player = {};
 var buildings = [];
 var distance = 0;
+var max_distance = 0;
 var state = "start";
 var stateMessages = {
 	"start": "Press space to start",
@@ -86,6 +87,9 @@ function simulation(timeDiffMillis) {
 	var elapsedSec = timeDiffMillis / 100;
 
 	distance -= elapsedSec * buildings[0].xaccel;
+	if (distance > max_distance) {
+		max_distance = distance;
+	}
 
 	moveBuildings(elapsedSec);
 
@@ -146,6 +150,8 @@ function draw(context) {
 	context.font = "bold 24px mono";
 	var dist = Math.round(distance / player.width * 100) / 100;
 	context.fillText(dist, 20, 40);
+	dist = Math.round(max_distance / player.width * 100) / 100;
+	context.fillText("Max: " + dist, 300, 40);
 
 	if (state != "running") {
 		context.fillStyle = "#ffffff";
