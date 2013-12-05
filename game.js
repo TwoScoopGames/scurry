@@ -38,14 +38,17 @@ function populateBuildings() {
 			var last = buildings[buildings.length - 1];
 			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
 		}
-		buildings.push({ x: x, y: getRandomArbitrary(200, 400), width: getRandomArbitrary(300, 700) });
+		var y = getRandomArbitrary(200, 400);
+		var b = new Entity(x, y, getRandomArbitrary(300, 700), canvas.height - y);
+		b.xaccel = -70;
+		buildings.push(b);
 	}
 }
 
 function moveBuildings(elapsedSec) {
 	for (var i in buildings) {
 		var building = buildings[i];
-		building.x -= elapsedSec * player.xaccel;
+		building.move(elapsedSec);
 	}
 	deleteInvisibleBuildings();
 	populateBuildings();
@@ -55,7 +58,7 @@ function reset() {
 	buildings = [];
 	distance = 0;
 	populateBuildings();
-	player = { x: 50, y: 50, width: 50, height: 50, xaccel: 70, yaccel: 0 }
+	player = new Entity(50, 50, 50, 50);
 	player.y = buildings[0].y - player.height;
 }
 reset();
@@ -82,7 +85,7 @@ function simulation(timeDiffMillis) {
 	}
 	var elapsedSec = timeDiffMillis / 100;
 
-	distance += elapsedSec * player.xaccel;
+	distance -= elapsedSec * buildings[0].xaccel;
 
 	moveBuildings(elapsedSec);
 
@@ -94,21 +97,27 @@ function simulation(timeDiffMillis) {
 	}
 	var gravityAccel = 50;
 	player.yaccel += elapsedSec * gravityAccel;
-	player.y += elapsedSec * player.yaccel;
+	player.move(elapsedSec);
 
 	if (player.y > canvas.height) {
 		state = "dead";
+		return;
 	}
 
 	var onGround = false;
 	for (var i in buildings) {
 		var building = buildings[i];
-		if (player.x + player.width > building.x && player.x < building.x + building.width) {
-			if (player.y + player.height > building.y) {
-				player.y = building.y - player.height;
-				player.yaccel = 0;
-				onGround = true;
+		if (player.collides(building)) {
+			if (player.didOverlapVert(building) && !player.didOverlapHoriz(building)) {
+				for (var j in buildings) {
+					buildings[j].xaccel = 0;
+				}
+				player.x = building.x - player.width;
+				return;
 			}
+			player.y = building.y - player.height;
+			player.yaccel = 0;
+			onGround = true;
 		}
 	}
 
