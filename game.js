@@ -26,6 +26,10 @@ var stateMessages = {
 	"dead": "You died. Space restarts"
 };
 
+var window_width = 50;
+var window_spacing = 30;
+var window_height = 100;
+
 function deleteInvisibleBuildings() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
 		buildings.shift();
@@ -40,7 +44,9 @@ function populateBuildings() {
 			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
 		}
 		var y = getRandomArbitrary(200, 400);
-		var b = new Entity(x, y, getRandomArbitrary(300, 700), canvas.height - y);
+		var num_windows = Math.floor(Math.random() * 5 + 3);
+		var width = (num_windows * (window_width + window_spacing)) + window_spacing + 1;
+		var b = new Entity(x, y, width, canvas.height - y);
 		b.vx = -70;
 		buildings.push(b);
 	}
@@ -141,6 +147,12 @@ function draw(context) {
 		var building = buildings[i];
 		context.fillStyle = "#666666";
 		context.fillRect(building.x, building.y, building.width, canvas.height - building.y);
+		context.fillStyle = "#ffff00";
+		for (var x = window_spacing; x < building.width - window_width - window_spacing; x += window_width + window_spacing) {
+			for (var y = window_spacing; y < building.height - window_height - window_spacing; y += window_height + window_spacing) {
+				context.fillRect(building.x + x, building.y + y, window_width, window_height);
+			}
+		}
 	}
 
 	context.fillStyle = "#ff0000";
