@@ -27,8 +27,8 @@ var stateMessages = {
 };
 
 var window_width = 50;
-var window_spacing = 30;
-var window_height = 100;
+var window_spacing = 40;
+var window_height = 70;
 
 function deleteInvisibleBuildings() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
@@ -147,9 +147,9 @@ function draw(context) {
 		var building = buildings[i];
 		context.fillStyle = "#666666";
 		context.fillRect(building.x, building.y, building.width, canvas.height - building.y);
-		context.fillStyle = "#ffff00";
+		context.fillStyle = "#333333";
 		for (var x = window_spacing; x < building.width - window_width - window_spacing; x += window_width + window_spacing) {
-			for (var y = window_spacing; y < building.height - window_height - window_spacing; y += window_height + window_spacing) {
+			for (var y = window_spacing; y < building.height; y += window_height + window_spacing) {
 				context.fillRect(building.x + x, building.y + y, window_width, window_height);
 			}
 		}
