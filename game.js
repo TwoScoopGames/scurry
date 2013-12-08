@@ -30,6 +30,46 @@ var window_width = 50;
 var window_spacing = 40;
 var window_height = 70;
 
+function Building(x) {
+	var y = getRandomArbitrary(200, 400);
+	var num_windows = Math.floor(Math.random() * 5 + 3);
+	var width = (num_windows * (window_width + window_spacing)) + window_spacing + 1;
+	Entity.call(this, x, y, width, canvas.height - y);
+	this.vx = -70;
+
+	var num_lit_windows = Math.random() * 5;
+	this.lit_windows = [];
+	for (var i = 0; i < num_lit_windows; i++) {
+		var w = Math.random() * num_windows * (this.height / (window_height + window_spacing));
+		this.lit_windows.push(Math.floor(w));
+	}
+}
+Building.prototype = Object.create(Entity.prototype);
+Building.prototype.draw = function(context) {
+	context.fillStyle = "#666666";
+	context.fillRect(this.x, this.y, this.width, canvas.height - this.y);
+	var w = 0;
+	for (var y = window_spacing; y < this.height; y += window_height + window_spacing) {
+		for (var x = window_spacing; x < this.width - window_width - window_spacing; x += window_width + window_spacing) {
+			if (this.is_window_lit(w)) {
+				context.fillStyle = "#ffff00";
+			} else {
+				context.fillStyle = "#333333";
+			}
+			context.fillRect(this.x + x, this.y + y, window_width, window_height);
+			w++;
+		}
+	}
+};
+Building.prototype.is_window_lit = function(w) {
+	for (var i = 0; i < this.lit_windows.length; i++) {
+		if (this.lit_windows[i] == w) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function deleteInvisibleBuildings() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
 		buildings.shift();
@@ -43,19 +83,13 @@ function populateBuildings() {
 			var last = buildings[buildings.length - 1];
 			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
 		}
-		var y = getRandomArbitrary(200, 400);
-		var num_windows = Math.floor(Math.random() * 5 + 3);
-		var width = (num_windows * (window_width + window_spacing)) + window_spacing + 1;
-		var b = new Entity(x, y, width, canvas.height - y);
-		b.vx = -70;
-		buildings.push(b);
+		buildings.push(new Building(x));
 	}
 }
 
 function moveBuildings(elapsedSec) {
 	for (var i in buildings) {
-		var building = buildings[i];
-		building.move(elapsedSec);
+		buildings[i].move(elapsedSec);
 	}
 	deleteInvisibleBuildings();
 	populateBuildings();
@@ -144,15 +178,7 @@ function draw(context) {
 	context.fillRect(0, 450, canvas.width, 30);
 
 	for (var i in buildings) {
-		var building = buildings[i];
-		context.fillStyle = "#666666";
-		context.fillRect(building.x, building.y, building.width, canvas.height - building.y);
-		context.fillStyle = "#333333";
-		for (var x = window_spacing; x < building.width - window_width - window_spacing; x += window_width + window_spacing) {
-			for (var y = window_spacing; y < building.height; y += window_height + window_spacing) {
-				context.fillRect(building.x + x, building.y + y, window_width, window_height);
-			}
-		}
+		buildings[i].draw(context);
 	}
 
 	context.fillStyle = "#ff0000";
