@@ -45,6 +45,38 @@ function Game(canvas, simulationFunc, drawFunc) {
 			}
 		}
 	}
+
+	var relMouseCoords = function(event) {
+		var x = event.x - canvas.offsetLeft + document.body.scrollLeft;
+		var y = event.y - canvas.offsetTop + document.body.scrollTop;
+		return {x:x, y:y};
+	};
+
+	var mouse = {
+		x: 0,
+		y: 0,
+		buttons: {
+			'0': false,
+			'1': false,
+			'2': false
+		}
+	};
+	window.oncontextmenu = function() {
+		return false;
+	};
+	this.mouse = mouse;
+	canvas.onmousedown = function(event) {
+		var m = relMouseCoords(event);
+		mouse.x = m.x;
+		mouse.y = m.y;
+		mouse.buttons[event.button] = true;
+	};
+	canvas.onmouseup = function(event) {
+		var m = relMouseCoords(event);
+		mouse.x = m.x;
+		mouse.y = m.y;
+		mouse.buttons[event.button] = false;
+	};
 }
 
 function Entity(x, y, width, height) {

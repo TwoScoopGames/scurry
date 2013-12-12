@@ -114,12 +114,13 @@ function simulation(timeDiffMillis) {
 		}
 	}
 	if (state === "paused" || state === "start" || state === "dead") {
-		if (game.keys["space"]) {
+		if (game.keys["space"] || game.mouse.buttons['0']) {
 			if (state === "dead") {
 				reset();
 			}
 			state = "running";
 			game.keys["space"] = false;
+			game.mouse.buttons['0'] = false;
 		} else {
 			return;
 		}
@@ -165,7 +166,7 @@ function simulation(timeDiffMillis) {
 		}
 	}
 
-	if (game.keys["space"] && onGround) {
+	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 	}
 }
