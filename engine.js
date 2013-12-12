@@ -77,6 +77,16 @@ function Game(canvas, simulationFunc, drawFunc) {
 		mouse.y = m.y;
 		mouse.buttons[event.button] = false;
 	};
+	canvas.addEventListener("touchstart", function(event) {
+		var touch = event.touches[0];
+		var m = relMouseCoords({x:touch.pageX, y:touch.pageY})
+		mouse.x = m.x;
+		mouse.y = m.y;
+		mouse.buttons[0] = true;
+	});
+	canvas.addEventListener("touchend", function(event) {
+		mouse.buttons[0] = false;
+	});
 }
 
 function Entity(x, y, width, height) {
