@@ -178,7 +178,7 @@ function draw(context) {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	context.fillStyle = "#00ff00";
-	context.fillRect(0, 450, canvas.width, 30);
+	context.fillRect(0, canvas.height - 100, canvas.width, 100);
 
 	for (var i in buildings) {
 		buildings[i].draw(context);
