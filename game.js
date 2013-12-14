@@ -101,7 +101,7 @@ function reset() {
 	buildings = [];
 	distance = 0;
 	populateBuildings();
-	player = new Entity(50, 50, 50, 50);
+	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
 	player.y = buildings[0].y - player.height;
 }
 reset();
@@ -171,7 +171,6 @@ function simulation(timeDiffMillis) {
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 	}
-	beetle.move(elapsedSec);
 }
 
 function draw(context) {
@@ -185,8 +184,7 @@ function draw(context) {
 		buildings[i].draw(context);
 	}
 
-	context.fillStyle = "#ff0000";
-	context.fillRect(player.x, player.y, player.width, player.height);
+	player.draw(context);
 
 	context.fillStyle = "#ffffff";
 	context.font = "bold 24px mono";
@@ -200,5 +198,4 @@ function draw(context) {
 		context.font = "bold 36px mono";
 		context.fillText(stateMessages[state], 100, 200);
 	}
-	beetle.draw(context);
 }

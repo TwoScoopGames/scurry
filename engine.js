@@ -147,10 +147,27 @@ SpriteSheet.prototype.move = function(elapsedSec) {
 	this.frame %= this.numFrames;
 	this.elapsedSec -= advance * this.framesPerSec;
 };
-SpriteSheet.prototype.draw = function(context) {
+SpriteSheet.prototype.draw = function(context, x, y) {
 	if (!this.loaded) {
 		return;
 	}
 	var sx = this.frame * this.frameWidth
-	context.drawImage(this.img, sx, 0, this.frameWidth, this.img.height, 0, 0, this.frameWidth, this.img.height);
+	context.drawImage(this.img, sx, 0, this.frameWidth, this.img.height, x, y, this.frameWidth, this.img.height);
+};
+
+function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffsetY) {
+	this.sprite = sprite;
+	this.spriteOffsetX = spriteOffsetX;
+	this.spriteOffsetY = spriteOffsetY;
+	Entity.call(this, x, y, width, height);
+}
+AnimatedEntity.prototype = Object.create(Entity.prototype);
+AnimatedEntity.prototype.move = function(elapsedSec) {
+	Entity.prototype.move.call(this, elapsedSec);
+	this.sprite.move(elapsedSec);
+};
+AnimatedEntity.prototype.draw = function(context) {
+	// context.fillStyle = "#ff0000";
+	// context.fillRect(this.x, this.y, this.width, this.height);
+	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
 };
