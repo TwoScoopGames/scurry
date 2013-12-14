@@ -121,3 +121,36 @@ Entity.prototype.didOverlapHoriz = function(other) {
 Entity.prototype.didOverlapVert = function(other) {
 	return this.lasty + this.height > other.lasty && this.lasty < other.lasty + other.height;
 }
+
+function SpriteSheet(path, numFrames, framesPerSec) {
+	this.img = new Image();
+	this.loaded = false;
+	this.numFrames = numFrames;
+	this.frame = 0;
+	this.framesPerSec = framesPerSec;
+	this.elapsedSec = 0;
+
+	var that = this;
+	this.img.onload = function() {
+		that.loaded = true;
+		that.frameWidth = that.img.width / that.numFrames;
+	};
+	this.img.src = path;
+}
+SpriteSheet.prototype.move = function(elapsedSec) {
+	this.elapsedSec += elapsedSec;
+	var advance = Math.floor(this.elapsedSec / this.framesPerSec);
+	if (advance == 0) {
+		return;
+	}
+	this.frame += advance;
+	this.frame %= this.numFrames;
+	this.elapsedSec -= advance * this.framesPerSec;
+};
+SpriteSheet.prototype.draw = function(context) {
+	if (!this.loaded) {
+		return;
+	}
+	var sx = this.frame * this.frameWidth
+	context.drawImage(this.img, sx, 0, this.frameWidth, this.img.height, 0, 0, this.frameWidth, this.img.height);
+};

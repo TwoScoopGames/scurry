@@ -26,6 +26,8 @@ var stateMessages = {
 	"dead": "You died. Space restarts"
 };
 
+var beetle = new SpriteSheet('images/scurry-player-run 86x57 .png', 5, 0.50);
+
 var window_width = 50;
 var window_spacing = 40;
 var window_height = 70;
@@ -169,6 +171,7 @@ function simulation(timeDiffMillis) {
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 	}
+	beetle.move(elapsedSec);
 }
 
 function draw(context) {
@@ -197,4 +200,5 @@ function draw(context) {
 		context.font = "bold 36px mono";
 		context.fillText(stateMessages[state], 100, 200);
 	}
+	beetle.draw(context);
 }
