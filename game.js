@@ -34,6 +34,7 @@ images.load('box2', 'images/box2.png');
 images.load('box3', 'images/box3.png');
 images.load('can1', 'images/can1.png');
 images.load('can2', 'images/can2.png');
+images.load('syrup', 'images/syrup.png');
 
 function wait_for_images_to_load() {
 	if (images.all_loaded()) {
@@ -58,7 +59,7 @@ function assets_loaded() {
 
 var shelf_item_spacing = 30;
 
-var shelf_items = ['empty', 'box1', 'box2', 'box3', 'can1', 'can2'];
+var shelf_items = ['empty', 'box1', 'box2', 'box3', 'can1', 'can2', 'syrup'];
 var same_item_chance = 0.50;
 
 function get_shelf_items(len) {
