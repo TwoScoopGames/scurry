@@ -46,7 +46,7 @@ var shelf_bkgd = new ThreePatch(images.get('shelf background'));
 
 var shelf_unit_spacing = 30;
 
-function Building(x) {
+function Shelf(x) {
 	var y = getRandomArbitrary(200, 400);
 	var shelf_unit_width = images.get('box1').width;
 	this.num_units = Math.floor(Math.random() * 3 + 2);
@@ -54,8 +54,8 @@ function Building(x) {
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -70;
 }
-Building.prototype = Object.create(Entity.prototype);
-Building.prototype.draw = function(context) {
+Shelf.prototype = Object.create(Entity.prototype);
+Shelf.prototype.draw = function(context) {
 	shelf.draw(context, this.x, this.y, this.width);
 	for (var y = this.y - shelf_bkgd.img.height + 1; y > -shelf_bkgd.img.height; y -= shelf_bkgd.img.height - 1) {
 		shelf_bkgd.draw(context, this.x, y, this.width);
@@ -70,7 +70,7 @@ Building.prototype.draw = function(context) {
 		u += box.width + shelf_unit_spacing;
 	}
 };
-Building.prototype.is_window_lit = function(w) {
+Shelf.prototype.is_window_lit = function(w) {
 	for (var i = 0; i < this.lit_windows.length; i++) {
 		if (this.lit_windows[i] == w) {
 			return true;
@@ -79,35 +79,35 @@ Building.prototype.is_window_lit = function(w) {
 	return false;
 }
 
-function deleteInvisibleBuildings() {
+function deleteInvisibleShelves() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
 		buildings.shift();
 	}
 }
 
-function populateBuildings() {
+function populateShelves() {
 	while (buildings.length == 0 || buildings[buildings.length - 1].x + buildings[buildings.length - 1].width < canvas.width) {
 		var x = 0;
 		if (buildings.length > 0) {
 			var last = buildings[buildings.length - 1];
 			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
 		}
-		buildings.push(new Building(x));
+		buildings.push(new Shelf(x));
 	}
 }
 
-function moveBuildings(elapsedSec) {
+function moveShelves(elapsedSec) {
 	for (var i in buildings) {
 		buildings[i].move(elapsedSec);
 	}
-	deleteInvisibleBuildings();
-	populateBuildings();
+	deleteInvisibleShelves();
+	populateShelves();
 }
 
 function reset() {
 	buildings = [];
 	distance = 0;
-	populateBuildings();
+	populateShelves();
 	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
 	player.y = buildings[0].y - player.height;
 }
@@ -141,7 +141,7 @@ function simulation(timeDiffMillis) {
 		max_distance = distance;
 	}
 
-	moveBuildings(elapsedSec);
+	moveShelves(elapsedSec);
 
 	if (game.keys["left"]) {
 		player.x -= elapsedSec * 70;
