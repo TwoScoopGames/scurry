@@ -186,18 +186,36 @@ AnimatedEntity.prototype.draw = function(context) {
 	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
 };
 
-function ThreePatch(image, firstDiv, secondDiv) {
+function ThreePatch(image) {
 	this.img = image;
-	this.firstDiv = firstDiv;
-	this.secondDiv = secondDiv;
+
+	var canvas = document.createElement("canvas");
+	canvas.width = image.width;
+	canvas.height = image.height;
+	var context = canvas.getContext("2d");
+	context.drawImage(image, 0, 0, image.width, image.height);
+	this.firstDiv = this.secondDiv = image.width;
+	for (var x = 0; x < image.width; x++) {
+		var pixel = context.getImageData(x, image.height - 1, 1, 1).data;
+		var alpha = pixel[3];
+		if (this.firstDiv == image.width && alpha > 0) {
+			console.log(x);
+			this.firstDiv = x;
+		}
+		if (this.firstDiv < image.width && alpha == 0) {
+			console.log(x);
+			this.secondDiv = x;
+			break;
+		}
+	}
 }
 ThreePatch.prototype.draw = function(context, x, y, width) {
 	x = x|0;
 	y = y|0;
 	var w1 = this.firstDiv;
 	var w2 = this.secondDiv - this.firstDiv;
-	var w3 = this.img.width - this.secondDiv;
-	var h = this.img.height;
+	var w3 = this.img.width - this.secondDiv - 1;
+	var h = this.img.height - 1;
 
 	context.drawImage(this.img, 0, 0, w1, h, x, y, w1, h);
 

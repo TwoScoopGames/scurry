@@ -32,8 +32,8 @@ images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
 
 var beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
-var shelf = new ThreePatch(images.get('shelf'), 34, 104);
-var shelf_bkgd = new ThreePatch(images.get('shelf background'), 94, 142);
+var shelf = new ThreePatch(images.get('shelf'));
+var shelf_bkgd = new ThreePatch(images.get('shelf background'));
 
 var shelf_unit_width = 50;
 
@@ -47,10 +47,10 @@ function Building(x) {
 Building.prototype = Object.create(Entity.prototype);
 Building.prototype.draw = function(context) {
 	shelf.draw(context, this.x, this.y, this.width);
-	for (var y = this.y - shelf_bkgd.img.height; y > -shelf_bkgd.img.height; y -= shelf_bkgd.img.height) {
+	for (var y = this.y - shelf_bkgd.img.height + 1; y > -shelf_bkgd.img.height; y -= shelf_bkgd.img.height - 1) {
 		shelf_bkgd.draw(context, this.x, y, this.width);
 	}
-	for (var y = this.y + shelf.img.height; y < canvas.height; y += shelf_bkgd.img.height) {
+	for (var y = this.y + shelf.img.height - 1; y < canvas.height; y += shelf_bkgd.img.height - 1) {
 		shelf_bkgd.draw(context, this.x, y, this.width);
 	}
 };
