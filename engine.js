@@ -37,11 +37,13 @@ function Game(canvas, simulationFunc, drawFunc) {
 		window.onkeydown = function(event) {
 			if (keyMap.hasOwnProperty(event.keyCode)) {
 				game.keys[keyMap[event.keyCode]] = true;
+				return false;
 			}
 		}
 		window.onkeyup = function(event) {
 			if (keyMap.hasOwnProperty(event.keyCode)) {
 				game.keys[keyMap[event.keyCode]] = false;
+				return false;
 			}
 		}
 	}
@@ -170,4 +172,30 @@ AnimatedEntity.prototype.draw = function(context) {
 	// context.fillStyle = "#ff0000";
 	// context.fillRect(this.x, this.y, this.width, this.height);
 	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
+};
+
+function ThreePatch(path, firstDiv, secondDiv) {
+	this.img = new Image();
+	this.img.src = path;
+	this.firstDiv = firstDiv;
+	this.secondDiv = secondDiv;
+}
+ThreePatch.prototype.draw = function(context, x, y, width) {
+	x = x|0;
+	y = y|0;
+	var w1 = this.firstDiv;
+	var w2 = this.secondDiv - this.firstDiv;
+	var w3 = this.img.width - this.secondDiv;
+	var h = this.img.height;
+
+	context.drawImage(this.img, 0, 0, w1, h, x, y, w1, h);
+
+	var startThirdDiv = x + width - w3;
+	context.drawImage(this.img, this.secondDiv, 0, w3, h, startThirdDiv, y, w3, h);
+
+	for (var x2 = this.firstDiv; x2 < width - w3; x2 += w2) {
+		var drawWidth = startThirdDiv - x - x2;
+		drawWidth = Math.min(drawWidth, w2);
+		context.drawImage(this.img, this.firstDiv, 0, drawWidth, h, x + x2, y, drawWidth, h);
+	}
 };

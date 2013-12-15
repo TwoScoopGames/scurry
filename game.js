@@ -27,41 +27,23 @@ var stateMessages = {
 };
 
 var beetle = new SpriteSheet('images/scurry-player-run 86x57 .png', 5, 0.50);
+var shelf = new ThreePatch('images/shelf.png', 34, 104);
+var shelf_bkgd = new ThreePatch('images/shelf-bars-spritesheet.png', 94, 142);
 
-var window_width = 50;
-var window_spacing = 40;
-var window_height = 70;
+var shelf_unit_width = 50;
 
 function Building(x) {
 	var y = getRandomArbitrary(200, 400);
-	var num_windows = Math.floor(Math.random() * 5 + 3);
-	var width = (num_windows * (window_width + window_spacing)) + window_spacing + 1;
+	var num_units = Math.floor(Math.random() * 10 + 6);
+	var width = num_units * shelf_unit_width;
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -70;
-
-	var num_lit_windows = Math.random() * 5;
-	this.lit_windows = [];
-	for (var i = 0; i < num_lit_windows; i++) {
-		var w = Math.random() * num_windows * (this.height / (window_height + window_spacing));
-		this.lit_windows.push(Math.floor(w));
-	}
 }
 Building.prototype = Object.create(Entity.prototype);
 Building.prototype.draw = function(context) {
-	context.fillStyle = "#666666";
-	context.fillRect(this.x, this.y, this.width, canvas.height - this.y);
-	var w = 0;
-	for (var y = window_spacing; y < this.height; y += window_height + window_spacing) {
-		for (var x = window_spacing; x < this.width - window_width - window_spacing; x += window_width + window_spacing) {
-			if (this.is_window_lit(w)) {
-				context.fillStyle = "#ffff00";
-			} else {
-				context.fillStyle = "#333333";
-			}
-			context.fillRect(this.x + x, this.y + y, window_width, window_height);
-			w++;
-		}
-	}
+	shelf.draw(context, this.x, this.y, this.width);
+	shelf_bkgd.draw(context, this.x, this.y - 91, this.width);
+	shelf_bkgd.draw(context, this.x, this.y + 100, this.width);
 };
 Building.prototype.is_window_lit = function(w) {
 	for (var i = 0; i < this.lit_windows.length; i++) {
