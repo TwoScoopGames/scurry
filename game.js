@@ -37,16 +37,24 @@ images.load('can2', 'images/can2.png');
 
 function wait_for_images_to_load() {
 	if (images.all_loaded()) {
-		game.start();
+		assets_loaded();
 	} else {
 		window.setTimeout(wait_for_images_to_load, 200);
 	}
 }
 window.setTimeout(wait_for_images_to_load, 200);
 
-var beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
-var shelf = new ThreePatch(images.get('shelf'));
-var shelf_bkgd = new ThreePatch(images.get('shelf background'));
+var beetle;
+var shelf;
+var shelf_bkgd;
+
+function assets_loaded() {
+	beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
+	shelf = new ThreePatch(images.get('shelf'));
+	shelf_bkgd = new ThreePatch(images.get('shelf background'));
+	reset();
+	game.start();
+}
 
 var shelf_item_spacing = 30;
 
@@ -63,7 +71,7 @@ function get_shelf_items(len) {
 			continue;
 		}
 		var	n = (Math.random() * possible_items.length) |0;
-		var item = possible_items[n]
+		var item = possible_items[n];
 		items.push(item);
 		if (item != 'empty') {
 			possible_items.splice(n, 1);
@@ -165,7 +173,6 @@ function reset() {
 	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
 	player.y = buildings[0].y - player.height;
 }
-reset();
 
 function simulation(timeDiffMillis) {
 	if (game.keys["pause"]) {
