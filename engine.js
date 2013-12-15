@@ -124,20 +124,37 @@ Entity.prototype.didOverlapVert = function(other) {
 	return this.lasty + this.height > other.lasty && this.lasty < other.lasty + other.height;
 }
 
-function SpriteSheet(path, numFrames, framesPerSec) {
-	this.img = new Image();
-	this.loaded = false;
+function ImageLoader() {
+	this.images = {};
+	this.total_images = 0;
+	this.loaded_images = 0;
+}
+ImageLoader.prototype.load = function(name, path) {
+	this.total_images++;
+
+	var img = new Image();
+	var that = this;
+	img.onload = function() {
+		that.loaded_images++;
+	};
+	img.src = path;
+
+	this.images[name] = img;
+};
+ImageLoader.prototype.all_loaded = function() {
+	return this.total_images == this.loaded_images;
+};
+ImageLoader.prototype.get = function(name) {
+	return this.images[name];
+};
+
+function SpriteSheet(image, numFrames, framesPerSec) {
+	this.img = image;
 	this.numFrames = numFrames;
+	this.frameWidth = this.img.width / this.numFrames;
 	this.frame = 0;
 	this.framesPerSec = framesPerSec;
 	this.elapsedSec = 0;
-
-	var that = this;
-	this.img.onload = function() {
-		that.loaded = true;
-		that.frameWidth = that.img.width / that.numFrames;
-	};
-	this.img.src = path;
 }
 SpriteSheet.prototype.move = function(elapsedSec) {
 	this.elapsedSec += elapsedSec;
@@ -150,9 +167,6 @@ SpriteSheet.prototype.move = function(elapsedSec) {
 	this.elapsedSec -= advance * this.framesPerSec;
 };
 SpriteSheet.prototype.draw = function(context, x, y) {
-	if (!this.loaded) {
-		return;
-	}
 	var sx = this.frame * this.frameWidth
 	context.drawImage(this.img, sx, 0, this.frameWidth, this.img.height, x, y, this.frameWidth, this.img.height);
 };
@@ -169,14 +183,11 @@ AnimatedEntity.prototype.move = function(elapsedSec) {
 	this.sprite.move(elapsedSec);
 };
 AnimatedEntity.prototype.draw = function(context) {
-	// context.fillStyle = "#ff0000";
-	// context.fillRect(this.x, this.y, this.width, this.height);
 	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
 };
 
-function ThreePatch(path, firstDiv, secondDiv) {
-	this.img = new Image();
-	this.img.src = path;
+function ThreePatch(image, firstDiv, secondDiv) {
+	this.img = image;
 	this.firstDiv = firstDiv;
 	this.secondDiv = secondDiv;
 }
@@ -199,3 +210,4 @@ ThreePatch.prototype.draw = function(context, x, y, width) {
 		context.drawImage(this.img, this.firstDiv, 0, drawWidth, h, x + x2, y, drawWidth, h);
 	}
 };
+

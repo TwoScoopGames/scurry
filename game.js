@@ -26,9 +26,14 @@ var stateMessages = {
 	"dead": "You died. Space restarts"
 };
 
-var beetle = new SpriteSheet('images/scurry-player-run 86x57 .png', 5, 0.50);
-var shelf = new ThreePatch('images/shelf.png', 34, 104);
-var shelf_bkgd = new ThreePatch('images/shelf-bars-spritesheet.png', 94, 142);
+var images = new ImageLoader();
+images.load('beetle', 'images/scurry-player-run 86x57 .png');
+images.load('shelf', 'images/shelf.png');
+images.load('shelf background', 'images/shelf-bars-spritesheet.png');
+
+var beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
+var shelf = new ThreePatch(images.get('shelf'), 34, 104);
+var shelf_bkgd = new ThreePatch(images.get('shelf background'), 94, 142);
 
 var shelf_unit_width = 50;
 
