@@ -9,7 +9,6 @@ game.mapKeys({
 	39: "right",
 	40: "down",
 });
-game.start();
 
 function getRandomArbitrary(min, max) {
 	return Math.random() * (max - min) + min;
@@ -30,17 +29,28 @@ var images = new ImageLoader();
 images.load('beetle', 'images/scurry-player-run 86x57 .png');
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
+images.load('box1', 'images/box1.png');
+
+function wait_for_images_to_load() {
+	if (images.all_loaded()) {
+		game.start();
+	} else {
+		window.setTimeout(wait_for_images_to_load, 200);
+	}
+}
+window.setTimeout(wait_for_images_to_load, 200);
 
 var beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
 var shelf = new ThreePatch(images.get('shelf'));
 var shelf_bkgd = new ThreePatch(images.get('shelf background'));
 
-var shelf_unit_width = 50;
+var shelf_unit_spacing = 30;
 
 function Building(x) {
 	var y = getRandomArbitrary(200, 400);
-	var num_units = Math.floor(Math.random() * 10 + 6);
-	var width = num_units * shelf_unit_width;
+	var shelf_unit_width = images.get('box1').width;
+	this.num_units = Math.floor(Math.random() * 3 + 2);
+	var width = (this.num_units * (shelf_unit_width + shelf_unit_spacing)) + shelf_unit_spacing;
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -70;
 }
@@ -52,6 +62,12 @@ Building.prototype.draw = function(context) {
 	}
 	for (var y = this.y + shelf.img.height - 1; y < canvas.height; y += shelf_bkgd.img.height - 1) {
 		shelf_bkgd.draw(context, this.x, y, this.width);
+	}
+	var u = this.x + shelf_unit_spacing;
+	var box = images.get('box1');
+	for (var i = 0; i < this.num_units; i++) {
+		context.drawImage(box, u, this.y - box.height);
+		u += box.width + shelf_unit_spacing;
 	}
 };
 Building.prototype.is_window_lit = function(w) {
