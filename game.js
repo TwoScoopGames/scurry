@@ -25,7 +25,11 @@ var stateMessages = {
 	"dead": "You died. Space restarts"
 };
 
+var bgv = -30;
+var bgx = 0;
+
 var images = new ImageLoader();
+images.load('bg', 'images/Scurry-bg-TEST2.png');
 images.load('beetle', 'images/scurry-player-run 86x57 .png');
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
@@ -173,6 +177,8 @@ function reset() {
 	populateShelves();
 	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
 	player.y = buildings[0].y - player.height;
+	bgv = -30;
+	bgx = 0;
 }
 
 function simulation(timeDiffMillis) {
@@ -228,6 +234,7 @@ function simulation(timeDiffMillis) {
 				for (var j in buildings) {
 					buildings[j].vx = 0;
 				}
+				bgv = 0;
 				player.x = building.x - player.width;
 				return;
 			}
@@ -240,14 +247,20 @@ function simulation(timeDiffMillis) {
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 	}
+
+	bgx += elapsedSec * bgv;
+	var bg = images.get('bg');
+	if (bgx + bg.width < 0) {
+		bgx += bg.width;
+	}
 }
 
 function draw(context) {
-	context.fillStyle = "#87ceeb";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-
-	context.fillStyle = "#00ff00";
-	context.fillRect(0, canvas.height - 100, canvas.width, 100);
+	var bg = images.get('bg');
+	context.drawImage(bg, bgx, 0);
+	if (bgx + bg.width < canvas.width) {
+		context.drawImage(bg, bgx + bg.width, 0);
+	}
 
 	for (var i in buildings) {
 		buildings[i].draw(context);
