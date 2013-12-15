@@ -42,8 +42,12 @@ function Building(x) {
 Building.prototype = Object.create(Entity.prototype);
 Building.prototype.draw = function(context) {
 	shelf.draw(context, this.x, this.y, this.width);
-	shelf_bkgd.draw(context, this.x, this.y - 91, this.width);
-	shelf_bkgd.draw(context, this.x, this.y + 100, this.width);
+	for (var y = this.y - shelf_bkgd.img.height; y > -shelf_bkgd.img.height; y -= shelf_bkgd.img.height) {
+		shelf_bkgd.draw(context, this.x, y, this.width);
+	}
+	for (var y = this.y + shelf.img.height; y < canvas.height; y += shelf_bkgd.img.height) {
+		shelf_bkgd.draw(context, this.x, y, this.width);
+	}
 };
 Building.prototype.is_window_lit = function(w) {
 	for (var i = 0; i < this.lit_windows.length; i++) {
