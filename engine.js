@@ -186,46 +186,49 @@ AnimatedEntity.prototype.draw = function(context) {
 	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
 };
 
-function ThreePatch(image) {
-	this.img = image;
-
+function get_context_with_image(image) {
 	var canvas = document.createElement("canvas");
 	canvas.width = image.width;
 	canvas.height = image.height;
 	var context = canvas.getContext("2d");
 	context.drawImage(image, 0, 0, image.width, image.height);
-	this.firstDiv = this.secondDiv = image.width;
+	return context;
+}
+
+function ThreePatch(image) {
+	this.img = image;
+
+	var context = get_context_with_image(image);
+	var firstDiv = secondDiv = image.width;
 	for (var x = 0; x < image.width; x++) {
 		var pixel = context.getImageData(x, image.height - 1, 1, 1).data;
 		var alpha = pixel[3];
-		if (this.firstDiv == image.width && alpha > 0) {
-			console.log(x);
-			this.firstDiv = x;
+		if (firstDiv == image.width && alpha > 0) {
+			firstDiv = x;
 		}
-		if (this.firstDiv < image.width && alpha == 0) {
-			console.log(x);
-			this.secondDiv = x;
+		if (firstDiv < image.width && alpha == 0) {
+			secondDiv = x;
 			break;
 		}
 	}
+	this.w1 = firstDiv;
+	this.w2 = secondDiv - firstDiv;
+	this.w3 = this.img.width - secondDiv - 1;
 }
 ThreePatch.prototype.draw = function(context, x, y, width) {
 	x = x|0;
 	y = y|0;
-	var w1 = this.firstDiv;
-	var w2 = this.secondDiv - this.firstDiv;
-	var w3 = this.img.width - this.secondDiv - 1;
 	var h = this.img.height - 1;
 
-	context.drawImage(this.img, 0, 0, w1, h, x, y, w1, h);
+	context.drawImage(this.img, 0, 0, this.w1, h, x, y, this.w1, h);
 
-	var startThirdDiv = x + width - w3;
-	context.drawImage(this.img, this.secondDiv, 0, w3, h, startThirdDiv, y, w3, h);
+	var startThirdDiv = x + width - this.w3;
+	context.drawImage(this.img, this.w1 + this.w2, 0, this.w3, h, startThirdDiv, y, this.w3, h);
 
-	for (var x2 = this.firstDiv; x2 < width - w3; x2 += w2) {
+	for (var x2 = this.w1; x2 < width - this.w3; x2 += this.w2) {
 		var drawWidth = startThirdDiv - x - x2;
-		drawWidth = Math.min(drawWidth, w2);
-		context.drawImage(this.img, this.firstDiv, 0, drawWidth, h, x + x2, y, drawWidth, h);
+		drawWidth = Math.min(drawWidth, this.w2);
+		context.drawImage(this.img, this.w1, 0, drawWidth, h, x + x2, y, drawWidth, h);
 	}
 };
 
