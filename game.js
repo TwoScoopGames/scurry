@@ -30,6 +30,10 @@ images.load('beetle', 'images/scurry-player-run 86x57 .png');
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
 images.load('box1', 'images/box1.png');
+images.load('box2', 'images/box2.png');
+images.load('box3', 'images/box3.png');
+images.load('can1', 'images/can1.png');
+images.load('can2', 'images/can2.png');
 
 function wait_for_images_to_load() {
 	if (images.all_loaded()) {
@@ -44,13 +48,68 @@ var beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
 var shelf = new ThreePatch(images.get('shelf'));
 var shelf_bkgd = new ThreePatch(images.get('shelf background'));
 
-var shelf_unit_spacing = 30;
+var shelf_item_spacing = 30;
+
+var shelf_items = ['empty', 'box1', 'box2', 'box3', 'can1', 'can2'];
+var same_item_chance = 0.50;
+
+function get_shelf_items(len) {
+	var num_units = Math.floor(Math.random() * 3 + 2);
+	var items = [];
+	var possible_items = shelf_items.slice(0);
+	for (var i = 0; i < num_units; i++) {
+		if (i > 0 && Math.random() < same_item_chance) {
+			items.push(items[i - 1]);
+			continue;
+		}
+		var	n = (Math.random() * possible_items.length) |0;
+		var item = possible_items[n]
+		items.push(item);
+		if (item != 'empty') {
+			possible_items.splice(n, 1);
+		}
+	}
+	return items;
+}
+function get_shelf_width(items) {
+	var width = 0;
+	width += shelf.w1 + shelf.w3;
+	for (var i = 0; i < items.length; i++) {
+		if (i > 0) {
+			width += shelf_item_spacing;
+		}
+
+		var item = items[i];
+		if (item == 'empty') {
+			item = 'box1';
+		}
+		width += images.get(item).width;
+	}
+	return width;
+}
+function draw_shelf_items(context, items, x, y) {
+	x += shelf.w1;
+	y += 5;
+	for (var i = 0; i < items.length; i++) {
+		if (i > 0) {
+			x += shelf_item_spacing;
+		}
+
+		var item = items[i];
+		if (item == 'empty') {
+			x += images.get('box1').width;
+			continue;
+		}
+		var img = images.get(item);
+		context.drawImage(img, x, y - img.height);
+		x += img.width;
+	}
+}
 
 function Shelf(x) {
 	var y = getRandomArbitrary(200, 400);
-	var shelf_unit_width = images.get('box1').width;
-	this.num_units = Math.floor(Math.random() * 3 + 2);
-	var width = (this.num_units * (shelf_unit_width + shelf_unit_spacing)) + shelf_unit_spacing;
+	this.items = get_shelf_items();
+	var width = get_shelf_width(this.items);
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -70;
 }
@@ -63,12 +122,7 @@ Shelf.prototype.draw = function(context) {
 	for (var y = this.y + shelf.img.height - 1; y < canvas.height; y += shelf_bkgd.img.height - 1) {
 		shelf_bkgd.draw(context, this.x, y, this.width);
 	}
-	var u = this.x + shelf_unit_spacing;
-	var box = images.get('box1');
-	for (var i = 0; i < this.num_units; i++) {
-		context.drawImage(box, u, this.y - box.height);
-		u += box.width + shelf_unit_spacing;
-	}
+	draw_shelf_items(context, this.items, this.x, this.y);
 };
 Shelf.prototype.is_window_lit = function(w) {
 	for (var i = 0; i < this.lit_windows.length; i++) {
