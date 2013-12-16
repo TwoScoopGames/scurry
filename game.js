@@ -137,14 +137,6 @@ Shelf.prototype.draw = function(context) {
 	}
 	draw_shelf_items(context, this.items, this.x, this.y);
 };
-Shelf.prototype.is_window_lit = function(w) {
-	for (var i = 0; i < this.lit_windows.length; i++) {
-		if (this.lit_windows[i] == w) {
-			return true;
-		}
-	}
-	return false;
-}
 
 function deleteInvisibleShelves() {
 	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
