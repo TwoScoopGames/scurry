@@ -214,6 +214,22 @@ function ThreePatch(image) {
 	this.w1 = firstDiv;
 	this.w2 = secondDiv - firstDiv;
 	this.w3 = this.img.width - secondDiv - 1;
+
+	firstDiv = secondDiv = image.height;
+	for (var y = 0; y < image.height; y++) {
+		var pixel = context.getImageData(image.width - 1, y, 1, 1).data;
+		var alpha = pixel[3];
+		if (firstDiv == image.height && alpha > 0) {
+			firstDiv = y;
+		}
+		if (firstDiv < image.height && alpha == 0) {
+			secondDiv = y;
+			break;
+		}
+	}
+	this.h1 = firstDiv;
+	this.h2 = secondDiv - firstDiv;
+	this.h3 = this.img.height - secondDiv - 1;
 }
 ThreePatch.prototype.draw = function(context, x, y, width) {
 	x = x|0;
