@@ -260,7 +260,7 @@ function draw(context) {
 
 	player.draw(context);
 
-	context.fillStyle = "#ffffff";
+	context.fillStyle = "#000000";
 	context.font = "bold 24px mono";
 	var dist = Math.round(distance / player.width * 100) / 100;
 	context.fillText(dist, 20, 40);
@@ -268,7 +268,6 @@ function draw(context) {
 	context.fillText("Max: " + dist, 300, 40);
 
 	if (state != "running") {
-		context.fillStyle = "#ffffff";
 		context.font = "bold 36px mono";
 		context.fillText(stateMessages[state], 100, 200);
 	}
