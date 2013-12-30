@@ -39,6 +39,10 @@ images.load('box3', 'images/box3.png');
 images.load('can1', 'images/can1.png');
 images.load('can2', 'images/can2.png');
 images.load('syrup', 'images/syrup.png');
+images.load('tag1', 'images/price-tag1.png');
+images.load('tag2', 'images/price-tag2.png');
+images.load('tag3', 'images/price-tag-sale.png');
+
 
 function wait_for_images_to_load() {
 	if (images.all_loaded()) {
@@ -64,8 +68,18 @@ function assets_loaded() {
 var shelf_item_spacing = 30;
 
 var shelf_items = ['empty', 'box1', 'box2', 'box3', 'can1', 'can2', 'syrup'];
+var shelf_tags = ['tag1', 'tag2', 'tag3'];
 var same_item_chance = 0.50;
 
+function rand_price() {
+
+	var price = (((Math.random() * 95) |0) + 5) * 10 + 9;
+	price = '' + price;
+	if (price.length == 2) {
+		return '.' + price;
+	}
+	return price[0] + '.' + price.substr(1);
+}
 function get_shelf_items(len) {
 	var num_units = Math.floor(Math.random() * 3 + 2);
 	var items = [];
@@ -76,7 +90,12 @@ function get_shelf_items(len) {
 			continue;
 		}
 		var	n = (Math.random() * possible_items.length) |0;
-		var item = possible_items[n];
+		var tag = (Math.random() * shelf_tags.length) |0;
+		var item = {
+			item: possible_items[n],
+			tag: shelf_tags[tag],
+			price: rand_price()
+		};
 		items.push(item);
 		if (item != 'empty') {
 			possible_items.splice(n, 1);
@@ -92,11 +111,17 @@ function get_shelf_width(items) {
 			width += shelf_item_spacing;
 		}
 
-		var item = items[i];
+		var item = items[i].item;
+		var tag = images.get(items[i].tag);
 		if (item == 'empty') {
 			item = 'box1';
 		}
-		width += images.get(item).width;
+		var img = images.get(item);
+		if (tag.width > img.width) {
+			width += tag.width;
+		} else {
+			width += img.width;
+		}
 	}
 	return width;
 }
@@ -108,14 +133,32 @@ function draw_shelf_items(context, items, x, y) {
 			x += shelf_item_spacing;
 		}
 
-		var item = items[i];
+		var item = items[i].item;
 		if (item == 'empty') {
 			x += images.get('box1').width;
 			continue;
 		}
 		var img = images.get(item);
 		context.drawImage(img, x, y - img.height);
-		x += img.width;
+
+		var tag = images.get(items[i].tag);
+		var tagx = x + ((img.width - tag.width) / 2);
+		context.drawImage(tag, tagx, y + 10);
+
+		var price = items[i].price;
+		if (items[i].tag == 'tag3') {
+			context.fillStyle = '#ff0000';
+		} else {
+			context.fillStyle = '#333333';
+		}
+		context.font = "36px pixelade";
+		context.fillText(price, tagx + 70, y + 75);
+
+		if (tag.width > img.width) {
+			x += tag.width;
+		} else {
+			x += img.width;
+		}
 	}
 }
 
@@ -261,14 +304,14 @@ function draw(context) {
 	player.draw(context);
 
 	context.fillStyle = "#000000";
-	context.font = "bold 24px mono";
+	context.font = "36px pixelade";
 	var dist = Math.round(distance / player.width * 100) / 100;
 	context.fillText(dist, 20, 40);
 	dist = Math.round(max_distance / player.width * 100) / 100;
 	context.fillText("Max: " + dist, 300, 40);
 
 	if (state != "running") {
-		context.font = "bold 36px mono";
+		context.font = "36px pixelade";
 		context.fillText(stateMessages[state], 100, 200);
 	}
 }
