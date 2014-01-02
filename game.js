@@ -15,7 +15,7 @@ function getRandomArbitrary(min, max) {
 }
 
 var player = {};
-var buildings = [];
+var shelves = [];
 var distance = 0;
 var max_distance = 0;
 var state = "start";
@@ -192,36 +192,36 @@ Shelf.prototype.draw = function(context) {
 };
 
 function deleteInvisibleShelves() {
-	while (buildings.length > 0 && buildings[0].x + buildings[0].width < 0) {
-		buildings.shift();
+	while (shelves.length > 0 && shelves[0].x + shelves[0].width < 0) {
+		shelves.shift();
 	}
 }
 
 function populateShelves() {
-	while (buildings.length == 0 || buildings[buildings.length - 1].x + buildings[buildings.length - 1].width < canvas.width) {
+	while (shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < canvas.width) {
 		var x = 0;
-		if (buildings.length > 0) {
-			var last = buildings[buildings.length - 1];
+		if (shelves.length > 0) {
+			var last = shelves[shelves.length - 1];
 			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
 		}
-		buildings.push(new Shelf(x));
+		shelves.push(new Shelf(x));
 	}
 }
 
 function moveShelves(elapsedSec) {
-	for (var i in buildings) {
-		buildings[i].move(elapsedSec);
+	for (var i in shelves) {
+		shelves[i].move(elapsedSec);
 	}
 	deleteInvisibleShelves();
 	populateShelves();
 }
 
 function reset() {
-	buildings = [];
+	shelves = [];
 	distance = 0;
 	populateShelves();
 	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
-	player.y = buildings[0].y - player.height;
+	player.y = shelves[0].y - player.height;
 	bgv = -30;
 	bgx = 0;
 }
@@ -249,7 +249,7 @@ function simulation(timeDiffMillis) {
 	}
 	var elapsedSec = timeDiffMillis / 100;
 
-	distance -= elapsedSec * buildings[0].vx;
+	distance -= elapsedSec * shelves[0].vx;
 	if (distance > max_distance) {
 		max_distance = distance;
 	}
@@ -272,18 +272,18 @@ function simulation(timeDiffMillis) {
 	}
 
 	var onGround = false;
-	for (var i in buildings) {
-		var building = buildings[i];
-		if (player.collides(building)) {
-			if (player.didOverlapVert(building) && !player.didOverlapHoriz(building)) {
-				for (var j in buildings) {
-					buildings[j].vx = 0;
+	for (var i in shelves) {
+		var shelf = shelves[i];
+		if (player.collides(shelf)) {
+			if (player.didOverlapVert(shelf) && !player.didOverlapHoriz(shelf)) {
+				for (var j in shelves) {
+					shelves[j].vx = 0;
 				}
 				bgv = 0;
-				player.x = building.x - player.width;
+				player.x = shelf.x - player.width;
 				return;
 			}
-			player.y = building.y - player.height;
+			player.y = shelf.y - player.height;
 			player.vy = 0;
 			onGround = true;
 		}
@@ -307,8 +307,8 @@ function draw(context) {
 		context.drawImage(bg, bgx + bg.width, 0);
 	}
 
-	for (var i in buildings) {
-		buildings[i].draw(context);
+	for (var i in shelves) {
+		shelves[i].draw(context);
 	}
 
 	player.draw(context);
