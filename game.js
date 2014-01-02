@@ -125,6 +125,35 @@ function get_shelf_width(items) {
 	}
 	return width;
 }
+function draw_tag_price(context, item, tagx, tagy) {
+	var price = item.price;
+	if (item.tag == 'tag3') {
+		context.fillStyle = '#ff0000';
+	} else {
+		context.fillStyle = '#333333';
+	}
+	context.font = "36px pixelade";
+	context.fillText(price, tagx + 70, tagy + 65);
+}
+function draw_shelf_item(context, item,	x, y) {
+	if (item.item == 'empty') {
+		return images.get('box1').width;
+	}
+	var img = images.get(item.item);
+	context.drawImage(img, x, y - img.height);
+
+	var tag = images.get(item.tag);
+	var tagx = x + ((img.width - tag.width) / 2);
+	var tagy = y + 10;
+	context.drawImage(tag, tagx, tagy);
+	draw_tag_price(context, item, tagx, tagy);
+
+	if (tag.width > img.width) {
+		return tag.width;
+	} else {
+		return img.width;
+	}
+}
 function draw_shelf_items(context, items, x, y) {
 	x += shelf.w1;
 	y += 5;
@@ -133,32 +162,9 @@ function draw_shelf_items(context, items, x, y) {
 			x += shelf_item_spacing;
 		}
 
-		var item = items[i].item;
-		if (item == 'empty') {
-			x += images.get('box1').width;
-			continue;
-		}
-		var img = images.get(item);
-		context.drawImage(img, x, y - img.height);
-
-		var tag = images.get(items[i].tag);
-		var tagx = x + ((img.width - tag.width) / 2);
-		context.drawImage(tag, tagx, y + 10);
-
-		var price = items[i].price;
-		if (items[i].tag == 'tag3') {
-			context.fillStyle = '#ff0000';
-		} else {
-			context.fillStyle = '#333333';
-		}
-		context.font = "36px pixelade";
-		context.fillText(price, tagx + 70, y + 75);
-
-		if (tag.width > img.width) {
-			x += tag.width;
-		} else {
-			x += img.width;
-		}
+		var item = items[i];
+		var width = draw_shelf_item(context, item, x, y);
+		x += width;
 	}
 }
 
