@@ -300,6 +300,13 @@ function simulation(timeDiffMillis) {
 	}
 }
 
+function shadowText(context, text, x, y) {
+	context.fillStyle = "#000000";
+	context.fillText(text, x + 3, y + 3);
+	context.fillStyle = "#00cc00";
+	context.fillText(text, x, y);
+}
+
 function draw(context) {
 	var bg = images.get('bg');
 	context.drawImage(bg, bgx, 0);
@@ -321,7 +328,7 @@ function draw(context) {
 	context.fillText("Max: " + dist, 300, 40);
 
 	if (state != "running") {
-		context.font = "36px pixelade";
-		context.fillText(stateMessages[state], 100, 200);
+		context.font = "100px pixelade";
+		shadowText(context, stateMessages[state], 100, 200);
 	}
 }
