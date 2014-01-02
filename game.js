@@ -167,6 +167,14 @@ function draw_shelf_items(context, items, x, y) {
 		x += width;
 	}
 }
+function draw_shelf(context, items, x, y, width) {
+	shelf.draw(context, x, y, width);
+	for (var r = 1; r < 4; r++) {
+		var y1 = y - (r * shelf_bkgd.img.height) + r;
+		shelf_bkgd.draw(context, x, y1, width);
+	}
+	draw_shelf_items(context, items, x, y);
+}
 
 function Shelf(x) {
 	var y = getRandomArbitrary(200, 400);
@@ -177,14 +185,10 @@ function Shelf(x) {
 }
 Shelf.prototype = Object.create(Entity.prototype);
 Shelf.prototype.draw = function(context) {
-	shelf.draw(context, this.x, this.y, this.width);
-	for (var y = this.y - shelf_bkgd.img.height + 1; y > -shelf_bkgd.img.height; y -= shelf_bkgd.img.height - 1) {
-		shelf_bkgd.draw(context, this.x, y, this.width);
-	}
-	for (var y = this.y + shelf.img.height - 1; y < canvas.height; y += shelf_bkgd.img.height - 1) {
-		shelf_bkgd.draw(context, this.x, y, this.width);
-	}
-	draw_shelf_items(context, this.items, this.x, this.y);
+	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
+	draw_shelf(context, this.items, this.x, this.y + height, this.width);
+	draw_shelf(context, this.items, this.x, this.y, this.width);
+	draw_shelf(context, this.items, this.x, this.y - height, this.width);
 };
 
 function deleteInvisibleShelves() {
