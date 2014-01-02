@@ -1,3 +1,5 @@
+var dbg = document.getElementById('debug');
+
 function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;
@@ -9,6 +11,9 @@ function Game(canvas, simulationFunc, drawFunc) {
 		}
 		var timeDiff = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
+
+		var fps = (1000 / timeDiff) |0;
+		dbg.innerHTML = fps + ' fps';
 
 		simulationFunc(timeDiff);
 		drawFunc(context);
