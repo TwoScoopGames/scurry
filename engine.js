@@ -1,5 +1,19 @@
 var dbg = document.getElementById('debug');
 
+function makeCanvas(width, height) {
+	var c = document.createElement('canvas');
+	c.width = width;
+	c.height = height;
+	return c;
+}
+
+function drawCanvas(width, height, drawFun) {
+	var canvas = makeCanvas(width, height);
+	var ctx = canvas.getContext('2d');
+	drawFun(ctx);
+	return canvas;
+}
+
 function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;

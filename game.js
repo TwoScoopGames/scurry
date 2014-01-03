@@ -178,17 +178,30 @@ function draw_shelf(context, items, x, y, width) {
 
 function Shelf(x) {
 	var y = getRandomArbitrary(200, 400);
-	this.items = get_shelf_items();
+	var items = get_shelf_items();
+	this.items = items;
 	var width = get_shelf_width(this.items);
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -70;
+
+	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
+	this.img = drawCanvas(width, height + 50, function(ctx) {
+		var y = 0;
+		for (var r = 0; r < 3; r++) {
+			shelf_bkgd.draw(ctx, 0, y, width);
+			y += shelf_bkgd.img.height - 1;
+		}
+		shelf.draw(ctx, 0, y, width);
+		draw_shelf_items(ctx, items, 0, y);
+	});
 }
 Shelf.prototype = Object.create(Entity.prototype);
 Shelf.prototype.draw = function(context) {
-	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
-	draw_shelf(context, this.items, this.x, this.y + height, this.width);
-	draw_shelf(context, this.items, this.x, this.y, this.width);
-	draw_shelf(context, this.items, this.x, this.y - height, this.width);
+	var spacing = (shelf_bkgd.img.height - 1) * 3;
+	var height = spacing + shelf.img.height - 1;
+	context.drawImage(this.img, this.x, this.y + height - spacing);
+	context.drawImage(this.img, this.x, this.y - spacing);
+	context.drawImage(this.img, this.x, this.y - height - spacing);
 };
 
 function deleteInvisibleShelves() {
