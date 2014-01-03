@@ -1,5 +1,14 @@
 var dbg = document.getElementById('debug');
 
+function time(f, iters) {
+	var start = window.performance.now();
+	for (var i = 0; i < iters; i++) {
+		f();
+	}
+	var stop = window.performance.now();
+	return stop - start;
+}
+
 function make_canvas(width, height) {
 	var c = document.createElement('canvas');
 	c.width = width;
