@@ -72,7 +72,6 @@ var shelf_tags = ['tag1', 'tag2', 'tag3'];
 var same_item_chance = 0.50;
 
 function rand_price() {
-
 	var price = (((Math.random() * 95) |0) + 5) * 10 + 9;
 	price = '' + price;
 	if (price.length == 2) {
@@ -185,7 +184,7 @@ function Shelf(x) {
 	this.vx = -70;
 
 	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
-	this.img = drawCanvas(width, height + 50, function(ctx) {
+	this.img = draw_canvas(width, height + 50, function(ctx) {
 		var y = 0;
 		for (var r = 0; r < 3; r++) {
 			shelf_bkgd.draw(ctx, 0, y, width);

@@ -1,14 +1,14 @@
 var dbg = document.getElementById('debug');
 
-function makeCanvas(width, height) {
+function make_canvas(width, height) {
 	var c = document.createElement('canvas');
 	c.width = width;
 	c.height = height;
 	return c;
 }
 
-function drawCanvas(width, height, drawFun) {
-	var canvas = makeCanvas(width, height);
+function draw_canvas(width, height, drawFun) {
+	var canvas = make_canvas(width, height);
 	var ctx = canvas.getContext('2d');
 	drawFun(ctx);
 	return canvas;
