@@ -50,7 +50,7 @@ var bgx = 0;
 
 var images = new ImageLoader();
 images.load('bg', 'images/Scurry-bg-TEST2.png');
-images.load('beetle', 'images/scurry-player-run 86x57 .png');
+images.load('beetle', 'images/scurry-run7f136x80.png');
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
 images.load('box1', 'images/box1.png');
@@ -78,7 +78,7 @@ var shelf;
 var shelf_bkgd;
 
 function assets_loaded() {
-	beetle = new SpriteSheet(images.get('beetle'), 5, 0.50);
+	beetle = new SpriteSheet(images.get('beetle'), 7, 0.30);
 	shelf = new ThreePatch(images.get('shelf'));
 	shelf_bkgd = new ThreePatch(images.get('shelf background'));
 	reset();
@@ -252,7 +252,7 @@ function reset() {
 	shelves = [];
 	distance = 0;
 	populateShelves();
-	player = new AnimatedEntity(50, 50, 56, 25, beetle, -17, -14);
+	player = new AnimatedEntity(50, 50, 120, 40, beetle, -17, -27);
 	player.y = shelves[0].y - player.height;
 	bgv = -30;
 	bgx = 0;
