@@ -1,4 +1,4 @@
-var dbg = document.getElementById('debug');
+// var dbg = document.getElementById('debug');
 
 function time(f, iters) {
 	var start = window.performance.now();
@@ -35,8 +35,8 @@ function Game(canvas, simulationFunc, drawFunc) {
 		var timeDiff = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
-		var fps = (1000 / timeDiff) |0;
-		dbg.innerHTML = fps + ' fps';
+		// var fps = (1000 / timeDiff) |0;
+		// dbg.innerHTML = fps + ' fps';
 
 		simulationFunc(timeDiff);
 		drawFunc(context);

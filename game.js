@@ -1,5 +1,25 @@
 var canvas = document.getElementById('game');
 
+function setCanvasSize() {
+	var ow = 1136;
+	var oh = 640;
+
+	var w = Math.min(window.innerWidth, ow);
+	var h = Math.min(window.innerHeight, oh);
+	canvas.style.width = w + 'px';
+	canvas.style.height = h + 'px';
+
+	canvas.width = oh / window.innerHeight * window.innerWidth;
+	canvas.height = oh;
+}
+window.onresize = setCanvasSize;
+setCanvasSize();
+
+// prevent springy scrolling on ios
+document.ontouchmove = function(e) {
+	e.preventDefault();
+};
+
 var game = new Game(canvas, simulation, draw);
 game.mapKeys({
 	27: "pause",
@@ -176,7 +196,7 @@ function draw_shelf(context, items, x, y, width) {
 }
 
 function Shelf(x) {
-	var y = getRandomArbitrary(200, 400);
+	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
 	var items = get_shelf_items();
 	this.items = items;
 	var width = get_shelf_width(this.items);

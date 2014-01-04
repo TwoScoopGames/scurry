@@ -2,9 +2,16 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	<title>Scurry</title>
 	<style type="text/css">
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
 		body {
 			background-color: black;
 			color: white;
@@ -13,11 +20,9 @@
 			text-align: center;
 		}
 		canvas {
-			border:5px solid blue;
-			margin-top: 30px;
-			margin-left: auto;
-			margin-right: auto;
 			display: block;
+			margin: 0 auto;
+			padding: 0;
 			-webkit-user-select: none;
 			-moz-user-select: none;
 			-ms-user-select: none;
@@ -31,10 +36,7 @@
 	</style>
 </head>
 <body>
-	<h1>Scurry</h1>
 	<canvas id="game" width="1136" height="640"></canvas>
-	<div id="debug"></div>
-
 	<script type="text/javascript" src="engine.js"></script>
 	<script type="text/javascript" src="game.js"></script>
 </body>
