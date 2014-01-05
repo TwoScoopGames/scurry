@@ -157,17 +157,31 @@ function ImageLoader() {
 	this.total_images = 0;
 	this.loaded_images = 0;
 }
-ImageLoader.prototype.load = function(name, path) {
+ImageLoader.prototype.load = function(name, path, num_frames) {
+	if (arguments.length == 2) {
+		num_frames = 1;
+	}
 	this.total_images++;
 
 	var img = new Image();
 	var that = this;
 	img.onload = function() {
 		that.loaded_images++;
+
+		if (num_frames == 1) {
+			that.images[name] = img;
+		} else {
+			var frame_width = img.width / num_frames;
+			for (var f = 0; f < num_frames; f++) {
+				var slice = draw_canvas(frame_width, img.height, function(ctx) {
+					var sx = f * frame_width
+					ctx.drawImage(img, sx, 0, frame_width, img.height, 0, 0, frame_width, img.height);
+				});
+				that.images[name + f] = slice;
+			}
+		}
 	};
 	img.src = path;
-
-	this.images[name] = img;
 };
 ImageLoader.prototype.all_loaded = function() {
 	return this.total_images == this.loaded_images;
@@ -176,27 +190,32 @@ ImageLoader.prototype.get = function(name) {
 	return this.images[name];
 };
 
-function SpriteSheet(image, numFrames, framesPerSec) {
-	this.img = image;
-	this.numFrames = numFrames;
-	this.frameWidth = this.img.width / this.numFrames;
+function Animation() {
+	this.frames = [];
 	this.frame = 0;
-	this.framesPerSec = framesPerSec;
 	this.elapsedSec = 0;
+	this.repeatAt = 0;
 }
-SpriteSheet.prototype.move = function(elapsedSec) {
-	this.elapsedSec += elapsedSec;
-	var advance = Math.floor(this.elapsedSec / this.framesPerSec);
-	if (advance == 0) {
-		return;
-	}
-	this.frame += advance;
-	this.frame %= this.numFrames;
-	this.elapsedSec -= advance * this.framesPerSec;
+Animation.prototype.add = function(img, time) {
+	this.frames.push({img: img, time: time});
 };
-SpriteSheet.prototype.draw = function(context, x, y) {
-	var sx = this.frame * this.frameWidth
-	context.drawImage(this.img, sx, 0, this.frameWidth, this.img.height, x, y, this.frameWidth, this.img.height);
+Animation.prototype.move = function(elapsedSec) {
+	this.elapsedSec += elapsedSec;
+	while (this.elapsedSec > this.frames[this.frame].time) {
+		this.elapsedSec -= this.frames[this.frame].time;
+		this.frame++;
+		if (this.frame >= this.frames.length) {
+			this.frame = this.repeatAt;
+		}
+	}
+};
+Animation.prototype.draw = function(context, x, y) {
+	var img = this.frames[this.frame].img;
+	context.drawImage(img, x, y);
+};
+Animation.prototype.reset = function() {
+	this.frame = 0;
+	this.elapsedSec = 0;
 };
 
 function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffsetY) {

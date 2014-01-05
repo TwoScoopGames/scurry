@@ -50,7 +50,8 @@ var bgx = 0;
 
 var images = new ImageLoader();
 images.load('bg', 'images/Scurry-bg-TEST2.png');
-images.load('beetle', 'images/scurry-run7f136x80.png');
+images.load('beetle', 'images/scurry-run7f136x80.png', 7);
+images.load('beetle-jump', 'images/scurry-jump-sprite-7f129x124.png', 7);
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
 images.load('box1', 'images/box1.png');
@@ -73,12 +74,30 @@ function wait_for_images_to_load() {
 }
 window.setTimeout(wait_for_images_to_load, 200);
 
-var beetle;
+var beetle = new Animation();
+var beetle_jump = new Animation();
 var shelf;
 var shelf_bkgd;
 
 function assets_loaded() {
-	beetle = new SpriteSheet(images.get('beetle'), 7, 0.30);
+	beetle.add(images.get('beetle0'), 0.3);
+	beetle.add(images.get('beetle1'), 0.3);
+	beetle.add(images.get('beetle2'), 0.3);
+	beetle.add(images.get('beetle3'), 0.3);
+	beetle.add(images.get('beetle4'), 0.3);
+	beetle.add(images.get('beetle5'), 0.3);
+	beetle.add(images.get('beetle6'), 0.3);
+
+	beetle_jump.add(images.get('beetle-jump0'), 0.5);
+	beetle_jump.add(images.get('beetle-jump1'), 0.5);
+	beetle_jump.add(images.get('beetle-jump2'), 0.5);
+	beetle_jump.add(images.get('beetle-jump3'), 0.5);
+	beetle_jump.add(images.get('beetle-jump4'), 0.5);
+	beetle_jump.add(images.get('beetle-jump5'), 0.5);
+	beetle_jump.add(images.get('beetle-jump6'), 0.5);
+	beetle_jump.add(images.get('beetle-jump5'), 0.5);
+	beetle_jump.repeatAt = 4;
+
 	shelf = new ThreePatch(images.get('shelf'));
 	shelf_bkgd = new ThreePatch(images.get('shelf background'));
 	reset();
@@ -321,8 +340,14 @@ function simulation(timeDiffMillis) {
 		}
 	}
 
+	if (onGround && player.sprite == beetle_jump) {
+		player.sprite = beetle;
+		beetle.reset();
+	}
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
+		player.sprite = beetle_jump;
+		beetle_jump.reset();
 	}
 
 	bgx += elapsedSec * bgv;
