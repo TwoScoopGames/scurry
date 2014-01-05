@@ -253,7 +253,7 @@ function populateShelves() {
 		var x = 0;
 		if (shelves.length > 0) {
 			var last = shelves[shelves.length - 1];
-			x = last.x + last.width + getRandomArbitrary(x + 100, x + 400);
+			x = last.x + last.width + getRandomArbitrary(x + 150, x + 400);
 		}
 		shelves.push(new Shelf(x));
 	}
