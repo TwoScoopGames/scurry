@@ -201,7 +201,7 @@ function Shelf(x) {
 	this.items = items;
 	var width = get_shelf_width(this.items);
 	Entity.call(this, x, y, width, canvas.height - y);
-	this.vx = -70;
+	this.vx = -100;
 
 	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
 	this.img = draw_canvas(width, height + 50, function(ctx) {
