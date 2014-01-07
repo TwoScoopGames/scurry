@@ -151,6 +151,9 @@ Entity.prototype.didOverlapHoriz = function(other) {
 Entity.prototype.didOverlapVert = function(other) {
 	return this.lasty + this.height > other.lasty && this.lasty < other.lasty + other.height;
 }
+Entity.prototype.wasAbove = function(other) {
+	return this.lasty + this.height <= other.lasty;
+}
 
 function ImageLoader() {
 	this.images = {};

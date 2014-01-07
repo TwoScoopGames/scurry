@@ -217,8 +217,7 @@ function draw_shelf(context, items, x, y, width) {
 function Shelf(x) {
 	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
 	var items = get_shelf_items();
-	this.items = items;
-	var width = get_shelf_width(this.items);
+	var width = get_shelf_width(items);
 	Entity.call(this, x, y, width, canvas.height - y);
 	this.vx = -100;
 
@@ -237,10 +236,15 @@ Shelf.prototype = Object.create(Entity.prototype);
 Shelf.prototype.draw = function(context) {
 	var spacing = (shelf_bkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
-	context.drawImage(this.img, this.x, this.y + height - spacing);
 	context.drawImage(this.img, this.x, this.y - spacing);
-	context.drawImage(this.img, this.x, this.y - height - spacing);
 };
+Shelf.prototype.copy = function(y) {
+	var s = new Shelf(this.x);
+	s.img = this.img;
+	s.width = this.width;
+	s.y = y;
+	return s;
+}
 
 function deleteInvisibleShelves() {
 	while (shelves.length > 0 && shelves[0].x + shelves[0].width < 0) {
@@ -255,7 +259,14 @@ function populateShelves() {
 			var last = shelves[shelves.length - 1];
 			x = last.x + last.width + getRandomArbitrary(x + 150, x + 400);
 		}
-		shelves.push(new Shelf(x));
+
+		var spacing = (shelf_bkgd.img.height - 1) * 3;
+		var height = spacing + shelf.img.height - 1;
+
+		var s = new Shelf(x);
+		shelves.push(s.copy(s.y + height));
+		shelves.push(s);
+		shelves.push(s.copy(s.y - height));
 	}
 }
 
@@ -271,8 +282,8 @@ function reset() {
 	shelves = [];
 	distance = 0;
 	populateShelves();
-	player = new AnimatedEntity(50, 50, 120, 40, beetle, -17, -27);
-	player.y = shelves[0].y - player.height;
+	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
+	player.y = shelves[1].y - player.height;
 	bgv = -30;
 	bgx = 0;
 }
@@ -326,17 +337,11 @@ function simulation(timeDiffMillis) {
 	for (var i in shelves) {
 		var shelf = shelves[i];
 		if (player.collides(shelf)) {
-			if (player.didOverlapVert(shelf) && !player.didOverlapHoriz(shelf)) {
-				for (var j in shelves) {
-					shelves[j].vx = 0;
-				}
-				bgv = 0;
-				player.x = shelf.x - player.width;
-				return;
+			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
+				player.y = shelf.y - player.height;
+				player.vy = 0;
+				onGround = true;
 			}
-			player.y = shelf.y - player.height;
-			player.vy = 0;
-			onGround = true;
 		}
 	}
 
