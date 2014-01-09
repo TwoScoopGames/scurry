@@ -122,8 +122,10 @@ function rand_price() {
 	}
 	return price[0] + '.' + price.substr(1);
 }
-function get_shelf_items(len) {
-	var num_units = Math.floor(Math.random() * 3 + 2);
+function get_shelf_items(num_units) {
+	if (arguments.length == 0) {
+		num_units = Math.floor(Math.random() * 3 + 2);
+	}
 	var items = [];
 	var possible_items = shelf_items.slice(0);
 	for (var i = 0; i < num_units; i++) {
@@ -139,7 +141,7 @@ function get_shelf_items(len) {
 			price: rand_price()
 		};
 		items.push(item);
-		if (item != 'empty') {
+		if (item.item != 'empty') {
 			possible_items.splice(n, 1);
 		}
 	}
@@ -220,7 +222,7 @@ function draw_shelf(context, items, x, y, width) {
 
 function Shelf(x) {
 	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
-	var items = get_shelf_items();
+	var items = x == 0 ? get_shelf_items(6) : get_shelf_items();
 	var width = get_shelf_width(items);
 	Entity.call(this, x, y, width, canvas.height - y);
 
