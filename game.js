@@ -361,6 +361,10 @@ function simulation(timeDiffMillis) {
 		beetle.reset();
 		sounds.play('land');
 	}
+	if (!onGround && player.sprite == beetle) {
+		player.sprite = beetle_jump;
+		beetle_jump.reset();
+	}
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
