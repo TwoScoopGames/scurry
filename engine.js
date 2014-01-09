@@ -200,6 +200,40 @@ ImageLoader.prototype.get = function(name) {
 	return this.images[name];
 };
 
+function SoundLoader() {
+	this.sounds = {};
+	this.total_sounds = 0;
+	this.loaded_sounds = 0;
+
+	window.AudioContext = window.AudioContext || window.webkitAudioContext;
+	this.context = new AudioContext();
+}
+SoundLoader.prototype.load = function(name, path) {
+	this.total_sounds++;
+	var that = this;
+
+	var request = new XMLHttpRequest();
+	request.open('GET', path, true);
+	request.responseType = 'arraybuffer';
+	request.onload = function() {
+		that.context.decodeAudioData(request.response, function(buffer) {
+			that.sounds[name] = buffer;
+			console.log("canplay " + path);
+			that.loaded_sounds++;
+		});
+	}
+	request.send();
+};
+SoundLoader.prototype.all_loaded = function() {
+	return this.total_sounds = this.loaded_sounds;
+};
+SoundLoader.prototype.play = function(name) {
+	var source = this.context.createBufferSource();
+	source.buffer = this.sounds[name];
+	source.connect(this.context.destination);
+	source.start(0);
+};
+
 function Animation() {
 	this.frames = [];
 	this.frame = 0;

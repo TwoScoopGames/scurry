@@ -64,15 +64,19 @@ images.load('tag1', 'images/price-tag1.png');
 images.load('tag2', 'images/price-tag2.png');
 images.load('tag3', 'images/price-tag-sale.png');
 
+var sounds = new SoundLoader();
+sounds.load('jump', 'audio/jump.wav');
+sounds.load('land', 'audio/land.wav');
+sounds.load('death', 'audio/death.wav');
 
-function wait_for_images_to_load() {
-	if (images.all_loaded()) {
+function wait_for_assets_to_load() {
+	if (images.all_loaded() && sounds.all_loaded()) {
 		assets_loaded();
 	} else {
-		window.setTimeout(wait_for_images_to_load, 200);
+		window.setTimeout(wait_for_assets_to_load, 200);
 	}
 }
-window.setTimeout(wait_for_images_to_load, 200);
+window.setTimeout(wait_for_assets_to_load, 200);
 
 var beetle = new Animation();
 var beetle_jump = new Animation();
@@ -334,6 +338,7 @@ function simulation(timeDiffMillis) {
 
 	if (player.y > canvas.height) {
 		state = "dead";
+		sounds.play('death');
 		return;
 	}
 
@@ -352,11 +357,13 @@ function simulation(timeDiffMillis) {
 	if (onGround && player.sprite == beetle_jump) {
 		player.sprite = beetle;
 		beetle.reset();
+		sounds.play('land');
 	}
 	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
+		sounds.play('jump');
 	}
 
 	bgx += elapsedSec * bgv;
