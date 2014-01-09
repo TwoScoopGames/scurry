@@ -218,7 +218,6 @@ SoundLoader.prototype.load = function(name, path) {
 	request.onload = function() {
 		that.context.decodeAudioData(request.response, function(buffer) {
 			that.sounds[name] = buffer;
-			console.log("canplay " + path);
 			that.loaded_sounds++;
 		});
 	}
