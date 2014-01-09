@@ -406,6 +406,14 @@ function draw(context) {
 	context.fillText(dist, game.camerax + 20, game.cameray + 40);
 	dist = Math.round(max_distance / player.width * 100) / 100;
 	context.fillText("Max: " + dist, game.camerax + 300, game.cameray + 40);
+
+	if (game.fps < 30) {
+		context.fillStyle = "#ff0000";
+	} else if (game.fps < 50) {
+		context.fillStyle = "#ffff00";
+	} else {
+		context.fillStyle = "#00ff00";
+	}
 	context.fillText(game.fps + " FPS", game.camerax + 20, game.cameray + 100);
 
 	if (state != "running") {
