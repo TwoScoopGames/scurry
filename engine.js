@@ -27,6 +27,10 @@ function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;
 	var running = false;
+	this.camerax = 0;
+	this.cameray = 0;
+	this.fps = 0;
+	var that = this;
 
 	function mainLoop(timestamp) {
 		if (lastTimestamp === -1) {
@@ -35,11 +39,14 @@ function Game(canvas, simulationFunc, drawFunc) {
 		var timeDiff = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
-		// var fps = (1000 / timeDiff) |0;
-		// dbg.innerHTML = fps + ' fps';
+		that.fps = (1000 / timeDiff) |0;
 
 		simulationFunc(timeDiff);
+
+		context.save();
+		context.translate(-that.camerax, -that.cameray);
 		drawFunc(context);
+		context.restore();
 
 		if (running) {
 			window.requestAnimationFrame(mainLoop);

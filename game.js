@@ -219,7 +219,6 @@ function Shelf(x) {
 	var items = get_shelf_items();
 	var width = get_shelf_width(items);
 	Entity.call(this, x, y, width, canvas.height - y);
-	this.vx = -100;
 
 	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
 	this.img = draw_canvas(width, height + 50, function(ctx) {
@@ -247,13 +246,13 @@ Shelf.prototype.copy = function(y) {
 }
 
 function deleteInvisibleShelves() {
-	while (shelves.length > 0 && shelves[0].x + shelves[0].width < 0) {
+	while (shelves.length > 0 && shelves[0].x + shelves[0].width < game.camerax) {
 		shelves.shift();
 	}
 }
 
 function populateShelves() {
-	while (shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < canvas.width) {
+	while (shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.camerax + canvas.width) {
 		var x = 0;
 		if (shelves.length > 0) {
 			var last = shelves[shelves.length - 1];
@@ -274,16 +273,17 @@ function moveShelves(elapsedSec) {
 	for (var i in shelves) {
 		shelves[i].move(elapsedSec);
 	}
-	deleteInvisibleShelves();
-	populateShelves();
 }
 
 function reset() {
 	shelves = [];
 	distance = 0;
+	game.camerax = 0;
 	populateShelves();
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
+	player.x = 200;
 	player.y = shelves[1].y - player.height;
+	player.vx = 100;
 	bgv = -30;
 	bgx = 0;
 }
@@ -311,7 +311,7 @@ function simulation(timeDiffMillis) {
 	}
 	var elapsedSec = timeDiffMillis / 100;
 
-	distance -= elapsedSec * shelves[0].vx;
+	distance += elapsedSec * player.vx;
 	if (distance > max_distance) {
 		max_distance = distance;
 	}
@@ -327,6 +327,10 @@ function simulation(timeDiffMillis) {
 	var gravityAccel = 50;
 	player.vy += elapsedSec * gravityAccel;
 	player.move(elapsedSec);
+	game.camerax = player.x - 200;
+
+	deleteInvisibleShelves();
+	populateShelves();
 
 	if (player.y > canvas.height) {
 		state = "dead";
@@ -371,9 +375,9 @@ function shadowText(context, text, x, y) {
 
 function draw(context) {
 	var bg = images.get('bg');
-	context.drawImage(bg, bgx, 0);
+	context.drawImage(bg, game.camerax + bgx, 0);
 	if (bgx + bg.width < canvas.width) {
-		context.drawImage(bg, bgx + bg.width, 0);
+		context.drawImage(bg, game.camerax + bgx + bg.width, 0);
 	}
 
 	for (var i in shelves) {
@@ -385,12 +389,13 @@ function draw(context) {
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
 	var dist = Math.round(distance / player.width * 100) / 100;
-	context.fillText(dist, 20, 40);
+	context.fillText(dist, game.camerax + 20, 40);
 	dist = Math.round(max_distance / player.width * 100) / 100;
-	context.fillText("Max: " + dist, 300, 40);
+	context.fillText("Max: " + dist, game.camerax + 300, 40);
+	context.fillText(game.fps + " FPS", game.camerax + 20, 100);
 
 	if (state != "running") {
 		context.font = "100px pixelade";
-		shadowText(context, stateMessages[state], 100, 200);
+		shadowText(context, stateMessages[state], game.camerax + 100, 200);
 	}
 }
