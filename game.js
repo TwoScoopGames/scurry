@@ -334,6 +334,7 @@ function simulation(timeDiffMillis) {
 	player.vy += elapsedSec * gravityAccel;
 	player.move(elapsedSec);
 	game.camerax = player.x - 200;
+	// game.cameray = player.y - (canvas.height / 2);
 
 	deleteInvisibleShelves();
 	populateShelves();
@@ -388,9 +389,9 @@ function shadowText(context, text, x, y) {
 
 function draw(context) {
 	var bg = images.get('bg');
-	context.drawImage(bg, game.camerax + bgx, 0);
+	context.drawImage(bg, game.camerax + bgx, game.cameray);
 	if (bgx + bg.width < canvas.width) {
-		context.drawImage(bg, game.camerax + bgx + bg.width, 0);
+		context.drawImage(bg, game.camerax + bgx + bg.width, game.cameray);
 	}
 
 	for (var i in shelves) {
@@ -402,13 +403,13 @@ function draw(context) {
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
 	var dist = Math.round(distance / player.width * 100) / 100;
-	context.fillText(dist, game.camerax + 20, 40);
+	context.fillText(dist, game.camerax + 20, game.cameray + 40);
 	dist = Math.round(max_distance / player.width * 100) / 100;
-	context.fillText("Max: " + dist, game.camerax + 300, 40);
-	context.fillText(game.fps + " FPS", game.camerax + 20, 100);
+	context.fillText("Max: " + dist, game.camerax + 300, game.cameray + 40);
+	context.fillText(game.fps + " FPS", game.camerax + 20, game.cameray + 100);
 
 	if (state != "running") {
 		context.font = "100px pixelade";
-		shadowText(context, stateMessages[state], game.camerax + 100, 200);
+		shadowText(context, stateMessages[state], game.camerax + 100, game.cameray + 200);
 	}
 }
