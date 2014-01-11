@@ -1,5 +1,3 @@
-// var dbg = document.getElementById('debug');
-
 function time(f, iters) {
 	var start = window.performance.now();
 	for (var i = 0; i < iters; i++) {
@@ -133,8 +131,8 @@ function Entity(x, y, width, height) {
 	this.height = height;
 	this.vx = 0;
 	this.vy = 0;
-	this.lastx = 0;
-	this.lasty = 0;
+	this.lastx = x;
+	this.lasty = y;
 }
 Entity.prototype.move = function(elapsedSec) {
 	this.lastx = this.x;
@@ -270,11 +268,23 @@ function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffset
 AnimatedEntity.prototype = Object.create(Entity.prototype);
 AnimatedEntity.prototype.move = function(elapsedSec) {
 	Entity.prototype.move.call(this, elapsedSec);
-	this.sprite.move(elapsedSec);
+	if (typeof this.sprite.move === 'function') {
+		this.sprite.move(elapsedSec);
+	}
 };
 AnimatedEntity.prototype.draw = function(context) {
-	this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
+	if (typeof this.sprite.draw === 'function') {
+		this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
+	} else {
+		context.drawImage(this.sprite, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
+	}
+	// draw bounding boxes
+	// context.strokeStyle = "#ff0000";
+	// context.strokeRect(this.x, this.y, this.width, this.height);
 };
+AnimatedEntity.prototype.copy = function() {
+	return new AnimatedEntity(this.x, this.y, this.width, this.height, this.sprite, this.spriteOffsetX, this.spriteOffsetY);
+}
 
 function get_context_with_image(image) {
 	var canvas = document.createElement("canvas");

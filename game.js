@@ -220,14 +220,14 @@ function draw_shelf(context, items, x, y, width) {
 	draw_shelf_items(context, items, x, y);
 }
 
-function Shelf(x) {
+function make_shelf(x) {
 	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
 	var items = x == 0 ? get_shelf_items(6) : get_shelf_items();
 	var width = get_shelf_width(items);
-	Entity.call(this, x, y, width, canvas.height - y);
 
-	var height = (shelf_bkgd.img.height - 1) * 3 + shelf.img.height - 1;
-	this.img = draw_canvas(width, height + 50, function(ctx) {
+	var spacing = (shelf_bkgd.img.height - 1) * 3;
+	var height = spacing + shelf.img.height - 1;
+	var img = draw_canvas(width, height + 50, function(ctx) {
 		var y = 0;
 		for (var r = 0; r < 3; r++) {
 			shelf_bkgd.draw(ctx, 0, y, width);
@@ -236,29 +236,21 @@ function Shelf(x) {
 		shelf.draw(ctx, 0, y, width);
 		draw_shelf_items(ctx, items, 0, y);
 	});
-}
-Shelf.prototype = Object.create(Entity.prototype);
-Shelf.prototype.draw = function(context) {
-	var spacing = (shelf_bkgd.img.height - 1) * 3;
-	var height = spacing + shelf.img.height - 1;
-	context.drawImage(this.img, this.x, this.y - spacing);
-};
-Shelf.prototype.copy = function(y) {
-	var s = new Shelf(this.x);
-	s.img = this.img;
-	s.width = this.width;
-	s.y = y;
-	return s;
+	return new AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
 }
 
-function deleteInvisibleShelves() {
-	while (shelves.length > 0 && shelves[0].x + shelves[0].width < game.camerax) {
+function delete_invisible_shelves() {
+	while (first_shelf_is_invisible()) {
 		shelves.shift();
 	}
 }
 
-function populateShelves() {
-	while (shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.camerax + canvas.width) {
+function first_shelf_is_invisible() {
+	return shelves.length > 0 && shelves[0].x + shelves[0].width < game.camerax;
+}
+
+function populate_shelves() {
+	while (need_shelves()) {
 		var x = 0;
 		if (shelves.length > 0) {
 			var last = shelves[shelves.length - 1];
@@ -268,14 +260,24 @@ function populateShelves() {
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
-		var s = new Shelf(x);
-		shelves.push(s.copy(s.y + height));
-		shelves.push(s);
-		shelves.push(s.copy(s.y - height));
+		var s2 = make_shelf(x);
+		var s3 = s2.copy();
+		s3.y += height;
+		shelves.push(s3);
+
+		shelves.push(s2);
+
+		var s1 = s2.copy();
+		s1.y -= height;
+		shelves.push(s1);
 	}
 }
 
-function moveShelves(elapsedSec) {
+function need_shelves() {
+	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.camerax + canvas.width;
+}
+
+function move_shelves(elapsedSec) {
 	for (var i in shelves) {
 		shelves[i].move(elapsedSec);
 	}
@@ -285,7 +287,7 @@ function reset() {
 	shelves = [];
 	distance = 0;
 	game.camerax = 0;
-	populateShelves();
+	populate_shelves();
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
 	player.y = shelves[1].y - player.height;
@@ -322,7 +324,7 @@ function simulation(timeDiffMillis) {
 		max_distance = distance;
 	}
 
-	moveShelves(elapsedSec);
+	move_shelves(elapsedSec);
 
 	if (game.keys["left"]) {
 		player.x -= elapsedSec * 70;
@@ -336,8 +338,8 @@ function simulation(timeDiffMillis) {
 	game.camerax = player.x - 200;
 	// game.cameray = player.y - (canvas.height / 2);
 
-	deleteInvisibleShelves();
-	populateShelves();
+	delete_invisible_shelves();
+	populate_shelves();
 
 	if (player.y > canvas.height) {
 		state = "dead";
@@ -380,7 +382,7 @@ function simulation(timeDiffMillis) {
 	}
 }
 
-function shadowText(context, text, x, y) {
+function shadow_text(context, text, x, y) {
 	context.fillStyle = "#000000";
 	context.fillText(text, x + 3, y + 3);
 	context.fillStyle = "#00cc00";
@@ -418,6 +420,6 @@ function draw(context) {
 
 	if (state != "running") {
 		context.font = "100px pixelade";
-		shadowText(context, stateMessages[state], game.camerax + 100, game.cameray + 200);
+		shadow_text(context, stateMessages[state], game.camerax + 100, game.cameray + 200);
 	}
 }
