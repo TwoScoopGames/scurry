@@ -37,6 +37,35 @@ game.mapKeys({
 	77: "m"
 });
 
+var ls = 36;
+var lrate = 0.02;
+var lmin = 36;
+var lmax = 46;
+var loading = new Game(canvas, function(elapsedSec) {
+	if (images.all_loaded() && sounds.all_loaded()) {
+		assets_loaded();
+		loading.stop();
+		game.start();
+		return;
+	}
+	ls += lrate * elapsedSec;
+	if (ls > lmax) {
+		lrate *= -1;
+		ls = lmax;
+	} else if (ls < lmin) {
+		lrate *= -1;
+		ls = lmin;
+	}
+}, function(context) {
+	context.fillStyle = "#000000";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	context.font = ls + "px mono";
+	context.fillStyle = "#00cc00";
+	context.fillText("Loading...", 100, (canvas.height / 2) - 18);
+});
+loading.start();
+
 function getRandomArbitrary(min, max) {
 	return Math.random() * (max - min) + min;
 }
@@ -76,15 +105,6 @@ sounds.load('jump', 'audio/jump.wav');
 sounds.load('land', 'audio/land.wav');
 sounds.load('death', 'audio/death.wav');
 
-function wait_for_assets_to_load() {
-	if (images.all_loaded() && sounds.all_loaded()) {
-		assets_loaded();
-	} else {
-		window.setTimeout(wait_for_assets_to_load, 200);
-	}
-}
-window.setTimeout(wait_for_assets_to_load, 200);
-
 var beetle = new Animation();
 var beetle_jump = new Animation();
 var shelf;
@@ -112,7 +132,6 @@ function assets_loaded() {
 	shelf = new ThreePatch(images.get('shelf'));
 	shelf_bkgd = new ThreePatch(images.get('shelf background'));
 	reset();
-	game.start();
 }
 
 var shelf_item_spacing = 30;
