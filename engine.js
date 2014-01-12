@@ -82,8 +82,13 @@ function Game(canvas, simulationFunc, drawFunc) {
 	}
 
 	var relMouseCoords = function(event) {
-		var x = event.x - canvas.offsetLeft + document.body.scrollLeft;
-		var y = event.y - canvas.offsetTop + document.body.scrollTop;
+		var x = event.pageX - canvas.offsetLeft + document.body.scrollLeft;
+		var y = event.pageY - canvas.offsetTop + document.body.scrollTop;
+
+		// scale based on ratio of canvas internal dimentions to css dimensions
+		x *= canvas.width / canvas.style.width.substring(0, canvas.style.width.indexOf('p'));
+		y *= canvas.height / canvas.style.height.substring(0, canvas.style.height.indexOf('p'));
+
 		return {x:x, y:y};
 	};
 
@@ -114,7 +119,7 @@ function Game(canvas, simulationFunc, drawFunc) {
 	};
 	canvas.addEventListener("touchstart", function(event) {
 		var touch = event.touches[0];
-		var m = relMouseCoords({x:touch.pageX, y:touch.pageY})
+		var m = relMouseCoords(touch)
 		mouse.x = m.x;
 		mouse.y = m.y;
 		mouse.buttons[0] = true;
@@ -202,6 +207,7 @@ function SoundLoader() {
 	this.sounds = {};
 	this.total_sounds = 0;
 	this.loaded_sounds = 0;
+	this.muted = false;
 
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 	this.context = new AudioContext();
@@ -225,6 +231,9 @@ SoundLoader.prototype.all_loaded = function() {
 	return this.total_sounds = this.loaded_sounds;
 };
 SoundLoader.prototype.play = function(name) {
+	if (this.muted) {
+		return;
+	}
 	var source = this.context.createBufferSource();
 	source.buffer = this.sounds[name];
 	source.connect(this.context.destination);

@@ -9,8 +9,12 @@ function setCanvasSize() {
 	canvas.style.width = w + 'px';
 	canvas.style.height = h + 'px';
 
-	canvas.width = oh / window.innerHeight * window.innerWidth;
-	canvas.height = oh;
+	if (w != ow || h != oh) {
+		canvas.width = oh / window.innerHeight * window.innerWidth;
+		canvas.height = oh;
+	}
+
+	// console.log(window.innerWidth + "x" + window.innerHeight + " - " + canvas.style.width + "x" + canvas.style.height + " - " + canvas.width + "x" + canvas.height);
 }
 window.onresize = setCanvasSize;
 setCanvasSize();
@@ -28,6 +32,7 @@ game.mapKeys({
 	38: "up",
 	39: "right",
 	40: "down",
+	77: "m"
 });
 
 function getRandomArbitrary(min, max) {
@@ -297,6 +302,14 @@ function reset() {
 }
 
 function simulation(timeDiffMillis) {
+	if (game.keys["m"]) {
+		sounds.muted = !sounds.muted;
+		game.keys["m"] = false;
+	}
+	if (game.mouse.buttons['0'] && game.mouse.x >= canvas.width - 80 && game.mouse.x < canvas.width - 40 && game.mouse.y >= 40 && game.mouse.y < 80) {
+		sounds.muted = !sounds.muted;
+		game.mouse.buttons['0'] = false;
+	}
 	if (game.keys["pause"]) {
 		game.keys["pause"] = false;
 		if (state === "paused") {
@@ -409,6 +422,13 @@ function draw(context) {
 	}
 
 	player.draw(context);
+
+	if (sounds.muted) {
+		context.fillStyle = "#ff0000";
+	} else {
+		context.fillStyle = "#0000ff";
+	}
+	context.fillRect(game.camerax + canvas.width - 80, game.cameray + 40, 40, 40);
 
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
