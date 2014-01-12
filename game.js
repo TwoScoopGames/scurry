@@ -318,14 +318,14 @@ function reset() {
 }
 
 function simulation(timeDiffMillis) {
-	if (keys.consume_pressed("m")) {
+	if (keys.consumePressed("m")) {
 		sounds.muted = !sounds.muted;
 	}
 	if (mouse.buttons[0] && mouse.x >= canvas.width - 80 && mouse.x < canvas.width - 40 && mouse.y >= 40 && mouse.y < 80) {
 		sounds.muted = !sounds.muted;
 		mouse.buttons[0] = false;
 	}
-	if (keys.consume_pressed("pause")) {
+	if (keys.consumePressed("pause")) {
 		if (state === "paused") {
 			state = "running";
 		} else if (state === "running") {
@@ -333,7 +333,7 @@ function simulation(timeDiffMillis) {
 		}
 	}
 	if (state === "paused" || state === "start" || state === "dead") {
-		if (keys.consume_pressed("space") || mouse.buttons[0]) {
+		if (keys.consumePressed("space") || mouse.buttons[0]) {
 			if (state === "dead") {
 				reset();
 			}
@@ -352,10 +352,10 @@ function simulation(timeDiffMillis) {
 
 	move_shelves(elapsedSec);
 
-	if (keys.is_pressed("left")) {
+	if (keys.isPressed("left")) {
 		player.x -= elapsedSec * 70;
 	}
-	if (keys.is_pressed("right")) {
+	if (keys.isPressed("right")) {
 		player.x += elapsedSec * 70;
 	}
 	var gravityAccel = 50;
@@ -402,7 +402,7 @@ function simulation(timeDiffMillis) {
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 	}
-	if ((keys.is_pressed("space") || mouse.buttons[0]) && onGround) {
+	if ((keys.isPressed("space") || mouse.buttons[0]) && onGround) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();

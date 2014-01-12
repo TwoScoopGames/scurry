@@ -83,11 +83,11 @@ function KeyboardInput(keyMap) {
 		}
 	}
 }
-KeyboardInput.prototype.is_pressed = function(name) {
+KeyboardInput.prototype.isPressed = function(name) {
 	return this.keys[name] == 1;
 };
-KeyboardInput.prototype.consume_pressed = function(name) {
-	var p = this.keys[name] == 1;
+KeyboardInput.prototype.consumePressed = function(name) {
+	var p = this.isPressed(name);
 	if (p) {
 		this.keys[name] = -1;
 	}
