@@ -19,11 +19,6 @@ function setCanvasSize() {
 window.onresize = setCanvasSize;
 setCanvasSize();
 
-// prevent springy scrolling on ios
-document.ontouchmove = function(e) {
-	e.preventDefault();
-};
-
 var keys = new KeyboardInput({
 	27: "pause",
 	32: "space",

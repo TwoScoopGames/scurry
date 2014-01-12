@@ -110,6 +110,12 @@ function MouseInput(canvas) {
 	this.y = 0;
 	this.buttons = [false, false, false];
 
+	// prevent springy scrolling on ios
+	document.ontouchmove = function(e) {
+		e.preventDefault();
+	};
+
+	// prevent right-click on desktop
 	window.oncontextmenu = function() {
 		return false;
 	};
