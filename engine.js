@@ -80,7 +80,9 @@ function Game(canvas, simulationFunc, drawFunc) {
 			}
 		}
 	}
+}
 
+function MouseInput(canvas) {
 	var relMouseCoords = function(event) {
 		var x = event.pageX - canvas.offsetLeft + document.body.scrollLeft;
 		var y = event.pageY - canvas.offsetTop + document.body.scrollTop;
@@ -92,40 +94,36 @@ function Game(canvas, simulationFunc, drawFunc) {
 		return {x:x, y:y};
 	};
 
-	var mouse = {
-		x: 0,
-		y: 0,
-		buttons: {
-			'0': false,
-			'1': false,
-			'2': false
-		}
-	};
+	this.x = 0;
+	this.y = 0;
+	this.buttons = [false, false, false];
+
 	window.oncontextmenu = function() {
 		return false;
 	};
-	this.mouse = mouse;
+
+	var that = this;
 	canvas.onmousedown = function(event) {
 		var m = relMouseCoords(event);
-		mouse.x = m.x;
-		mouse.y = m.y;
-		mouse.buttons[event.button] = true;
+		that.x = m.x;
+		that.y = m.y;
+		that.buttons[event.button] = true;
 	};
 	canvas.onmouseup = function(event) {
 		var m = relMouseCoords(event);
-		mouse.x = m.x;
-		mouse.y = m.y;
-		mouse.buttons[event.button] = false;
+		that.x = m.x;
+		that.y = m.y;
+		that.buttons[event.button] = false;
 	};
 	canvas.addEventListener("touchstart", function(event) {
 		var touch = event.touches[0];
 		var m = relMouseCoords(touch)
-		mouse.x = m.x;
-		mouse.y = m.y;
-		mouse.buttons[0] = true;
+		that.x = m.x;
+		that.y = m.y;
+		that.buttons[0] = true;
 	});
 	canvas.addEventListener("touchend", function(event) {
-		mouse.buttons[0] = false;
+		that.buttons[0] = false;
 	});
 }
 

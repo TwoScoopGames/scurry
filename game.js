@@ -24,6 +24,8 @@ document.ontouchmove = function(e) {
 	e.preventDefault();
 };
 
+var mouse = new MouseInput(canvas);
+
 var game = new Game(canvas, simulation, draw);
 game.mapKeys({
 	27: "pause",
@@ -306,9 +308,9 @@ function simulation(timeDiffMillis) {
 		sounds.muted = !sounds.muted;
 		game.keys["m"] = false;
 	}
-	if (game.mouse.buttons['0'] && game.mouse.x >= canvas.width - 80 && game.mouse.x < canvas.width - 40 && game.mouse.y >= 40 && game.mouse.y < 80) {
+	if (mouse.buttons[0] && mouse.x >= canvas.width - 80 && mouse.x < canvas.width - 40 && mouse.y >= 40 && mouse.y < 80) {
 		sounds.muted = !sounds.muted;
-		game.mouse.buttons['0'] = false;
+		mouse.buttons[0] = false;
 	}
 	if (game.keys["pause"]) {
 		game.keys["pause"] = false;
@@ -319,13 +321,13 @@ function simulation(timeDiffMillis) {
 		}
 	}
 	if (state === "paused" || state === "start" || state === "dead") {
-		if (game.keys["space"] || game.mouse.buttons['0']) {
+		if (game.keys["space"] || mouse.buttons[0]) {
 			if (state === "dead") {
 				reset();
 			}
 			state = "running";
 			game.keys["space"] = false;
-			game.mouse.buttons['0'] = false;
+			mouse.buttons[0] = false;
 		} else {
 			return;
 		}
@@ -389,7 +391,7 @@ function simulation(timeDiffMillis) {
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 	}
-	if ((game.keys["space"] || game.mouse.buttons['0']) && onGround) {
+	if ((game.keys["space"] || mouse.buttons[0]) && onGround) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
