@@ -24,10 +24,7 @@ document.ontouchmove = function(e) {
 	e.preventDefault();
 };
 
-var mouse = new MouseInput(canvas);
-
-var game = new Game(canvas, simulation, draw);
-game.mapKeys({
+var keys = new KeyboardInput({
 	27: "pause",
 	32: "space",
 	37: "left",
@@ -36,6 +33,9 @@ game.mapKeys({
 	40: "down",
 	77: "m"
 });
+var mouse = new MouseInput(canvas);
+
+var game = new Game(canvas, simulation, draw);
 
 var ls = 36;
 var lrate = 0.02;
@@ -323,16 +323,14 @@ function reset() {
 }
 
 function simulation(timeDiffMillis) {
-	if (game.keys["m"]) {
+	if (keys.consume_pressed("m")) {
 		sounds.muted = !sounds.muted;
-		game.keys["m"] = false;
 	}
 	if (mouse.buttons[0] && mouse.x >= canvas.width - 80 && mouse.x < canvas.width - 40 && mouse.y >= 40 && mouse.y < 80) {
 		sounds.muted = !sounds.muted;
 		mouse.buttons[0] = false;
 	}
-	if (game.keys["pause"]) {
-		game.keys["pause"] = false;
+	if (keys.consume_pressed("pause")) {
 		if (state === "paused") {
 			state = "running";
 		} else if (state === "running") {
@@ -340,12 +338,11 @@ function simulation(timeDiffMillis) {
 		}
 	}
 	if (state === "paused" || state === "start" || state === "dead") {
-		if (game.keys["space"] || mouse.buttons[0]) {
+		if (keys.consume_pressed("space") || mouse.buttons[0]) {
 			if (state === "dead") {
 				reset();
 			}
 			state = "running";
-			game.keys["space"] = false;
 			mouse.buttons[0] = false;
 		} else {
 			return;
@@ -360,10 +357,10 @@ function simulation(timeDiffMillis) {
 
 	move_shelves(elapsedSec);
 
-	if (game.keys["left"]) {
+	if (keys.is_pressed("left")) {
 		player.x -= elapsedSec * 70;
 	}
-	if (game.keys["right"]) {
+	if (keys.is_pressed("right")) {
 		player.x += elapsedSec * 70;
 	}
 	var gravityAccel = 50;
@@ -410,7 +407,7 @@ function simulation(timeDiffMillis) {
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 	}
-	if ((game.keys["space"] || mouse.buttons[0]) && onGround) {
+	if ((keys.is_pressed("space") || mouse.buttons[0]) && onGround) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();

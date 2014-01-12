@@ -59,28 +59,40 @@ function Game(canvas, simulationFunc, drawFunc) {
 	this.stop = function() {
 		running = false;
 	}
+}
 
+function KeyboardInput(keyMap) {
 	this.keys = {};
 
-	this.mapKeys = function(keyMap) {
-		var game = this;
-		for (var kc in keyMap) {
-			game.keys[keyMap[kc]] = false;
-		}
-		window.onkeydown = function(event) {
-			if (keyMap.hasOwnProperty(event.keyCode)) {
-				game.keys[keyMap[event.keyCode]] = true;
-				return false;
+	var that = this;
+	for (var kc in keyMap) {
+		this.keys[keyMap[kc]] = 0;
+	}
+	window.onkeydown = function(event) {
+		if (keyMap.hasOwnProperty(event.keyCode)) {
+			if (that.keys[keyMap[event.keyCode]] == 0) {
+				that.keys[keyMap[event.keyCode]] = 1;
 			}
+			return false;
 		}
-		window.onkeyup = function(event) {
-			if (keyMap.hasOwnProperty(event.keyCode)) {
-				game.keys[keyMap[event.keyCode]] = false;
-				return false;
-			}
+	}
+	window.onkeyup = function(event) {
+		if (keyMap.hasOwnProperty(event.keyCode)) {
+			that.keys[keyMap[event.keyCode]] = 0;
+			return false;
 		}
 	}
 }
+KeyboardInput.prototype.is_pressed = function(name) {
+	return this.keys[name] == 1;
+};
+KeyboardInput.prototype.consume_pressed = function(name) {
+	var p = this.keys[name] == 1;
+	if (p) {
+		this.keys[name] = -1;
+	}
+	return p;
+};
 
 function MouseInput(canvas) {
 	var relMouseCoords = function(event) {
