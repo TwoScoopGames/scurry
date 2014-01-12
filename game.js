@@ -337,6 +337,14 @@ function simulation(timeDiffMillis) {
 	player.move(elapsedSec);
 	game.camerax = player.x - 200;
 	// game.cameray = player.y - (canvas.height / 2);
+	var half_canvas_height = canvas.height / 2;
+	var bounds_from_center = 100;
+	if (player.y < game.cameray + half_canvas_height - bounds_from_center) {
+		game.cameray = player.y - half_canvas_height + bounds_from_center;
+	}
+	if (player.y + player.height > game.cameray + half_canvas_height + bounds_from_center) {
+		game.cameray = player.y + player.height - half_canvas_height - bounds_from_center;
+	}
 
 	delete_invisible_shelves();
 	populate_shelves();
