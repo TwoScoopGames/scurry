@@ -267,7 +267,7 @@ function delete_invisible_shelves() {
 }
 
 function first_shelf_is_invisible() {
-	return shelves.length > 0 && shelves[0].x + shelves[0].width < game.camerax;
+	return shelves.length > 0 && shelves[0].x + shelves[0].width < game.cameraX;
 }
 
 function populate_shelves() {
@@ -295,7 +295,7 @@ function populate_shelves() {
 }
 
 function need_shelves() {
-	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.camerax + canvas.width;
+	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.cameraX + canvas.width;
 }
 
 function move_shelves(elapsedSec) {
@@ -307,7 +307,7 @@ function move_shelves(elapsedSec) {
 function reset() {
 	shelves = [];
 	distance = 0;
-	game.camerax = 0;
+	game.cameraX = 0;
 	populate_shelves();
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
@@ -361,15 +361,15 @@ function simulation(timeDiffMillis) {
 	var gravityAccel = 50;
 	player.vy += elapsedSec * gravityAccel;
 	player.move(elapsedSec);
-	game.camerax = player.x - 200;
-	// game.cameray = player.y - (canvas.height / 2);
+	game.cameraX = player.x - 200;
+
 	var half_canvas_height = canvas.height / 2;
 	var bounds_from_center = 100;
-	if (player.y < game.cameray + half_canvas_height - bounds_from_center) {
-		game.cameray = player.y - half_canvas_height + bounds_from_center;
+	if (player.y < game.cameraY + half_canvas_height - bounds_from_center) {
+		game.cameraY = player.y - half_canvas_height + bounds_from_center;
 	}
-	if (player.y + player.height > game.cameray + half_canvas_height + bounds_from_center) {
-		game.cameray = player.y + player.height - half_canvas_height - bounds_from_center;
+	if (player.y + player.height > game.cameraY + half_canvas_height + bounds_from_center) {
+		game.cameraY = player.y + player.height - half_canvas_height - bounds_from_center;
 	}
 
 	delete_invisible_shelves();
@@ -425,9 +425,9 @@ function shadow_text(context, text, x, y) {
 
 function draw(context) {
 	var bg = images.get('bg');
-	context.drawImage(bg, game.camerax + bgx, game.cameray);
+	context.drawImage(bg, game.cameraX + bgx, game.cameraY);
 	if (bgx + bg.width < canvas.width) {
-		context.drawImage(bg, game.camerax + bgx + bg.width, game.cameray);
+		context.drawImage(bg, game.cameraX + bgx + bg.width, game.cameraY);
 	}
 
 	for (var i in shelves) {
@@ -441,14 +441,14 @@ function draw(context) {
 	} else {
 		context.fillStyle = "#0000ff";
 	}
-	context.fillRect(game.camerax + canvas.width - 80, game.cameray + 40, 40, 40);
+	context.fillRect(game.cameraX + canvas.width - 80, game.cameraY + 40, 40, 40);
 
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
 	var dist = Math.round(distance / player.width * 100) / 100;
-	context.fillText(dist, game.camerax + 20, game.cameray + 40);
+	context.fillText(dist, game.cameraX + 20, game.cameraY + 40);
 	dist = Math.round(max_distance / player.width * 100) / 100;
-	context.fillText("Max: " + dist, game.camerax + 300, game.cameray + 40);
+	context.fillText("Max: " + dist, game.cameraX + 300, game.cameraY + 40);
 
 	if (game.fps < 30) {
 		context.fillStyle = "#ff0000";
@@ -457,10 +457,10 @@ function draw(context) {
 	} else {
 		context.fillStyle = "#00ff00";
 	}
-	context.fillText(game.fps + " FPS", game.camerax + 20, game.cameray + 100);
+	context.fillText(game.fps + " FPS", game.cameraX + 20, game.cameraY + 100);
 
 	if (state != "running") {
 		context.font = "100px pixelade";
-		shadow_text(context, stateMessages[state], game.camerax + 100, game.cameray + 200);
+		shadow_text(context, stateMessages[state], game.cameraX + 100, game.cameraY + 200);
 	}
 }

@@ -25,8 +25,8 @@ function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;
 	var running = false;
-	this.camerax = 0;
-	this.cameray = 0;
+	this.cameraX = 0;
+	this.cameraY = 0;
 	this.fps = 0;
 	var that = this;
 
@@ -42,7 +42,7 @@ function Game(canvas, simulationFunc, drawFunc) {
 		simulationFunc(timeDiff);
 
 		context.save();
-		context.translate(-that.camerax, -that.cameray);
+		context.translate(-that.cameraX, -that.cameraY);
 		drawFunc(context);
 		context.restore();
 
