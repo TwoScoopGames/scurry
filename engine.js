@@ -7,15 +7,15 @@ function time(f, iters) {
 	return stop - start;
 }
 
-function make_canvas(width, height) {
+function makeCanvas(width, height) {
 	var c = document.createElement('canvas');
 	c.width = width;
 	c.height = height;
 	return c;
 }
 
-function draw_canvas(width, height, drawFun) {
-	var canvas = make_canvas(width, height);
+function drawCanvas(width, height, drawFun) {
+	var canvas = makeCanvas(width, height);
 	var ctx = canvas.getContext('2d');
 	drawFun(ctx);
 	return canvas;
@@ -202,7 +202,7 @@ ImageLoader.prototype.load = function(name, path, num_frames) {
 		} else {
 			var frame_width = img.width / num_frames;
 			for (var f = 0; f < num_frames; f++) {
-				var slice = draw_canvas(frame_width, img.height, function(ctx) {
+				var slice = drawCanvas(frame_width, img.height, function(ctx) {
 					var sx = f * frame_width
 					ctx.drawImage(img, sx, 0, frame_width, img.height, 0, 0, frame_width, img.height);
 				});

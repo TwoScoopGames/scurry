@@ -248,7 +248,7 @@ function make_shelf(x) {
 
 	var spacing = (shelf_bkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
-	var img = draw_canvas(width, height + 50, function(ctx) {
+	var img = drawCanvas(width, height + 50, function(ctx) {
 		var y = 0;
 		for (var r = 0; r < 3; r++) {
 			shelf_bkgd.draw(ctx, 0, y, width);
