@@ -35,13 +35,16 @@ var game = new Game(canvas, simulation, draw);
 var starting = false;
 var startTime = 0;
 var lightsOn = false;
+var beetleBlack;
 var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (starting) {
 		startTime += timeDiffMillis;
-		if (startTime > 807) {
+		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
+			beetleBlack = new AnimatedEntity(startScreen.cameraX, 420, 0, 0, beetle_black, 0, 0);
+			beetleBlack.vx = 140;
 		}
-		if (startTime > 4000) {
+		if (startTime > 2300) {
 			startScreen.stop();
 			reset();
 			game.start();
@@ -55,6 +58,9 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	}
 	var elapsedSec = timeDiffMillis / 100;
 	move_shelves(elapsedSec);
+	if (beetleBlack) {
+		beetleBlack.move(elapsedSec);
+	}
 	startScreen.cameraX += 20 * elapsedSec;
 	delete_invisible_shelves(startScreen.cameraX);
 	populate_shelves(startScreen.cameraX);
@@ -84,9 +90,11 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		logo = images.get("logo-white");
 	}
 	context.fillRect(startScreen.cameraX, startScreen.cameraY, canvas.width, canvas.height);
-
 	context.drawImage(logo, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
 
+	if (lightsOn) {
+		beetleBlack.draw(context);
+	}
 	if (!starting) {
 		context.fillStyle = "#ffffff";
 		context.font = "48px pixelade";
@@ -144,6 +152,7 @@ var bgx = 0;
 var images = new ImageLoader();
 images.load('bg', 'images/Scurry-bg-TEST2.png');
 images.load('beetle', 'images/scurry-run7f136x80.png', 7);
+images.load('beetle-black', 'images/scurry-run7f45x26.png', 7);
 images.load('beetle-jump', 'images/scurry-jump-sprite-7f129x124.png', 7);
 images.load('shelf', 'images/shelf.png');
 images.load('shelf background', 'images/shelf-bars-spritesheet.png');
@@ -166,6 +175,7 @@ sounds.load('death', 'audio/death.wav');
 sounds.load('lights-on', 'audio/lights-on.wav');
 
 var beetle = new Animation();
+var beetle_black = new Animation();
 var beetle_jump = new Animation();
 var shelf;
 var shelf_bkgd;
@@ -178,6 +188,14 @@ function assetsLoaded() {
 	beetle.add(images.get('beetle4'), 0.3);
 	beetle.add(images.get('beetle5'), 0.3);
 	beetle.add(images.get('beetle6'), 0.3);
+
+	beetle_black.add(images.get('beetle-black0'), 0.3);
+	beetle_black.add(images.get('beetle-black1'), 0.3);
+	beetle_black.add(images.get('beetle-black2'), 0.3);
+	beetle_black.add(images.get('beetle-black3'), 0.3);
+	beetle_black.add(images.get('beetle-black4'), 0.3);
+	beetle_black.add(images.get('beetle-black5'), 0.3);
+	beetle_black.add(images.get('beetle-black6'), 0.3);
 
 	beetle_jump.add(images.get('beetle-jump0'), 0.5);
 	beetle_jump.add(images.get('beetle-jump1'), 0.5);
