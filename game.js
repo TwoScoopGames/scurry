@@ -32,6 +32,70 @@ var mouse = new MouseInput(canvas);
 
 var game = new Game(canvas, simulation, draw);
 
+var starting = false;
+var startTime = 0;
+var lightsOn = false;
+var startScreen = new Game(canvas, function(timeDiffMillis) {
+	if (starting) {
+		startTime += timeDiffMillis;
+		if (startTime > 807) {
+			lightsOn = true;
+		}
+		if (startTime > 5000) {
+			startScreen.stop();
+			reset();
+			game.start();
+			return;
+		}
+	}
+	if (!starting && (keys.consumePressed("space") || mouse.buttons[0])) {
+		starting = true;
+		mouse.buttons[0] = false;
+		sounds.play('lights-on');
+	}
+	var elapsedSec = timeDiffMillis / 100;
+	move_shelves(elapsedSec);
+	startScreen.cameraX += 20 * elapsedSec;
+	delete_invisible_shelves(startScreen.cameraX);
+	populate_shelves(startScreen.cameraX);
+
+	bgx += elapsedSec * -5;
+	var bg = images.get('bg');
+	if (bgx + bg.width < 0) {
+		bgx += bg.width;
+	}
+}, function(context) {
+	var bg = images.get('bg');
+	context.drawImage(bg, startScreen.cameraX + bgx, startScreen.cameraY);
+	if (bgx + bg.width < canvas.width) {
+		context.drawImage(bg, startScreen.cameraX + bgx + bg.width, startScreen.cameraY);
+	}
+
+	for (var i in shelves) {
+		shelves[i].draw(context);
+	}
+
+	var logo;
+	if (lightsOn) {
+		context.fillStyle = "rgba(255, 255, 255, 0.7)";
+		logo = images.get("logo-black");
+	} else {
+		context.fillStyle = "rgba(0, 0, 0, 0.7)";
+		logo = images.get("logo-white");
+	}
+	context.fillRect(startScreen.cameraX, startScreen.cameraY, canvas.width, canvas.height);
+
+	context.drawImage(logo, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
+
+	if (lightsOn) {
+		context.fillStyle = "#000000";
+	} else {
+		context.fillStyle = "#ffffff";
+	}
+	context.font = "48px pixelade";
+	context.fillText("TAP TO START", startScreen.cameraX + 450, startScreen.cameraY + 450);
+});
+
 var ls = 36;
 var lrate = 0.02;
 var lmin = 36;
@@ -40,7 +104,7 @@ var loading = new Game(canvas, function(elapsedSec) {
 	if (images.allLoaded() && sounds.allLoaded()) {
 		assetsLoaded();
 		loading.stop();
-		game.start();
+		startScreen.start();
 		return;
 	}
 	ls += lrate * elapsedSec;
@@ -94,11 +158,14 @@ images.load('syrup', 'images/syrup.png');
 images.load('tag1', 'images/price-tag1.png');
 images.load('tag2', 'images/price-tag2.png');
 images.load('tag3', 'images/price-tag-sale.png');
+images.load('logo-white', 'images/logo-white.png');
+images.load('logo-black', 'images/logo-black.png');
 
 var sounds = new SoundLoader();
 sounds.load('jump', 'audio/jump.wav');
 sounds.load('land', 'audio/land.wav');
 sounds.load('death', 'audio/death.wav');
+sounds.load('lights-on', 'audio/lights-on.wav');
 
 var beetle = new Animation();
 var beetle_jump = new Animation();
@@ -260,18 +327,18 @@ function make_shelf(x) {
 	return new AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
 }
 
-function delete_invisible_shelves() {
+function delete_invisible_shelves(cameraX) {
 	while (first_shelf_is_invisible()) {
 		shelves.shift();
 	}
 }
 
-function first_shelf_is_invisible() {
-	return shelves.length > 0 && shelves[0].x + shelves[0].width < game.cameraX;
+function first_shelf_is_invisible(cameraX) {
+	return shelves.length > 0 && shelves[0].x + shelves[0].width < cameraX;
 }
 
-function populate_shelves() {
-	while (need_shelves()) {
+function populate_shelves(cameraX) {
+	while (need_shelves(cameraX)) {
 		var x = 0;
 		if (shelves.length > 0) {
 			var last = shelves[shelves.length - 1];
@@ -294,8 +361,8 @@ function populate_shelves() {
 	}
 }
 
-function need_shelves() {
-	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < game.cameraX + canvas.width;
+function need_shelves(cameraX) {
+	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
 }
 
 function move_shelves(elapsedSec) {
@@ -308,7 +375,7 @@ function reset() {
 	shelves = [];
 	distance = 0;
 	game.cameraX = 0;
-	populate_shelves();
+	populate_shelves(0);
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
 	player.y = shelves[1].y - player.height;
@@ -372,8 +439,8 @@ function simulation(timeDiffMillis) {
 		game.cameraY = player.y + player.height - half_canvas_height - bounds_from_center;
 	}
 
-	delete_invisible_shelves();
-	populate_shelves();
+	delete_invisible_shelves(game.cameraX);
+	populate_shelves(game.cameraX);
 
 	if (player.y > canvas.height) {
 		state = "dead";
