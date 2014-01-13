@@ -37,8 +37,8 @@ var lrate = 0.02;
 var lmin = 36;
 var lmax = 46;
 var loading = new Game(canvas, function(elapsedSec) {
-	if (images.all_loaded() && sounds.all_loaded()) {
-		assets_loaded();
+	if (images.allLoaded() && sounds.allLoaded()) {
+		assetsLoaded();
 		loading.stop();
 		game.start();
 		return;
@@ -105,7 +105,7 @@ var beetle_jump = new Animation();
 var shelf;
 var shelf_bkgd;
 
-function assets_loaded() {
+function assetsLoaded() {
 	beetle.add(images.get('beetle0'), 0.3);
 	beetle.add(images.get('beetle1'), 0.3);
 	beetle.add(images.get('beetle2'), 0.3);

@@ -152,12 +152,12 @@ function Entity(x, y, width, height) {
 	this.height = height;
 	this.vx = 0;
 	this.vy = 0;
-	this.lastx = x;
-	this.lasty = y;
+	this.lastX = x;
+	this.lastY = y;
 }
 Entity.prototype.move = function(elapsedSec) {
-	this.lastx = this.x;
-	this.lasty = this.y;
+	this.lastX = this.x;
+	this.lastY = this.y;
 	this.x += elapsedSec * this.vx;
 	this.y += elapsedSec * this.vy;
 }
@@ -172,39 +172,39 @@ Entity.prototype.collides = function(other) {
 }
 
 Entity.prototype.didOverlapHoriz = function(other) {
-	return this.lastx + this.width > other.lastx && this.lastx < other.lastx + other.width;
+	return this.lastX + this.width > other.lastX && this.lastX < other.lastX + other.width;
 }
 Entity.prototype.didOverlapVert = function(other) {
-	return this.lasty + this.height > other.lasty && this.lasty < other.lasty + other.height;
+	return this.lastY + this.height > other.lastY && this.lastY < other.lastY + other.height;
 }
 Entity.prototype.wasAbove = function(other) {
-	return this.lasty + this.height <= other.lasty;
+	return this.lastY + this.height <= other.lastY;
 }
 
 function ImageLoader() {
 	this.images = {};
-	this.total_images = 0;
-	this.loaded_images = 0;
+	this.totalImages = 0;
+	this.loadedImages = 0;
 }
-ImageLoader.prototype.load = function(name, path, num_frames) {
+ImageLoader.prototype.load = function(name, path, numFrames) {
 	if (arguments.length == 2) {
-		num_frames = 1;
+		numFrames = 1;
 	}
-	this.total_images++;
+	this.totalImages++;
 
 	var img = new Image();
 	var that = this;
 	img.onload = function() {
-		that.loaded_images++;
+		that.loadedImages++;
 
-		if (num_frames == 1) {
+		if (numFrames == 1) {
 			that.images[name] = img;
 		} else {
-			var frame_width = img.width / num_frames;
-			for (var f = 0; f < num_frames; f++) {
-				var slice = drawCanvas(frame_width, img.height, function(ctx) {
-					var sx = f * frame_width
-					ctx.drawImage(img, sx, 0, frame_width, img.height, 0, 0, frame_width, img.height);
+			var frameWidth = img.width / numFrames;
+			for (var f = 0; f < numFrames; f++) {
+				var slice = drawCanvas(frameWidth, img.height, function(ctx) {
+					var sx = f * frameWidth
+					ctx.drawImage(img, sx, 0, frameWidth, img.height, 0, 0, frameWidth, img.height);
 				});
 				that.images[name + f] = slice;
 			}
@@ -212,8 +212,8 @@ ImageLoader.prototype.load = function(name, path, num_frames) {
 	};
 	img.src = path;
 };
-ImageLoader.prototype.all_loaded = function() {
-	return this.total_images == this.loaded_images;
+ImageLoader.prototype.allLoaded = function() {
+	return this.totalImages == this.loadedImages;
 };
 ImageLoader.prototype.get = function(name) {
 	return this.images[name];
@@ -221,15 +221,15 @@ ImageLoader.prototype.get = function(name) {
 
 function SoundLoader() {
 	this.sounds = {};
-	this.total_sounds = 0;
-	this.loaded_sounds = 0;
+	this.totalSounds = 0;
+	this.loadedSounds = 0;
 	this.muted = false;
 
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
 	this.context = new AudioContext();
 }
 SoundLoader.prototype.load = function(name, path) {
-	this.total_sounds++;
+	this.totalSounds++;
 	var that = this;
 
 	var request = new XMLHttpRequest();
@@ -238,13 +238,13 @@ SoundLoader.prototype.load = function(name, path) {
 	request.onload = function() {
 		that.context.decodeAudioData(request.response, function(buffer) {
 			that.sounds[name] = buffer;
-			that.loaded_sounds++;
+			that.loadedSounds++;
 		});
 	}
 	request.send();
 };
-SoundLoader.prototype.all_loaded = function() {
-	return this.total_sounds = this.loaded_sounds;
+SoundLoader.prototype.allLoaded = function() {
+	return this.totalSounds = this.loadedSounds;
 };
 SoundLoader.prototype.play = function(name) {
 	if (this.muted) {
