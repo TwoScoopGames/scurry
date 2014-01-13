@@ -41,7 +41,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		if (startTime > 807) {
 			lightsOn = true;
 		}
-		if (startTime > 5000) {
+		if (startTime > 4000) {
 			startScreen.stop();
 			reset();
 			game.start();
@@ -87,13 +87,11 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 
 	context.drawImage(logo, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
 
-	if (lightsOn) {
-		context.fillStyle = "#000000";
-	} else {
+	if (!starting) {
 		context.fillStyle = "#ffffff";
+		context.font = "48px pixelade";
+		context.fillText("TAP TO START", startScreen.cameraX + 450, startScreen.cameraY + 450);
 	}
-	context.font = "48px pixelade";
-	context.fillText("TAP TO START", startScreen.cameraX + 450, startScreen.cameraY + 450);
 });
 
 var ls = 36;
