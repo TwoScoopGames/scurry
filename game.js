@@ -1,4 +1,4 @@
-var canvas = document.getElementById('game');
+var canvas = document.getElementById("game");
 
 function setCanvasSize() {
 	var ow = 1136;
@@ -6,8 +6,8 @@ function setCanvasSize() {
 
 	var w = Math.min(window.innerWidth, ow);
 	var h = Math.min(window.innerHeight, oh);
-	canvas.style.width = w + 'px';
-	canvas.style.height = h + 'px';
+	canvas.style.width = w + "px";
+	canvas.style.height = h + "px";
 
 	if (w != ow || h != oh) {
 		canvas.width = oh / window.innerHeight * window.innerWidth;
@@ -54,7 +54,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (!starting && (keys.consumePressed("space") || mouse.buttons[0])) {
 		starting = true;
 		mouse.buttons[0] = false;
-		sounds.play('lights-on');
+		sounds.play("lights-on");
 	}
 	var elapsedSec = timeDiffMillis / 100;
 	move_shelves(elapsedSec);
@@ -66,7 +66,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	populate_shelves(startScreen.cameraX);
 
 	bgx += elapsedSec * -5;
-	var bg = images.get('bg');
+	var bg = images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
@@ -74,7 +74,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	logo_white.move(elapsedSec);
 	logo_black.move(elapsedSec);
 }, function(context) {
-	var bg = images.get('bg');
+	var bg = images.get("bg");
 	context.drawImage(bg, startScreen.cameraX + bgx, startScreen.cameraY);
 	if (bgx + bg.width < canvas.width) {
 		context.drawImage(bg, startScreen.cameraX + bgx + bg.width, startScreen.cameraY);
@@ -164,29 +164,29 @@ var bgv = -30;
 var bgx = 0;
 
 var images = new ImageLoader();
-images.load('bg', 'images/Scurry-bg-TEST2.png');
-images.load('beetle', 'images/scurry-run7f136x80.png', 7);
-images.load('beetle-black', 'images/scurry-run7f45x26.png', 7);
-images.load('beetle-jump', 'images/scurry-jump-sprite-7f129x124.png', 7);
-images.load('shelf', 'images/shelf.png');
-images.load('shelf background', 'images/shelf-bars-spritesheet.png');
-images.load('box1', 'images/box1.png');
-images.load('box2', 'images/box2.png');
-images.load('box3', 'images/box3.png');
-images.load('can1', 'images/can1.png');
-images.load('can2', 'images/can2.png');
-images.load('syrup', 'images/syrup.png');
-images.load('tag1', 'images/price-tag1.png');
-images.load('tag2', 'images/price-tag2.png');
-images.load('tag3', 'images/price-tag-sale.png');
-images.load('logo-white', 'images/scurry-logo-white-10f686x399.png', 10);
-images.load('logo-black', 'images/scurry-logo-black-10f686x399.png', 10);
+images.load("bg", "images/Scurry-bg-TEST2.png");
+images.load("beetle", "images/scurry-run7f136x80.png", 7);
+images.load("beetle-black", "images/scurry-run7f45x26.png", 7);
+images.load("beetle-jump", "images/scurry-jump-sprite-7f129x124.png", 7);
+images.load("shelf", "images/shelf.png");
+images.load("shelf background", "images/shelf-bars-spritesheet.png");
+images.load("box1", "images/box1.png");
+images.load("box2", "images/box2.png");
+images.load("box3", "images/box3.png");
+images.load("can1", "images/can1.png");
+images.load("can2", "images/can2.png");
+images.load("syrup", "images/syrup.png");
+images.load("tag1", "images/price-tag1.png");
+images.load("tag2", "images/price-tag2.png");
+images.load("tag3", "images/price-tag-sale.png");
+images.load("logo-white", "images/scurry-logo-white-10f686x399.png", 10);
+images.load("logo-black", "images/scurry-logo-black-10f686x399.png", 10);
 
 var sounds = new SoundLoader();
-sounds.load('jump', 'audio/jump.wav');
-sounds.load('land', 'audio/land.wav');
-sounds.load('death', 'audio/death.wav');
-sounds.load('lights-on', 'audio/lights-on.wav');
+sounds.load("jump", "audio/jump.wav");
+sounds.load("land", "audio/land.wav");
+sounds.load("death", "audio/death.wav");
+sounds.load("lights-on", "audio/lights-on.wav");
 
 var beetle = new Animation();
 var beetle_black = new Animation();
@@ -197,72 +197,72 @@ var logo_white = new Animation();
 var logo_black = new Animation();
 
 function assetsLoaded() {
-	beetle.add(images.get('beetle0'), 0.3);
-	beetle.add(images.get('beetle1'), 0.3);
-	beetle.add(images.get('beetle2'), 0.3);
-	beetle.add(images.get('beetle3'), 0.3);
-	beetle.add(images.get('beetle4'), 0.3);
-	beetle.add(images.get('beetle5'), 0.3);
-	beetle.add(images.get('beetle6'), 0.3);
+	beetle.add(images.get("beetle0"), 0.3);
+	beetle.add(images.get("beetle1"), 0.3);
+	beetle.add(images.get("beetle2"), 0.3);
+	beetle.add(images.get("beetle3"), 0.3);
+	beetle.add(images.get("beetle4"), 0.3);
+	beetle.add(images.get("beetle5"), 0.3);
+	beetle.add(images.get("beetle6"), 0.3);
 
-	beetle_black.add(images.get('beetle-black0'), 0.3);
-	beetle_black.add(images.get('beetle-black1'), 0.3);
-	beetle_black.add(images.get('beetle-black2'), 0.3);
-	beetle_black.add(images.get('beetle-black3'), 0.3);
-	beetle_black.add(images.get('beetle-black4'), 0.3);
-	beetle_black.add(images.get('beetle-black5'), 0.3);
-	beetle_black.add(images.get('beetle-black6'), 0.3);
+	beetle_black.add(images.get("beetle-black0"), 0.3);
+	beetle_black.add(images.get("beetle-black1"), 0.3);
+	beetle_black.add(images.get("beetle-black2"), 0.3);
+	beetle_black.add(images.get("beetle-black3"), 0.3);
+	beetle_black.add(images.get("beetle-black4"), 0.3);
+	beetle_black.add(images.get("beetle-black5"), 0.3);
+	beetle_black.add(images.get("beetle-black6"), 0.3);
 
-	beetle_jump.add(images.get('beetle-jump0'), 0.5);
-	beetle_jump.add(images.get('beetle-jump1'), 0.5);
-	beetle_jump.add(images.get('beetle-jump2'), 0.5);
-	beetle_jump.add(images.get('beetle-jump3'), 0.5);
-	beetle_jump.add(images.get('beetle-jump4'), 0.5);
-	beetle_jump.add(images.get('beetle-jump5'), 0.5);
-	beetle_jump.add(images.get('beetle-jump6'), 0.5);
-	beetle_jump.add(images.get('beetle-jump5'), 0.5);
+	beetle_jump.add(images.get("beetle-jump0"), 0.5);
+	beetle_jump.add(images.get("beetle-jump1"), 0.5);
+	beetle_jump.add(images.get("beetle-jump2"), 0.5);
+	beetle_jump.add(images.get("beetle-jump3"), 0.5);
+	beetle_jump.add(images.get("beetle-jump4"), 0.5);
+	beetle_jump.add(images.get("beetle-jump5"), 0.5);
+	beetle_jump.add(images.get("beetle-jump6"), 0.5);
+	beetle_jump.add(images.get("beetle-jump5"), 0.5);
 	beetle_jump.repeatAt = 4;
 
-	logo_white.add(images.get('logo-white0'), 1.0);
-	logo_white.add(images.get('logo-white1'), 1.0);
-	logo_white.add(images.get('logo-white2'), 1.0);
-	logo_white.add(images.get('logo-white3'), 1.0);
-	logo_white.add(images.get('logo-white4'), 1.0);
-	logo_white.add(images.get('logo-white5'), 1.0);
-	logo_white.add(images.get('logo-white6'), 1.0);
-	logo_white.add(images.get('logo-white7'), 1.0);
-	logo_white.add(images.get('logo-white8'), 1.0);
-	logo_white.add(images.get('logo-white9'), 1.0);
+	logo_white.add(images.get("logo-white0"), 1.0);
+	logo_white.add(images.get("logo-white1"), 1.0);
+	logo_white.add(images.get("logo-white2"), 1.0);
+	logo_white.add(images.get("logo-white3"), 1.0);
+	logo_white.add(images.get("logo-white4"), 1.0);
+	logo_white.add(images.get("logo-white5"), 1.0);
+	logo_white.add(images.get("logo-white6"), 1.0);
+	logo_white.add(images.get("logo-white7"), 1.0);
+	logo_white.add(images.get("logo-white8"), 1.0);
+	logo_white.add(images.get("logo-white9"), 1.0);
 
-	logo_black.add(images.get('logo-black0'), 1.0);
-	logo_black.add(images.get('logo-black1'), 1.0);
-	logo_black.add(images.get('logo-black2'), 1.0);
-	logo_black.add(images.get('logo-black3'), 1.0);
-	logo_black.add(images.get('logo-black4'), 1.0);
-	logo_black.add(images.get('logo-black5'), 1.0);
-	logo_black.add(images.get('logo-black6'), 1.0);
-	logo_black.add(images.get('logo-black7'), 1.0);
-	logo_black.add(images.get('logo-black8'), 1.0);
-	logo_black.add(images.get('logo-black9'), 1.0);
+	logo_black.add(images.get("logo-black0"), 1.0);
+	logo_black.add(images.get("logo-black1"), 1.0);
+	logo_black.add(images.get("logo-black2"), 1.0);
+	logo_black.add(images.get("logo-black3"), 1.0);
+	logo_black.add(images.get("logo-black4"), 1.0);
+	logo_black.add(images.get("logo-black5"), 1.0);
+	logo_black.add(images.get("logo-black6"), 1.0);
+	logo_black.add(images.get("logo-black7"), 1.0);
+	logo_black.add(images.get("logo-black8"), 1.0);
+	logo_black.add(images.get("logo-black9"), 1.0);
 
-	shelf = new ThreePatch(images.get('shelf'));
-	shelf_bkgd = new ThreePatch(images.get('shelf background'));
+	shelf = new ThreePatch(images.get("shelf"));
+	shelf_bkgd = new ThreePatch(images.get("shelf background"));
 	reset();
 }
 
 var shelf_item_spacing = 30;
 
-var shelf_items = ['empty', 'box1', 'box2', 'box3', 'can1', 'can2', 'syrup'];
-var shelf_tags = ['tag1', 'tag2', 'tag3'];
+var shelf_items = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup"];
+var shelf_tags = ["tag1", "tag2", "tag3"];
 var same_item_chance = 0.50;
 
 function rand_price() {
 	var price = (((Math.random() * 95) |0) + 5) * 10 + 9;
-	price = '' + price;
+	price = "" + price;
 	if (price.length == 2) {
-		return '.' + price;
+		return "." + price;
 	}
-	return price[0] + '.' + price.substr(1);
+	return price[0] + "." + price.substr(1);
 }
 function get_shelf_items(num_units) {
 	if (arguments.length == 0) {
@@ -283,7 +283,7 @@ function get_shelf_items(num_units) {
 			price: rand_price()
 		};
 		items.push(item);
-		if (item.item != 'empty') {
+		if (item.item != "empty") {
 			possible_items.splice(n, 1);
 		}
 	}
@@ -299,8 +299,8 @@ function get_shelf_width(items) {
 
 		var item = items[i].item;
 		var tag = images.get(items[i].tag);
-		if (item == 'empty') {
-			item = 'box1';
+		if (item == "empty") {
+			item = "box1";
 		}
 		var img = images.get(item);
 		if (tag.width > img.width) {
@@ -313,17 +313,17 @@ function get_shelf_width(items) {
 }
 function draw_tag_price(context, item, tagx, tagy) {
 	var price = item.price;
-	if (item.tag == 'tag3') {
-		context.fillStyle = '#ff0000';
+	if (item.tag == "tag3") {
+		context.fillStyle = "#ff0000";
 	} else {
-		context.fillStyle = '#333333';
+		context.fillStyle = "#333333";
 	}
 	context.font = "36px pixelade";
 	context.fillText(price, tagx + 70, tagy + 65);
 }
 function draw_shelf_item(context, item,	x, y) {
-	if (item.item == 'empty') {
-		return images.get('box1').width;
+	if (item.item == "empty") {
+		return images.get("box1").width;
 	}
 	var img = images.get(item.item);
 	context.drawImage(img, x, y - img.height);
@@ -498,7 +498,7 @@ function simulation(timeDiffMillis) {
 
 	if (player.y > canvas.height) {
 		state = "dead";
-		sounds.play('death');
+		sounds.play("death");
 		return;
 	}
 
@@ -517,7 +517,7 @@ function simulation(timeDiffMillis) {
 	if (onGround && player.sprite == beetle_jump) {
 		player.sprite = beetle;
 		beetle.reset();
-		sounds.play('land');
+		sounds.play("land");
 	}
 	if (!onGround && player.sprite == beetle) {
 		player.sprite = beetle_jump;
@@ -527,11 +527,11 @@ function simulation(timeDiffMillis) {
 		player.vy = -150;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
-		sounds.play('jump');
+		sounds.play("jump");
 	}
 
 	bgx += elapsedSec * bgv;
-	var bg = images.get('bg');
+	var bg = images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
@@ -545,7 +545,7 @@ function shadow_text(context, text, x, y) {
 }
 
 function draw(context) {
-	var bg = images.get('bg');
+	var bg = images.get("bg");
 	context.drawImage(bg, game.cameraX + bgx, game.cameraY);
 	if (bgx + bg.width < canvas.width) {
 		context.drawImage(bg, game.cameraX + bgx + bg.width, game.cameraY);

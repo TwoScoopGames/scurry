@@ -8,7 +8,7 @@ function time(f, iters) {
 }
 
 function makeCanvas(width, height) {
-	var c = document.createElement('canvas');
+	var c = document.createElement("canvas");
 	c.width = width;
 	c.height = height;
 	return c;
@@ -16,7 +16,7 @@ function makeCanvas(width, height) {
 
 function drawCanvas(width, height, drawFun) {
 	var canvas = makeCanvas(width, height);
-	var ctx = canvas.getContext('2d');
+	var ctx = canvas.getContext("2d");
 	drawFun(ctx);
 	return canvas;
 }
@@ -68,7 +68,7 @@ function KeyboardInput(keyMap) {
 	for (var kc in keyMap) {
 		this.keys[keyMap[kc]] = 0;
 	}
-	window.addEventListener('keydown', function(event) {
+	window.addEventListener("keydown", function(event) {
 		if (keyMap.hasOwnProperty(event.keyCode)) {
 			if (that.keys[keyMap[event.keyCode]] == 0) {
 				that.keys[keyMap[event.keyCode]] = 1;
@@ -76,7 +76,7 @@ function KeyboardInput(keyMap) {
 			return false;
 		}
 	});
-	window.addEventListener('keyup', function(event) {
+	window.addEventListener("keyup", function(event) {
 		if (keyMap.hasOwnProperty(event.keyCode)) {
 			that.keys[keyMap[event.keyCode]] = 0;
 			return false;
@@ -100,8 +100,8 @@ function MouseInput(canvas) {
 		var y = event.pageY - canvas.offsetTop + document.body.scrollTop;
 
 		// scale based on ratio of canvas internal dimentions to css dimensions
-		x *= canvas.width / canvas.style.width.substring(0, canvas.style.width.indexOf('p'));
-		y *= canvas.height / canvas.style.height.substring(0, canvas.style.height.indexOf('p'));
+		x *= canvas.width / canvas.style.width.substring(0, canvas.style.width.indexOf("p"));
+		y *= canvas.height / canvas.style.height.substring(0, canvas.style.height.indexOf("p"));
 
 		return {x:x, y:y};
 	};
@@ -121,31 +121,31 @@ function MouseInput(canvas) {
 	};
 
 	var that = this;
-	canvas.addEventListener('mousedown', function(event) {
+	canvas.addEventListener("mousedown", function(event) {
 		var m = relMouseCoords(event);
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[event.button] = true;
 	});
-	canvas.addEventListener('mouseup', function(event) {
+	canvas.addEventListener("mouseup", function(event) {
 		var m = relMouseCoords(event);
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[event.button] = false;
 	});
-	canvas.addEventListener('touchstart', function(event) {
+	canvas.addEventListener("touchstart", function(event) {
 		var touch = event.touches[0];
 		var m = relMouseCoords(touch)
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[0] = true;
 	});
-	canvas.addEventListener('touchend', function(event) {
+	canvas.addEventListener("touchend", function(event) {
 		that.buttons[0] = false;
 	});
 }
 MouseInput.prototype.supportsTouch = function() {
-	return 'ontouchstart' in window || navigator.msMaxTouchPoints;
+	return "ontouchstart" in window || navigator.msMaxTouchPoints;
 }
 
 function Entity(x, y, width, height) {
@@ -197,7 +197,7 @@ ImageLoader.prototype.load = function(name, path, numFrames) {
 
 	var img = new Image();
 	var that = this;
-	img.addEventListener('load', function() {
+	img.addEventListener("load", function() {
 		that.loadedImages++;
 
 		if (numFrames == 1) {
@@ -238,9 +238,9 @@ SoundLoader.prototype.load = function(name, path) {
 		// safari on iOS mutes sounds until they're played in response to user input
 		// play a dummy sound on first touch
 		var firstTouchHandler = function(event) {
-			window.removeEventListener('click', firstTouchHandler);
-			window.removeEventListener('keydown', firstTouchHandler);
-			window.removeEventListener('touchstart', firstTouchHandler);
+			window.removeEventListener("click", firstTouchHandler);
+			window.removeEventListener("keydown", firstTouchHandler);
+			window.removeEventListener("touchstart", firstTouchHandler);
 
 			var source = that.context.createOscillator();
 			source.connect(that.context.destination);
@@ -250,20 +250,20 @@ SoundLoader.prototype.load = function(name, path) {
 			if (that.firstPlay) {
 				that.play(that.firstPlay);
 			} else {
-				that.firstPlay = 'workaround';
+				that.firstPlay = "workaround";
 			}
 
 		};
-		window.addEventListener('click', firstTouchHandler);
-		window.addEventListener('keydown', firstTouchHandler);
-		window.addEventListener('touchstart', firstTouchHandler);
+		window.addEventListener("click", firstTouchHandler);
+		window.addEventListener("keydown", firstTouchHandler);
+		window.addEventListener("touchstart", firstTouchHandler);
 	}
 
 	this.totalSounds++;
 
 	var request = new XMLHttpRequest();
-	request.open('GET', path, true);
-	request.responseType = 'arraybuffer';
+	request.open("GET", path, true);
+	request.responseType = "arraybuffer";
 	request.onload = function() {
 		that.context.decodeAudioData(request.response, function(buffer) {
 			that.sounds[name] = buffer;
@@ -333,12 +333,12 @@ function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffset
 AnimatedEntity.prototype = Object.create(Entity.prototype);
 AnimatedEntity.prototype.move = function(elapsedSec) {
 	Entity.prototype.move.call(this, elapsedSec);
-	if (typeof this.sprite.move === 'function') {
+	if (typeof this.sprite.move === "function") {
 		this.sprite.move(elapsedSec);
 	}
 };
 AnimatedEntity.prototype.draw = function(context) {
-	if (typeof this.sprite.draw === 'function') {
+	if (typeof this.sprite.draw === "function") {
 		this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
 	} else {
 		context.drawImage(this.sprite, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
