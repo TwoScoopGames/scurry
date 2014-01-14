@@ -101,7 +101,9 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (!starting) {
 		context.fillStyle = "#ffffff";
 		context.font = "48px pixelade";
-		context.fillText("TAP TO START", startScreen.cameraX + 450, startScreen.cameraY + 450);
+		var msg = "TAP TO START";
+		var w = context.measureText(msg).width;
+		context.fillText(msg, startScreen.cameraX + (canvas.width / 2) - (w / 2), startScreen.cameraY + 450);
 	}
 });
 
