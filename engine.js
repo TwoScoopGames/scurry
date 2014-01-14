@@ -68,20 +68,20 @@ function KeyboardInput(keyMap) {
 	for (var kc in keyMap) {
 		this.keys[keyMap[kc]] = 0;
 	}
-	window.onkeydown = function(event) {
+	window.addEventListener('keydown', function(event) {
 		if (keyMap.hasOwnProperty(event.keyCode)) {
 			if (that.keys[keyMap[event.keyCode]] == 0) {
 				that.keys[keyMap[event.keyCode]] = 1;
 			}
 			return false;
 		}
-	}
-	window.onkeyup = function(event) {
+	});
+	window.addEventListener('keyup', function(event) {
 		if (keyMap.hasOwnProperty(event.keyCode)) {
 			that.keys[keyMap[event.keyCode]] = 0;
 			return false;
 		}
-	}
+	});
 }
 KeyboardInput.prototype.isPressed = function(name) {
 	return this.keys[name] == 1;
@@ -121,26 +121,26 @@ function MouseInput(canvas) {
 	};
 
 	var that = this;
-	canvas.onmousedown = function(event) {
+	canvas.addEventListener('mousedown', function(event) {
 		var m = relMouseCoords(event);
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[event.button] = true;
-	};
-	canvas.onmouseup = function(event) {
+	});
+	canvas.addEventListener('mouseup', function(event) {
 		var m = relMouseCoords(event);
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[event.button] = false;
-	};
-	canvas.addEventListener("touchstart", function(event) {
+	});
+	canvas.addEventListener('touchstart', function(event) {
 		var touch = event.touches[0];
 		var m = relMouseCoords(touch)
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[0] = true;
 	});
-	canvas.addEventListener("touchend", function(event) {
+	canvas.addEventListener('touchend', function(event) {
 		that.buttons[0] = false;
 	});
 }
@@ -194,7 +194,7 @@ ImageLoader.prototype.load = function(name, path, numFrames) {
 
 	var img = new Image();
 	var that = this;
-	img.onload = function() {
+	img.addEventListener('load', function() {
 		that.loadedImages++;
 
 		if (numFrames == 1) {
@@ -209,7 +209,7 @@ ImageLoader.prototype.load = function(name, path, numFrames) {
 				that.images[name + f] = slice;
 			}
 		}
-	};
+	});
 	img.src = path;
 };
 ImageLoader.prototype.allLoaded = function() {
