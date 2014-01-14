@@ -101,11 +101,20 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (!starting) {
 		context.fillStyle = "#ffffff";
 		context.font = "48px pixelade";
-		var msg = "TAP TO START";
-		var w = context.measureText(msg).width;
-		context.fillText(msg, startScreen.cameraX + (canvas.width / 2) - (w / 2), startScreen.cameraY + 450);
+		var msg = "CLICK TO START";
+		if (mouse.supportsTouch()) {
+			msg = "TAP TO START";
+		}
+		centerText(context, msg, startScreen.cameraX, startScreen.cameraY + 450);
 	}
 });
+
+function centerText(context, text, offsetX, offsetY) {
+		var w = context.measureText(text).width;
+		var x = offsetX + (canvas.width / 2) - (w / 2) |0;
+		var y = offsetY |0;
+		context.fillText(text, x, y);
+}
 
 var ls = 36;
 var lrate = 0.02;

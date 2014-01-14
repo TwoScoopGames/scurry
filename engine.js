@@ -144,6 +144,9 @@ function MouseInput(canvas) {
 		that.buttons[0] = false;
 	});
 }
+MouseInput.prototype.supportsTouch = function() {
+	return 'ontouchstart' in window || navigator.msMaxTouchPoints;
+}
 
 function Entity(x, y, width, height) {
 	this.x = x;
