@@ -181,6 +181,8 @@ images.load("tag2", "images/price-tag2.png");
 images.load("tag3", "images/price-tag-sale.png");
 images.load("logo-white", "images/scurry-logo-white-10f686x399.png", 10);
 images.load("logo-black", "images/scurry-logo-black-10f686x399.png", 10);
+images.load("sound-off", "images/sound-off-icon.png");
+images.load("sound-on", "images/sound-on-icon.png");
 
 var sounds = new SoundLoader();
 sounds.load("jump", "audio/jump.wav");
@@ -442,7 +444,7 @@ function simulation(timeDiffMillis) {
 	if (keys.consumePressed("m")) {
 		sounds.muted = !sounds.muted;
 	}
-	if (mouse.buttons[0] && mouse.x >= canvas.width - 80 && mouse.x < canvas.width - 40 && mouse.y >= 40 && mouse.y < 80) {
+	if (mouse.buttons[0] && mouse.x >= canvas.width - 84 && mouse.x < canvas.width - 12 && mouse.y >= 12 && mouse.y < 84) {
 		sounds.muted = !sounds.muted;
 		mouse.buttons[0] = false;
 	}
@@ -558,11 +560,10 @@ function draw(context) {
 	player.draw(context);
 
 	if (sounds.muted) {
-		context.fillStyle = "#ff0000";
+		context.drawImage(images.get("sound-off"), game.cameraX + canvas.width - 84, game.cameraY + 12);
 	} else {
-		context.fillStyle = "#0000ff";
+		context.drawImage(images.get("sound-on"), game.cameraX + canvas.width - 84, game.cameraY + 12);
 	}
-	context.fillRect(game.cameraX + canvas.width - 80, game.cameraY + 40, 40, 40);
 
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
