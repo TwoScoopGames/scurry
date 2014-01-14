@@ -292,9 +292,15 @@ function Animation() {
 	this.frame = 0;
 	this.elapsedSec = 0;
 	this.repeatAt = 0;
+	this.width = 0;
+	this.height = 0;
 }
 Animation.prototype.add = function(img, time) {
 	this.frames.push({img: img, time: time});
+	if (frames.length == 0) {
+		this.width = img.width;
+		this.height = img.height;
+	}
 };
 Animation.prototype.move = function(elapsedSec) {
 	this.elapsedSec += elapsedSec;

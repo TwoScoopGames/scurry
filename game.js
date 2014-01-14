@@ -70,6 +70,9 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
+
+	logo_white.move(elapsedSec);
+	logo_black.move(elapsedSec);
 }, function(context) {
 	var bg = images.get('bg');
 	context.drawImage(bg, startScreen.cameraX + bgx, startScreen.cameraY);
@@ -84,13 +87,13 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	var logo;
 	if (lightsOn) {
 		context.fillStyle = "rgba(255, 255, 255, 0.7)";
-		logo = images.get("logo-black");
+		logo = logo_black;
 	} else {
 		context.fillStyle = "rgba(0, 0, 0, 0.7)";
-		logo = images.get("logo-white");
+		logo = logo_white;
 	}
 	context.fillRect(startScreen.cameraX, startScreen.cameraY, canvas.width, canvas.height);
-	context.drawImage(logo, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
+	logo.draw(context, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
 
 	if (lightsOn) {
 		beetleBlack.draw(context);
@@ -165,8 +168,8 @@ images.load('syrup', 'images/syrup.png');
 images.load('tag1', 'images/price-tag1.png');
 images.load('tag2', 'images/price-tag2.png');
 images.load('tag3', 'images/price-tag-sale.png');
-images.load('logo-white', 'images/logo-white.png');
-images.load('logo-black', 'images/logo-black.png');
+images.load('logo-white', 'images/scurry-logo-white-10f686x399.png', 10);
+images.load('logo-black', 'images/scurry-logo-black-10f686x399.png', 10);
 
 var sounds = new SoundLoader();
 sounds.load('jump', 'audio/jump.wav');
@@ -179,6 +182,8 @@ var beetle_black = new Animation();
 var beetle_jump = new Animation();
 var shelf;
 var shelf_bkgd;
+var logo_white = new Animation();
+var logo_black = new Animation();
 
 function assetsLoaded() {
 	beetle.add(images.get('beetle0'), 0.3);
@@ -206,6 +211,28 @@ function assetsLoaded() {
 	beetle_jump.add(images.get('beetle-jump6'), 0.5);
 	beetle_jump.add(images.get('beetle-jump5'), 0.5);
 	beetle_jump.repeatAt = 4;
+
+	logo_white.add(images.get('logo-white0'), 1.0);
+	logo_white.add(images.get('logo-white1'), 1.0);
+	logo_white.add(images.get('logo-white2'), 1.0);
+	logo_white.add(images.get('logo-white3'), 1.0);
+	logo_white.add(images.get('logo-white4'), 1.0);
+	logo_white.add(images.get('logo-white5'), 1.0);
+	logo_white.add(images.get('logo-white6'), 1.0);
+	logo_white.add(images.get('logo-white7'), 1.0);
+	logo_white.add(images.get('logo-white8'), 1.0);
+	logo_white.add(images.get('logo-white9'), 1.0);
+
+	logo_black.add(images.get('logo-black0'), 1.0);
+	logo_black.add(images.get('logo-black1'), 1.0);
+	logo_black.add(images.get('logo-black2'), 1.0);
+	logo_black.add(images.get('logo-black3'), 1.0);
+	logo_black.add(images.get('logo-black4'), 1.0);
+	logo_black.add(images.get('logo-black5'), 1.0);
+	logo_black.add(images.get('logo-black6'), 1.0);
+	logo_black.add(images.get('logo-black7'), 1.0);
+	logo_black.add(images.get('logo-black8'), 1.0);
+	logo_black.add(images.get('logo-black9'), 1.0);
 
 	shelf = new ThreePatch(images.get('shelf'));
 	shelf_bkgd = new ThreePatch(images.get('shelf background'));
