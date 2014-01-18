@@ -176,6 +176,8 @@ images.load("logo-white", "images/scurry-logo-white-10f686x399.png", 10);
 images.load("logo-black", "images/scurry-logo-black-10f686x399.png", 10);
 images.load("sound-off", "images/sound-off-icon.png");
 images.load("sound-on", "images/sound-on-icon.png");
+images.load("play", "images/play-icon.png");
+images.load("pause", "images/pause-icon.png");
 
 var sounds = new SoundLoader();
 sounds.load("jump", "audio/jump.wav");
@@ -190,6 +192,8 @@ var shelf;
 var shelf_bkgd;
 var logo_white = new Animation();
 var logo_black = new Animation();
+var soundToggle;
+var pauseToggle;
 
 function assetsLoaded() {
 	beetle.add(images.get("beetle0"), 0.3);
@@ -242,6 +246,21 @@ function assetsLoaded() {
 
 	shelf = new NinePatch(images.get("shelf"));
 	shelf_bkgd = new NinePatch(images.get("shelf background"));
+
+	pauseToggle = new ToggleButton(canvas.width - 84, 12, 72, 72, images.get("play"), images.get("pause"), "pause", function(toggled) {
+		if (state != "paused" && state != "running") {
+			return false;
+		}
+		if (toggled) {
+			state = "paused";
+		} else {
+			state = "running";
+		}
+	});
+	soundToggle = new ToggleButton(canvas.width - 84, 108, 72, 72, images.get("sound-on"), images.get("sound-off"), "m", function(toggled) {
+		sounds.muted = !toggled;
+	});
+
 	reset();
 }
 
@@ -430,13 +449,9 @@ function reset() {
 }
 
 function simulation(timeDiffMillis) {
-	if (keys.consumePressed("m")) {
-		sounds.muted = !sounds.muted;
-	}
-	if (mouse.buttons[0] && mouse.x >= canvas.width - 84 && mouse.x < canvas.width - 12 && mouse.y >= 12 && mouse.y < 84) {
-		sounds.muted = !sounds.muted;
-		mouse.buttons[0] = false;
-	}
+	soundToggle.move(timeDiffMillis);
+	pauseToggle.move(timeDiffMillis);
+
 	if (keys.consumePressed("pause")) {
 		if (state === "paused") {
 			state = "running";
@@ -552,15 +567,45 @@ function drawStage(game, context) {
 	}
 }
 
+function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+	this.onIcon = onIcon;
+	this.offIcon = offIcon;
+	this.key = key;
+	this.toggled = true;
+	this.onToggle = onToggle;
+}
+ToggleButton.prototype.move = function(elapsedSec) {
+	if (mouse.buttons[0] && mouse.x >= this.x && mouse.x < this.x + this.width && mouse.y >= this.y && mouse.y < this.y + this.height) {
+		mouse.buttons[0] = false;
+		this.toggle();
+	}
+	if (keys.consumePressed(this.key)) {
+		this.toggle();
+	}
+};
+ToggleButton.prototype.draw = function(context) {
+	var icon = this.offIcon;
+	if (this.toggled) {
+		icon = this.onIcon;
+	}
+	context.drawImage(icon, game.cameraX + this.x, game.cameraY + this.y);
+};
+ToggleButton.prototype.toggle = function() {
+	if (this.onToggle(!this.toggled) !== false) {
+		this.toggled = !this.toggled;
+	}
+};
+
 function draw(context) {
 	drawStage(game, context);
 	player.draw(context);
 
-	if (sounds.muted) {
-		context.drawImage(images.get("sound-off"), game.cameraX + canvas.width - 84, game.cameraY + 12);
-	} else {
-		context.drawImage(images.get("sound-on"), game.cameraX + canvas.width - 84, game.cameraY + 12);
-	}
+	soundToggle.draw(context);
+	pauseToggle.draw(context);
 
 	context.fillStyle = "#000000";
 	context.font = "36px pixelade";
