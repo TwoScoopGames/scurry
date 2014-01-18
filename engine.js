@@ -362,39 +362,41 @@ AnimatedEntity.prototype.copy = function() {
 
 function NinePatch(image) {
 	this.img = image;
+	var imgw = image.width - 1;
+	var imgh = image.height - 1;
 
 	var context = get_context_with_image(image);
-	var firstDiv = secondDiv = image.width;
-	for (var x = 0; x < image.width; x++) {
-		var pixel = context.getImageData(x, image.height - 1, 1, 1).data;
+	var firstDiv = secondDiv = imgw;
+	for (var x = 0; x < imgw; x++) {
+		var pixel = context.getImageData(x, imgh, 1, 1).data;
 		var alpha = pixel[3];
-		if (firstDiv == image.width && alpha > 0) {
+		if (firstDiv == imgw && alpha > 0) {
 			firstDiv = x;
 		}
-		if (firstDiv < image.width && alpha == 0) {
+		if (firstDiv < imgw && alpha == 0) {
 			secondDiv = x;
 			break;
 		}
 	}
 	this.w1 = firstDiv;
 	this.w2 = secondDiv - firstDiv;
-	this.w3 = this.img.width - secondDiv - 1;
+	this.w3 = imgw - secondDiv;
 
-	firstDiv = secondDiv = image.height;
-	for (var y = 0; y < image.height; y++) {
-		var pixel = context.getImageData(image.width - 1, y, 1, 1).data;
+	firstDiv = secondDiv = imgh;
+	for (var y = 0; y < imgh; y++) {
+		var pixel = context.getImageData(imgw, y, 1, 1).data;
 		var alpha = pixel[3];
-		if (firstDiv == image.height && alpha > 0) {
+		if (firstDiv == imgh && alpha > 0) {
 			firstDiv = y;
 		}
-		if (firstDiv < image.height && alpha == 0) {
+		if (firstDiv < imgh && alpha == 0) {
 			secondDiv = y;
 			break;
 		}
 	}
 	this.h1 = firstDiv;
 	this.h2 = secondDiv - firstDiv;
-	this.h3 = this.img.height - secondDiv - 1;
+	this.h3 = imgh - secondDiv;
 }
 NinePatch.prototype.draw = function(context, x, y, width, height) {
 	x = x|0;
