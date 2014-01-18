@@ -41,7 +41,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		startTime += timeDiffMillis;
 		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
-			beetleBlack = new AnimatedEntity(startScreen.cameraX, 420, 0, 0, beetle_black, 0, 0);
+			beetleBlack = new AnimatedEntity(startScreen.cameraX, startScreen.cameraY + 420, 0, 0, beetle_black, 0, 0);
 			beetleBlack.vx = 140;
 		}
 		if (startTime > 2300) {
@@ -62,6 +62,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		beetleBlack.move(elapsedSec);
 	}
 	startScreen.cameraX += 20 * elapsedSec;
+	startScreen.cameraY = -800;
 	delete_invisible_shelves(startScreen.cameraX);
 	populate_shelves(startScreen.cameraX);
 
@@ -74,15 +75,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	logo_white.move(elapsedSec);
 	logo_black.move(elapsedSec);
 }, function(context) {
-	var bg = images.get("bg");
-	context.drawImage(bg, startScreen.cameraX + bgx, startScreen.cameraY);
-	if (bgx + bg.width < canvas.width) {
-		context.drawImage(bg, startScreen.cameraX + bgx + bg.width, startScreen.cameraY);
-	}
-
-	for (var i in shelves) {
-		shelves[i].draw(context);
-	}
+	drawStage(startScreen, context);
 
 	var logo;
 	if (lightsOn) {
@@ -357,7 +350,7 @@ function draw_shelf_items(context, items, x, y) {
 }
 
 function make_shelf(x) {
-	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
+	var y = -((canvas.height / 4) + (Math.random() * (canvas.height / 2)));
 	var items = x == 0 ? get_shelf_items(6) : get_shelf_items();
 	var width = get_shelf_width(items);
 
@@ -393,16 +386,22 @@ function populate_shelves(cameraX) {
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
-		var s2 = make_shelf(x);
-		var s3 = s2.copy();
-		s3.y += height;
-		shelves.push(s3);
+		var template = make_shelf(x);
 
-		shelves.push(s2);
+		var bottom = new Entity(x, template.y + template.height, template.width, -(template.y + template.height));
+		bottom.draw = function(ctx) {
+			shelf_bkgd.draw(ctx, this.x, this.y, this.width, this.height);
+		};
+		bottom.collides = function(other) {
+			return false;
+		};
+		shelves.push(bottom);
 
-		var s1 = s2.copy();
-		s1.y -= height;
-		shelves.push(s1);
+		for (var n = 0; n < 3; n++) {
+			var s = template.copy();
+			shelves.push(s);
+			template.y -= height;
+		}
 	}
 }
 
@@ -419,14 +418,15 @@ function move_shelves(elapsedSec) {
 function reset() {
 	shelves = [];
 	distance = 0;
-	game.cameraX = 0;
 	populate_shelves(0);
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
-	player.y = shelves[1].y - player.height;
+	player.y = shelves[2].y - player.height;
 	player.vx = 100;
 	bgv = -30;
 	bgx = 0;
+	game.cameraX = 0;
+	game.cameraY = player.y - (canvas.height / 2);
 }
 
 function simulation(timeDiffMillis) {
@@ -487,7 +487,7 @@ function simulation(timeDiffMillis) {
 	delete_invisible_shelves(game.cameraX);
 	populate_shelves(game.cameraX);
 
-	if (player.y > canvas.height) {
+	if (player.y > -player.height) {
 		state = "dead";
 		sounds.play("death");
 		return;
@@ -496,7 +496,7 @@ function simulation(timeDiffMillis) {
 	var onGround = false;
 	for (var i in shelves) {
 		var shelf = shelves[i];
-		if (player.collides(shelf)) {
+		if (shelf.collides(player)) {
 			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
 				player.y = shelf.y - player.height;
 				player.vy = 0;
@@ -535,7 +535,7 @@ function shadow_text(context, text, x, y) {
 	context.fillText(text, x, y);
 }
 
-function draw(context) {
+function drawStage(game, context) {
 	var bg = images.get("bg");
 	context.drawImage(bg, game.cameraX + bgx, game.cameraY);
 	if (bgx + bg.width < canvas.width) {
@@ -546,6 +546,14 @@ function draw(context) {
 		shelves[i].draw(context);
 	}
 
+	if (game.cameraY > -canvas.height) {
+		context.fillStyle = "#000000";
+		context.fillRect(game.cameraX, 0, canvas.width, canvas.height + game.cameraY);
+	}
+}
+
+function draw(context) {
+	drawStage(game, context);
 	player.draw(context);
 
 	if (sounds.muted) {
