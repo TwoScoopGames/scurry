@@ -47,6 +47,8 @@ function Game(canvas, simulationFunc, drawFunc) {
 		that.fps = (1000 / timeDiff) |0;
 
 		simulationFunc(timeDiff);
+		that.cameraX = that.cameraX|0;
+		that.cameraY = that.cameraY|0;
 
 		context.save();
 		context.translate(-that.cameraX, -that.cameraY);
