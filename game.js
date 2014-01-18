@@ -247,8 +247,8 @@ function assetsLoaded() {
 	logo_black.add(images.get("logo-black8"), 1.0);
 	logo_black.add(images.get("logo-black9"), 1.0);
 
-	shelf = new ThreePatch(images.get("shelf"));
-	shelf_bkgd = new ThreePatch(images.get("shelf background"));
+	shelf = new NinePatch(images.get("shelf"));
+	shelf_bkgd = new NinePatch(images.get("shelf background"));
 	reset();
 }
 
@@ -355,14 +355,6 @@ function draw_shelf_items(context, items, x, y) {
 		x += width;
 	}
 }
-function draw_shelf(context, items, x, y, width) {
-	shelf.draw(context, x, y, width);
-	for (var r = 1; r < 4; r++) {
-		var y1 = y - (r * shelf_bkgd.img.height) + r;
-		shelf_bkgd.draw(context, x, y1, width);
-	}
-	draw_shelf_items(context, items, x, y);
-}
 
 function make_shelf(x) {
 	var y = (canvas.height / 4) + (Math.random() * (canvas.height / 2));
@@ -372,13 +364,10 @@ function make_shelf(x) {
 	var spacing = (shelf_bkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
 	var img = drawCanvas(width, height + 50, function(ctx) {
-		var y = 0;
-		for (var r = 0; r < 3; r++) {
-			shelf_bkgd.draw(ctx, 0, y, width);
-			y += shelf_bkgd.img.height - 1;
-		}
-		shelf.draw(ctx, 0, y, width);
-		draw_shelf_items(ctx, items, 0, y);
+		var bkgdh = (shelf_bkgd.img.height - 1) * 3;
+		shelf_bkgd.draw(ctx, 0, 0, width, bkgdh);
+		shelf.draw(ctx, 0, bkgdh, width, shelf.img.height - 1);
+		draw_shelf_items(ctx, items, 0, bkgdh);
 	});
 	return new AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
 }

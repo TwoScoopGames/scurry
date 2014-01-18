@@ -360,7 +360,7 @@ function get_context_with_image(image) {
 	return context;
 }
 
-function ThreePatch(image) {
+function NinePatch(image) {
 	this.img = image;
 
 	var context = get_context_with_image(image);
@@ -396,20 +396,48 @@ function ThreePatch(image) {
 	this.h2 = secondDiv - firstDiv;
 	this.h3 = this.img.height - secondDiv - 1;
 }
-ThreePatch.prototype.draw = function(context, x, y, width) {
+NinePatch.prototype.draw = function(context, x, y, width, height) {
 	x = x|0;
 	y = y|0;
-	var h = this.img.height - 1;
+	width = width |0;
+	height = height |0;
 
-	context.drawImage(this.img, 0, 0, this.w1, h, x, y, this.w1, h);
-
-	var startThirdDiv = x + width - this.w3;
-	context.drawImage(this.img, this.w1 + this.w2, 0, this.w3, h, startThirdDiv, y, this.w3, h);
-
-	for (var x2 = this.w1; x2 < width - this.w3; x2 += this.w2) {
-		var drawWidth = startThirdDiv - x - x2;
-		drawWidth = Math.min(drawWidth, this.w2);
-		context.drawImage(this.img, this.w1, 0, drawWidth, h, x + x2, y, drawWidth, h);
+	for (var cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
+		for (var cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
+			var w = Math.min(this.w2, x + width - this.w3 - cx);
+			var h = Math.min(this.h2, y + height - this.h3 - cy);
+			context.drawImage(this.img, this.w1, this.h1, w, h, cx, cy, w, h);
+		}
+	}
+	for (var cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
+		var h = Math.min(this.h2, y + height - this.h3 - cy);
+		if (this.w1 > 0) {
+			context.drawImage(this.img, 0,                 this.h1, this.w1, h, x,                   cy, this.w1, h);
+		}
+		if (this.w3 > 0) {
+			context.drawImage(this.img, this.w1 + this.w2, this.h1, this.w3, h, x + width - this.w3, cy, this.w3, h);
+		}
+	}
+	for (var cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
+		var w = Math.min(this.w2, x + width - this.w3 - cx);
+		if (this.h1 > 0) {
+			context.drawImage(this.img, this.w1, 0,                 w, this.h1, cx, y,                    w, this.h1);
+		}
+		if (this.h3 > 0) {
+			context.drawImage(this.img, this.w1, this.w1 + this.w2, w, this.h3, cx, y + height - this.h3, w, this.h3);
+		}
+	}
+	if (this.w1 > 0 && this.h1 > 0) {
+		context.drawImage(this.img, 0, 0, this.w1, this.h1, x, y, this.w1, this.h1);
+	}
+	if (this.w3 > 0 && this.h1 > 0) {
+		context.drawImage(this.img, this.w1 + this.w2, 0, this.w3, this.h1, x + width - this.w3, y, this.w3, this.h1);
+	}
+	if (this.w1 > 0 && this.h3 > 0) {
+		context.drawImage(this.img, 0, this.h1 + this.h2, this.w1, this.h3, x, y + height - this.h3, this.w1, this.h3);
+	}
+	if (this.w3 > 0 && this.h3 > 0) {
+		context.drawImage(this.img, this.w1 + this.w2, this.h1 + this.h2, this.w3, this.h3, x + width - this.w3, y + height - this.h3, this.w3, this.h3);
 	}
 };
 
