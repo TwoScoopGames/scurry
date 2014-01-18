@@ -21,6 +21,13 @@ function drawCanvas(width, height, drawFun) {
 	return canvas;
 }
 
+function get_context_with_image(image) {
+	var canvas = makeCanvas(image.width, image.height);
+	var ctx = canvas.getContext("2d");
+	ctx.drawImage(image, 0, 0, image.width, image.height);
+	return ctx;
+}
+
 function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;
@@ -349,15 +356,6 @@ AnimatedEntity.prototype.draw = function(context) {
 };
 AnimatedEntity.prototype.copy = function() {
 	return new AnimatedEntity(this.x, this.y, this.width, this.height, this.sprite, this.spriteOffsetX, this.spriteOffsetY);
-}
-
-function get_context_with_image(image) {
-	var canvas = document.createElement("canvas");
-	canvas.width = image.width;
-	canvas.height = image.height;
-	var context = canvas.getContext("2d");
-	context.drawImage(image, 0, 0, image.width, image.height);
-	return context;
 }
 
 function NinePatch(image) {
