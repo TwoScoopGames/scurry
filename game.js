@@ -94,13 +94,17 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (!starting) {
 		context.fillStyle = "#ffffff";
 		context.font = "48px pixelade";
-		var msg = "CLICK TO START";
-		if (mouse.supportsTouch()) {
-			msg = "TAP TO START";
-		}
-		centerText(context, msg, startScreen.cameraX, startScreen.cameraY + 450);
+		centerText(context, clickOrTap() + " TO START", startScreen.cameraX, startScreen.cameraY + 450);
 	}
 });
+
+function clickOrTap() {
+	if (mouse.supportsTouch()) {
+		return "TAP";
+	} else {
+		return "CLICK";
+	}
+}
 
 function centerText(context, text, offsetX, offsetY) {
 		var w = context.measureText(text).width;
@@ -148,9 +152,8 @@ var distance = 0;
 var max_distance = 0;
 var state = "start";
 var stateMessages = {
-	"start": "Press space to start",
-	"paused": "Paused. Space starts",
-	"dead": "You died. Space restarts"
+	"start": clickOrTap() + " TO START",
+	"paused": "PAUSED"
 };
 
 var bgv = -30;
@@ -248,7 +251,7 @@ function assetsLoaded() {
 	shelf_bkgd = new NinePatch(images.get("shelf background"));
 
 	pauseToggle = new ToggleButton(canvas.width - 84, 12, 72, 72, images.get("play"), images.get("pause"), "pause", function(toggled) {
-		if (state != "paused" && state != "running") {
+		if (state === "dead") {
 			return false;
 		}
 		if (toggled) {
@@ -434,6 +437,7 @@ function move_shelves(elapsedSec) {
 	}
 }
 
+var deadTime = 0;
 function reset() {
 	shelves = [];
 	distance = 0;
@@ -446,26 +450,28 @@ function reset() {
 	bgx = 0;
 	game.cameraX = 0;
 	game.cameraY = player.y - (canvas.height / 2);
+	deadTime = 0;
+	pauseToggle.toggled = true;
 }
+
 
 function simulation(timeDiffMillis) {
 	soundToggle.move(timeDiffMillis);
 	pauseToggle.move(timeDiffMillis);
 
-	if (keys.consumePressed("pause")) {
-		if (state === "paused") {
-			state = "running";
-		} else if (state === "running") {
-			state = "paused";
+	if (state === "dead") {
+		deadTime += timeDiffMillis;
+		if (deadTime > 1000) {
+			state = "start";
+			reset();
 		}
+		return;
 	}
-	if (state === "paused" || state === "start" || state === "dead") {
+	if (state === "paused" || state === "start") {
 		if (keys.consumePressed("space") || mouse.buttons[0]) {
-			if (state === "dead") {
-				reset();
-			}
 			state = "running";
 			mouse.buttons[0] = false;
+			pauseToggle.toggled = false;
 		} else {
 			return;
 		}
@@ -543,13 +549,6 @@ function simulation(timeDiffMillis) {
 	}
 }
 
-function shadow_text(context, text, x, y) {
-	context.fillStyle = "#000000";
-	context.fillText(text, x + 3, y + 3);
-	context.fillStyle = "#00cc00";
-	context.fillText(text, x, y);
-}
-
 function drawStage(game, context) {
 	var bg = images.get("bg");
 	context.drawImage(bg, game.cameraX + bgx, game.cameraY);
@@ -623,8 +622,11 @@ function draw(context) {
 	}
 	context.fillText(game.fps + " FPS", game.cameraX + 20, game.cameraY + 100);
 
-	if (state != "running") {
-		context.font = "100px pixelade";
-		shadow_text(context, stateMessages[state], game.cameraX + 100, game.cameraY + 200);
+	if (stateMessages[state]) {
+		context.fillStyle = "rgba(0, 0, 0, 0.7)";
+		context.fillRect(game.cameraX, game.cameraY + 400, canvas.width, 70);
+		context.fillStyle = "#ffffff";
+		context.font = "48px pixelade";
+		centerText(context, stateMessages[state], game.cameraX, game.cameraY + 450);
 	}
 }
