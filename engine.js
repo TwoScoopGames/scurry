@@ -28,14 +28,32 @@ function get_context_with_image(image) {
 	return ctx;
 }
 
+
 function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
 	var lastTimestamp = -1;
 	var running = false;
+	var that = this;
+
 	this.cameraX = 0;
 	this.cameraY = 0;
-	this.fps = 0;
-	var that = this;
+	this.showFrameRate = true;
+
+	function drawFrameRate(timeDiffMillis) {
+		var fps = (1000 / timeDiffMillis) |0;
+
+		context.font = "24px mono";
+		if (fps < 30) {
+			context.fillStyle = "#ff0000";
+		} else if (fps < 50) {
+			context.fillStyle = "#ffff00";
+		} else {
+			context.fillStyle = "#00ff00";
+		}
+		var msg = fps + " FPS";
+		var w = context.measureText(msg).width;
+		context.fillText(msg, that.cameraX + canvas.width - w - 50, that.cameraY + 50);
+	}
 
 	function mainLoop(timestamp) {
 		if (lastTimestamp === -1) {
@@ -44,8 +62,6 @@ function Game(canvas, simulationFunc, drawFunc) {
 		var timeDiff = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
-		that.fps = (1000 / timeDiff) |0;
-
 		simulationFunc(timeDiff);
 		that.cameraX = that.cameraX|0;
 		that.cameraY = that.cameraY|0;
@@ -53,6 +69,11 @@ function Game(canvas, simulationFunc, drawFunc) {
 		context.save();
 		context.translate(-that.cameraX, -that.cameraY);
 		drawFunc(context);
+
+		if (that.showFrameRate) {
+			drawFrameRate(timeDiff);
+		}
+
 		context.restore();
 
 		if (running) {
