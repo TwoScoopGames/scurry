@@ -227,11 +227,11 @@ function Entity(x, y, width, height) {
 	this.lastX = x;
 	this.lastY = y;
 }
-Entity.prototype.move = function(elapsedSec) {
+Entity.prototype.move = function(elapsedMillis) {
 	this.lastX = this.x;
 	this.lastY = this.y;
-	this.x += elapsedSec * this.vx;
-	this.y += elapsedSec * this.vy;
+	this.x += elapsedMillis * this.vx;
+	this.y += elapsedMillis * this.vy;
 }
 Entity.prototype.overlapsHoriz = function(other) {
 	return this.x + this.width > other.x && this.x < other.x + other.width;
@@ -362,7 +362,7 @@ SoundLoader.prototype.play = function(name) {
 function Animation() {
 	this.frames = [];
 	this.frame = 0;
-	this.elapsedSec = 0;
+	this.elapsedMillis = 0;
 	this.repeatAt = 0;
 	this.width = 0;
 	this.height = 0;
@@ -374,10 +374,10 @@ Animation.prototype.add = function(img, time) {
 		this.height = img.height;
 	}
 };
-Animation.prototype.move = function(elapsedSec) {
-	this.elapsedSec += elapsedSec;
-	while (this.elapsedSec > this.frames[this.frame].time) {
-		this.elapsedSec -= this.frames[this.frame].time;
+Animation.prototype.move = function(elapsedMillis) {
+	this.elapsedMillis += elapsedMillis;
+	while (this.elapsedMillis > this.frames[this.frame].time) {
+		this.elapsedMillis -= this.frames[this.frame].time;
 		this.frame++;
 		if (this.frame >= this.frames.length) {
 			this.frame = this.repeatAt;
@@ -390,7 +390,7 @@ Animation.prototype.draw = function(context, x, y) {
 };
 Animation.prototype.reset = function() {
 	this.frame = 0;
-	this.elapsedSec = 0;
+	this.elapsedMillis = 0;
 };
 
 function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffsetY) {
@@ -400,10 +400,10 @@ function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffset
 	Entity.call(this, x, y, width, height);
 }
 AnimatedEntity.prototype = Object.create(Entity.prototype);
-AnimatedEntity.prototype.move = function(elapsedSec) {
-	Entity.prototype.move.call(this, elapsedSec);
+AnimatedEntity.prototype.move = function(elapsedMillis) {
+	Entity.prototype.move.call(this, elapsedMillis);
 	if (typeof this.sprite.move === "function") {
-		this.sprite.move(elapsedSec);
+		this.sprite.move(elapsedMillis);
 	}
 };
 AnimatedEntity.prototype.draw = function(context) {

@@ -42,7 +42,7 @@ var startScreen = new Game(canvas, function(elapsedMillis) {
 		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
 			beetleBlack = new AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
-			beetleBlack.vx = 140;
+			beetleBlack.vx = 1.40;
 		}
 		if (startTime > 2300) {
 			startScreen.stop();
@@ -56,22 +56,21 @@ var startScreen = new Game(canvas, function(elapsedMillis) {
 		mouse.buttons[0] = false;
 		sounds.play("lights-on");
 	}
-	var elapsedSec = elapsedMillis / 100;
-	move_shelves(elapsedSec);
+	move_shelves(elapsedMillis);
 	if (beetleBlack) {
-		beetleBlack.move(elapsedSec);
+		beetleBlack.move(elapsedMillis);
 	}
 	delete_invisible_shelves(startScreen.camera.x);
 	populate_shelves(startScreen.camera.x);
 
-	bgx += elapsedSec * -5;
+	bgx += elapsedMillis * -0.05;
 	var bg = images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
 
-	logo_white.move(elapsedSec);
-	logo_black.move(elapsedSec);
+	logo_white.move(elapsedMillis);
+	logo_black.move(elapsedMillis);
 }, function(context) {
 	drawStage(startScreen, context);
 
@@ -119,14 +118,14 @@ var ls = 36;
 var lrate = 0.02;
 var lmin = 36;
 var lmax = 46;
-var loading = new Game(canvas, function(elapsedSec) {
+var loading = new Game(canvas, function(elapsedMillis) {
 	if (images.allLoaded() && sounds.allLoaded()) {
 		assetsLoaded();
 		loading.stop();
 		startScreen.start();
 		return;
 	}
-	ls += lrate * elapsedSec;
+	ls += lrate * elapsedMillis;
 	if (ls > lmax) {
 		lrate *= -1;
 		ls = lmax;
@@ -201,53 +200,53 @@ var soundToggle;
 var pauseToggle;
 
 function assetsLoaded() {
-	beetle.add(images.get("beetle0"), 0.3);
-	beetle.add(images.get("beetle1"), 0.3);
-	beetle.add(images.get("beetle2"), 0.3);
-	beetle.add(images.get("beetle3"), 0.3);
-	beetle.add(images.get("beetle4"), 0.3);
-	beetle.add(images.get("beetle5"), 0.3);
-	beetle.add(images.get("beetle6"), 0.3);
+	beetle.add(images.get("beetle0"), 30);
+	beetle.add(images.get("beetle1"), 30);
+	beetle.add(images.get("beetle2"), 30);
+	beetle.add(images.get("beetle3"), 30);
+	beetle.add(images.get("beetle4"), 30);
+	beetle.add(images.get("beetle5"), 30);
+	beetle.add(images.get("beetle6"), 30);
 
-	beetle_black.add(images.get("beetle-black0"), 0.3);
-	beetle_black.add(images.get("beetle-black1"), 0.3);
-	beetle_black.add(images.get("beetle-black2"), 0.3);
-	beetle_black.add(images.get("beetle-black3"), 0.3);
-	beetle_black.add(images.get("beetle-black4"), 0.3);
-	beetle_black.add(images.get("beetle-black5"), 0.3);
-	beetle_black.add(images.get("beetle-black6"), 0.3);
+	beetle_black.add(images.get("beetle-black0"), 30);
+	beetle_black.add(images.get("beetle-black1"), 30);
+	beetle_black.add(images.get("beetle-black2"), 30);
+	beetle_black.add(images.get("beetle-black3"), 30);
+	beetle_black.add(images.get("beetle-black4"), 30);
+	beetle_black.add(images.get("beetle-black5"), 30);
+	beetle_black.add(images.get("beetle-black6"), 30);
 
-	beetle_jump.add(images.get("beetle-jump0"), 0.5);
-	beetle_jump.add(images.get("beetle-jump1"), 0.5);
-	beetle_jump.add(images.get("beetle-jump2"), 0.5);
-	beetle_jump.add(images.get("beetle-jump3"), 0.5);
-	beetle_jump.add(images.get("beetle-jump4"), 0.5);
-	beetle_jump.add(images.get("beetle-jump5"), 0.5);
-	beetle_jump.add(images.get("beetle-jump6"), 0.5);
-	beetle_jump.add(images.get("beetle-jump5"), 0.5);
+	beetle_jump.add(images.get("beetle-jump0"), 50);
+	beetle_jump.add(images.get("beetle-jump1"), 50);
+	beetle_jump.add(images.get("beetle-jump2"), 50);
+	beetle_jump.add(images.get("beetle-jump3"), 50);
+	beetle_jump.add(images.get("beetle-jump4"), 50);
+	beetle_jump.add(images.get("beetle-jump5"), 50);
+	beetle_jump.add(images.get("beetle-jump6"), 50);
+	beetle_jump.add(images.get("beetle-jump5"), 50);
 	beetle_jump.repeatAt = 4;
 
-	logo_white.add(images.get("logo-white0"), 1.0);
-	logo_white.add(images.get("logo-white1"), 1.0);
-	logo_white.add(images.get("logo-white2"), 1.0);
-	logo_white.add(images.get("logo-white3"), 1.0);
-	logo_white.add(images.get("logo-white4"), 1.0);
-	logo_white.add(images.get("logo-white5"), 1.0);
-	logo_white.add(images.get("logo-white6"), 1.0);
-	logo_white.add(images.get("logo-white7"), 1.0);
-	logo_white.add(images.get("logo-white8"), 1.0);
-	logo_white.add(images.get("logo-white9"), 1.0);
+	logo_white.add(images.get("logo-white0"), 100);
+	logo_white.add(images.get("logo-white1"), 100);
+	logo_white.add(images.get("logo-white2"), 100);
+	logo_white.add(images.get("logo-white3"), 100);
+	logo_white.add(images.get("logo-white4"), 100);
+	logo_white.add(images.get("logo-white5"), 100);
+	logo_white.add(images.get("logo-white6"), 100);
+	logo_white.add(images.get("logo-white7"), 100);
+	logo_white.add(images.get("logo-white8"), 100);
+	logo_white.add(images.get("logo-white9"), 100);
 
-	logo_black.add(images.get("logo-black0"), 1.0);
-	logo_black.add(images.get("logo-black1"), 1.0);
-	logo_black.add(images.get("logo-black2"), 1.0);
-	logo_black.add(images.get("logo-black3"), 1.0);
-	logo_black.add(images.get("logo-black4"), 1.0);
-	logo_black.add(images.get("logo-black5"), 1.0);
-	logo_black.add(images.get("logo-black6"), 1.0);
-	logo_black.add(images.get("logo-black7"), 1.0);
-	logo_black.add(images.get("logo-black8"), 1.0);
-	logo_black.add(images.get("logo-black9"), 1.0);
+	logo_black.add(images.get("logo-black0"), 100);
+	logo_black.add(images.get("logo-black1"), 100);
+	logo_black.add(images.get("logo-black2"), 100);
+	logo_black.add(images.get("logo-black3"), 100);
+	logo_black.add(images.get("logo-black4"), 100);
+	logo_black.add(images.get("logo-black5"), 100);
+	logo_black.add(images.get("logo-black6"), 100);
+	logo_black.add(images.get("logo-black7"), 100);
+	logo_black.add(images.get("logo-black8"), 100);
+	logo_black.add(images.get("logo-black9"), 100);
 
 	shelf = new NinePatch(images.get("shelf"));
 	shelf_bkgd = new NinePatch(images.get("shelf background"));
@@ -433,9 +432,9 @@ function need_shelves(cameraX) {
 	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
 }
 
-function move_shelves(elapsedSec) {
+function move_shelves(elapsedMillis) {
 	for (var i in shelves) {
-		shelves[i].move(elapsedSec);
+		shelves[i].move(elapsedMillis);
 	}
 }
 
@@ -447,8 +446,8 @@ function reset() {
 	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
 	player.y = shelves[2].y - player.height;
-	player.vx = 100;
-	bgv = -30;
+	player.vx = 1;
+	bgv = -0.3;
 	bgx = 0;
 	game.camera = new EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 	deadTime = 0;
@@ -476,24 +475,23 @@ function simulation(elapsedMillis) {
 			return;
 		}
 	}
-	var elapsedSec = elapsedMillis / 100;
 
-	distance += elapsedSec * player.vx;
+	distance = player.x;
 	if (distance > max_distance) {
 		max_distance = distance;
 	}
 
-	move_shelves(elapsedSec);
+	move_shelves(elapsedMillis);
 
 	if (keys.isPressed("left")) {
-		player.x -= elapsedSec * 70;
+		player.x -= elapsedMillis * 0.70;
 	}
 	if (keys.isPressed("right")) {
-		player.x += elapsedSec * 70;
+		player.x += elapsedMillis * 0.70;
 	}
-	var gravityAccel = 50;
-	player.vy += elapsedSec * gravityAccel;
-	player.move(elapsedSec);
+	var gravityAccel = 0.005;
+	player.vy += elapsedMillis * gravityAccel;
+	player.move(elapsedMillis);
 
 	delete_invisible_shelves(game.camera.x);
 	populate_shelves(game.camera.x);
@@ -509,7 +507,7 @@ function simulation(elapsedMillis) {
 		var shelf = shelves[i];
 		if (shelf.collides(player)) {
 			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
-				player.y = shelf.y - player.height;
+				player.y = shelf.y - player.height - 0.01;
 				player.vy = 0;
 				onGround = true;
 			}
@@ -526,13 +524,13 @@ function simulation(elapsedMillis) {
 		beetle_jump.reset();
 	}
 	if ((keys.isPressed("space") || mouse.buttons[0]) && onGround) {
-		player.vy = -150;
+		player.vy = -1.50;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 		sounds.play("jump");
 	}
 
-	bgx += elapsedSec * bgv;
+	bgx += elapsedMillis * bgv;
 	var bg = images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
@@ -572,7 +570,7 @@ function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
 	this.toggled = true;
 	this.onToggle = onToggle;
 }
-ToggleButton.prototype.move = function(elapsedSec) {
+ToggleButton.prototype.move = function(elapsedMillis) {
 	if (mouse.buttons[0] && mouse.x >= this.x && mouse.x < this.x + this.width && mouse.y >= this.y && mouse.y < this.y + this.height) {
 		mouse.buttons[0] = false;
 		this.toggle();
