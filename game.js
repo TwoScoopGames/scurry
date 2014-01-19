@@ -41,7 +41,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		startTime += timeDiffMillis;
 		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
-			beetleBlack = new AnimatedEntity(startScreen.cameraX, startScreen.cameraY + 420, 0, 0, beetle_black, 0, 0);
+			beetleBlack = new AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
 			beetleBlack.vx = 140;
 		}
 		if (startTime > 2300) {
@@ -61,10 +61,8 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 	if (beetleBlack) {
 		beetleBlack.move(elapsedSec);
 	}
-	startScreen.cameraX += 20 * elapsedSec;
-	startScreen.cameraY = -800;
-	delete_invisible_shelves(startScreen.cameraX);
-	populate_shelves(startScreen.cameraX);
+	delete_invisible_shelves(startScreen.camera.x);
+	populate_shelves(startScreen.camera.x);
 
 	bgx += elapsedSec * -5;
 	var bg = images.get("bg");
@@ -77,26 +75,30 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 }, function(context) {
 	drawStage(startScreen, context);
 
-	var logo;
-	if (lightsOn) {
-		context.fillStyle = "rgba(255, 255, 255, 0.7)";
-		logo = logo_black;
-	} else {
-		context.fillStyle = "rgba(0, 0, 0, 0.7)";
-		logo = logo_white;
-	}
-	context.fillRect(startScreen.cameraX, startScreen.cameraY, canvas.width, canvas.height);
-	logo.draw(context, startScreen.cameraX + (canvas.width / 2) - (logo.width / 2), startScreen.cameraY);
+	startScreen.camera.drawAbsolute(context, function() {
+		var logo;
+		if (lightsOn) {
+			context.fillStyle = "rgba(255, 255, 255, 0.7)";
+			logo = logo_black;
+		} else {
+			context.fillStyle = "rgba(0, 0, 0, 0.7)";
+			logo = logo_white;
+		}
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		logo.draw(context, (canvas.width / 2) - (logo.width / 2), 0);
 
-	if (lightsOn) {
-		beetleBlack.draw(context);
-	}
-	if (!starting) {
-		context.fillStyle = "#ffffff";
-		context.font = "48px pixelade";
-		centerText(context, clickOrTap() + " TO START", startScreen.cameraX, startScreen.cameraY + 450);
-	}
+		if (lightsOn) {
+			beetleBlack.draw(context);
+		}
+		if (!starting) {
+			context.fillStyle = "#ffffff";
+			context.font = "48px pixelade";
+			centerText(context, clickOrTap() + " TO START", 0, 450);
+		}
+	});
 });
+startScreen.camera.vx = 0.2;
+startScreen.camera.y = -800;
 
 function clickOrTap() {
 	if (mouse.supportsTouch()) {
@@ -107,10 +109,10 @@ function clickOrTap() {
 }
 
 function centerText(context, text, offsetX, offsetY) {
-		var w = context.measureText(text).width;
-		var x = offsetX + (canvas.width / 2) - (w / 2) |0;
-		var y = offsetY |0;
-		context.fillText(text, x, y);
+	var w = context.measureText(text).width;
+	var x = offsetX + (canvas.width / 2) - (w / 2) |0;
+	var y = offsetY |0;
+	context.fillText(text, x, y);
 }
 
 var ls = 36;
@@ -388,7 +390,7 @@ function make_shelf(x) {
 }
 
 function delete_invisible_shelves(cameraX) {
-	while (first_shelf_is_invisible()) {
+	while (first_shelf_is_invisible(cameraX)) {
 		shelves.shift();
 	}
 }
@@ -448,12 +450,10 @@ function reset() {
 	player.vx = 100;
 	bgv = -30;
 	bgx = 0;
-	game.cameraX = 0;
-	game.cameraY = player.y - (canvas.height / 2);
+	game.camera = new EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 	deadTime = 0;
 	pauseToggle.toggled = true;
 }
-
 
 function simulation(timeDiffMillis) {
 	soundToggle.move(timeDiffMillis);
@@ -494,19 +494,9 @@ function simulation(timeDiffMillis) {
 	var gravityAccel = 50;
 	player.vy += elapsedSec * gravityAccel;
 	player.move(elapsedSec);
-	game.cameraX = player.x - 200;
 
-	var half_canvas_height = canvas.height / 2;
-	var bounds_from_center = 100;
-	if (player.y < game.cameraY + half_canvas_height - bounds_from_center) {
-		game.cameraY = player.y - half_canvas_height + bounds_from_center;
-	}
-	if (player.y + player.height > game.cameraY + half_canvas_height + bounds_from_center) {
-		game.cameraY = player.y + player.height - half_canvas_height - bounds_from_center;
-	}
-
-	delete_invisible_shelves(game.cameraX);
-	populate_shelves(game.cameraX);
+	delete_invisible_shelves(game.camera.x);
+	populate_shelves(game.camera.x);
 
 	if (player.y > -player.height) {
 		state = "dead";
@@ -551,18 +541,22 @@ function simulation(timeDiffMillis) {
 
 function drawStage(game, context) {
 	var bg = images.get("bg");
-	context.drawImage(bg, game.cameraX + bgx, game.cameraY);
-	if (bgx + bg.width < canvas.width) {
-		context.drawImage(bg, game.cameraX + bgx + bg.width, game.cameraY);
-	}
+
+	game.camera.drawAbsolute(context, function() {
+		var x = bgx|0;
+		context.drawImage(bg, x, 0);
+		if (x + bg.width < canvas.width) {
+			context.drawImage(bg, x + bg.width, 0);
+		}
+	});
 
 	for (var i in shelves) {
 		shelves[i].draw(context);
 	}
 
-	if (game.cameraY > -canvas.height) {
+	if (game.camera.y > -canvas.height) {
 		context.fillStyle = "#000000";
-		context.fillRect(game.cameraX, 0, canvas.width, canvas.height + game.cameraY);
+		context.fillRect(game.camera.x|0, 0, canvas.width, canvas.height + game.camera.y + 1|0);
 	}
 }
 
@@ -591,7 +585,7 @@ ToggleButton.prototype.draw = function(context) {
 	if (this.toggled) {
 		icon = this.onIcon;
 	}
-	context.drawImage(icon, game.cameraX + this.x, game.cameraY + this.y);
+	context.drawImage(icon, this.x, this.y);
 };
 ToggleButton.prototype.toggle = function() {
 	if (this.onToggle(!this.toggled) !== false) {
@@ -603,21 +597,23 @@ function draw(context) {
 	drawStage(game, context);
 	player.draw(context);
 
-	soundToggle.draw(context);
-	pauseToggle.draw(context);
+	game.camera.drawAbsolute(context, function() {
+		soundToggle.draw(context);
+		pauseToggle.draw(context);
 
-	context.fillStyle = "#000000";
-	context.font = "36px pixelade";
-	var dist = Math.round(distance / player.width * 100) / 100;
-	context.fillText(dist, game.cameraX + 20, game.cameraY + 40);
-	dist = Math.round(max_distance / player.width * 100) / 100;
-	context.fillText("Max: " + dist, game.cameraX + 300, game.cameraY + 40);
+		context.fillStyle = "#000000";
+		context.font = "36px pixelade";
+		var dist = Math.round(distance / player.width * 100) / 100;
+		context.fillText(dist, 20, 40);
+		dist = Math.round(max_distance / player.width * 100) / 100;
+		context.fillText("Max: " + dist, 300, 40);
 
-	if (stateMessages[state]) {
-		context.fillStyle = "rgba(0, 0, 0, 0.7)";
-		context.fillRect(game.cameraX, game.cameraY + 400, canvas.width, 70);
-		context.fillStyle = "#ffffff";
-		context.font = "48px pixelade";
-		centerText(context, stateMessages[state], game.cameraX, game.cameraY + 450);
-	}
+		if (stateMessages[state]) {
+			context.fillStyle = "rgba(0, 0, 0, 0.7)";
+			context.fillRect(0, 400, canvas.width, 70);
+			context.fillStyle = "#ffffff";
+			context.font = "48px pixelade";
+			centerText(context, stateMessages[state], 0, 450);
+		}
+	});
 }

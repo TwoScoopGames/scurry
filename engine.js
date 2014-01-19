@@ -28,6 +28,45 @@ function get_context_with_image(image) {
 	return ctx;
 }
 
+function Camera(x, y, width, height) {
+	Entity.call(this, x, y, width, height);
+}
+Camera.prototype = Object.create(Entity.prototype);
+Camera.prototype.draw = function(context) {
+	context.translate(-(this.x|0), -(this.y|0));
+};
+Camera.prototype.drawAbsolute = function(context, drawFunc) {
+	context.save();
+	context.translate(this.x|0, this.y|0);
+	drawFunc();
+	context.restore();
+}
+
+
+function EntityBoxCamera(entity, width, height, screenCenterX, screenCenterY) {
+	this.entity = entity;
+	this.screenCenterX = screenCenterX;
+	this.screenCenterY = screenCenterY;
+
+	var x = keepPositionInBox(entity.x, entity.width, 0, width, screenCenterX);
+	var y = keepPositionInBox(entity.y, entity.height, 0, height, screenCenterY);
+	Camera.call(this, x, y, width, height);
+}
+EntityBoxCamera.prototype = Object.create(Camera.prototype);
+EntityBoxCamera.prototype.move = function(elapsedMillis) {
+	this.x = keepPositionInBox(this.entity.x, this.entity.width, this.x, this.width, this.screenCenterX);
+	this.y = keepPositionInBox(this.entity.y, this.entity.height, this.y, this.height, this.screenCenterY);
+};
+function keepPositionInBox(entityPos, entitySize, thisPos, thisSize, offset) {
+	var boundsFromCenter = thisSize / 2;
+	if (entityPos < thisPos + offset - boundsFromCenter) {
+		thisPos = entityPos - offset + boundsFromCenter;
+	}
+	if (entityPos + entitySize > thisPos + offset + boundsFromCenter) {
+		thisPos = entityPos + entitySize - offset - boundsFromCenter;
+	}
+	return thisPos;
+}
 
 function Game(canvas, simulationFunc, drawFunc) {
 	var context = canvas.getContext("2d");
@@ -35,8 +74,7 @@ function Game(canvas, simulationFunc, drawFunc) {
 	var running = false;
 	var that = this;
 
-	this.cameraX = 0;
-	this.cameraY = 0;
+	this.camera = new Camera(0, 0, canvas.width, canvas.height);
 	this.showFrameRate = true;
 
 	function drawFrameRate(timeDiffMillis) {
@@ -52,7 +90,9 @@ function Game(canvas, simulationFunc, drawFunc) {
 		}
 		var msg = fps + " FPS";
 		var w = context.measureText(msg).width;
-		context.fillText(msg, that.cameraX + canvas.width - w - 50, that.cameraY + 50);
+		that.camera.drawAbsolute(context, function() {
+			context.fillText(msg, canvas.width - w - 50, 50);
+		});
 	}
 
 	function mainLoop(timestamp) {
@@ -63,11 +103,10 @@ function Game(canvas, simulationFunc, drawFunc) {
 		lastTimestamp = timestamp;
 
 		simulationFunc(timeDiff);
-		that.cameraX = that.cameraX|0;
-		that.cameraY = that.cameraY|0;
+		that.camera.move(timeDiff);
 
 		context.save();
-		context.translate(-that.cameraX, -that.cameraY);
+		that.camera.draw(context);
 		drawFunc(context);
 
 		if (that.showFrameRate) {
