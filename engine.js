@@ -77,8 +77,8 @@ function Game(canvas, simulationFunc, drawFunc) {
 	this.camera = new Camera(0, 0, canvas.width, canvas.height);
 	this.showFrameRate = true;
 
-	function drawFrameRate(timeDiffMillis) {
-		var fps = (1000 / timeDiffMillis) |0;
+	function drawFrameRate(elapsedMillis) {
+		var fps = (1000 / elapsedMillis) |0;
 
 		context.font = "24px mono";
 		if (fps < 30) {
@@ -99,18 +99,18 @@ function Game(canvas, simulationFunc, drawFunc) {
 		if (lastTimestamp === -1) {
 			lastTimestamp = timestamp;
 		}
-		var timeDiff = timestamp - lastTimestamp;
+		var elapsedMillis = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 
-		simulationFunc(timeDiff);
-		that.camera.move(timeDiff);
+		simulationFunc(elapsedMillis);
+		that.camera.move(elapsedMillis);
 
 		context.save();
 		that.camera.draw(context);
 		drawFunc(context);
 
 		if (that.showFrameRate) {
-			drawFrameRate(timeDiff);
+			drawFrameRate(elapsedMillis);
 		}
 
 		context.restore();

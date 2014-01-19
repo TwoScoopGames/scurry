@@ -36,9 +36,9 @@ var starting = false;
 var startTime = 0;
 var lightsOn = false;
 var beetleBlack;
-var startScreen = new Game(canvas, function(timeDiffMillis) {
+var startScreen = new Game(canvas, function(elapsedMillis) {
 	if (starting) {
-		startTime += timeDiffMillis;
+		startTime += elapsedMillis;
 		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
 			beetleBlack = new AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
@@ -56,7 +56,7 @@ var startScreen = new Game(canvas, function(timeDiffMillis) {
 		mouse.buttons[0] = false;
 		sounds.play("lights-on");
 	}
-	var elapsedSec = timeDiffMillis / 100;
+	var elapsedSec = elapsedMillis / 100;
 	move_shelves(elapsedSec);
 	if (beetleBlack) {
 		beetleBlack.move(elapsedSec);
@@ -455,12 +455,12 @@ function reset() {
 	pauseToggle.toggled = true;
 }
 
-function simulation(timeDiffMillis) {
-	soundToggle.move(timeDiffMillis);
-	pauseToggle.move(timeDiffMillis);
+function simulation(elapsedMillis) {
+	soundToggle.move(elapsedMillis);
+	pauseToggle.move(elapsedMillis);
 
 	if (state === "dead") {
-		deadTime += timeDiffMillis;
+		deadTime += elapsedMillis;
 		if (deadTime > 1000) {
 			state = "start";
 			reset();
@@ -476,7 +476,7 @@ function simulation(timeDiffMillis) {
 			return;
 		}
 	}
-	var elapsedSec = timeDiffMillis / 100;
+	var elapsedSec = elapsedMillis / 100;
 
 	distance += elapsedSec * player.vx;
 	if (distance > max_distance) {
@@ -554,6 +554,7 @@ function drawStage(game, context) {
 		shelves[i].draw(context);
 	}
 
+	// draw the insta-death floor
 	if (game.camera.y > -canvas.height) {
 		context.fillStyle = "#000000";
 		context.fillRect(game.camera.x|0, 0, canvas.width, canvas.height + game.camera.y + 1|0);
