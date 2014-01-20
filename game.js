@@ -285,52 +285,55 @@ function rand_price() {
 	}
 	return price[0] + "." + price.substr(1);
 }
-function get_shelf_items(num_units) {
-	if (arguments.length == 0) {
-		num_units = Math.floor(Math.random() * 3 + 2);
-	}
+function getShelfItems(width) {
 	var items = [];
 	var possible_items = shelf_items.slice(0);
-	for (var i = 0; i < num_units; i++) {
-		if (i > 0 && Math.random() < same_item_chance) {
-			items.push(items[i - 1]);
-			continue;
+	function getItemWidth(item) {
+		var name = item.item;
+		if (name == "empty") {
+			name = "box1";
 		}
-		var	n = (Math.random() * possible_items.length) |0;
+		var img = images.get(name);
+		var tag = images.get(item.tag);
+		if (tag.width > img.width) {
+			return tag.width;
+		} else {
+			return img.width;
+		}
+	}
+	function makeItem(item) {
 		var tag = (Math.random() * shelf_tags.length) |0;
-		var item = {
-			item: possible_items[n],
+		return {
+			item: item,
 			tag: shelf_tags[tag],
 			price: rand_price()
 		};
-		items.push(item);
-		if (item.item != "empty") {
+	}
+	while (width > 0 && possible_items.length > 0) {
+		if (items.length > 0 && Math.random() < same_item_chance) {
+			var i = items[items.length - 1];
+			var w = getItemWidth(i);
+			if (w < width) {
+				width -= w + shelf_item_spacing;
+				items.push(i);
+				continue;
+			}
+		}
+		while (possible_items.length > 0) {
+			var	n = (Math.random() * possible_items.length) |0;
+			var i = possible_items[n];
 			possible_items.splice(n, 1);
+			var item = makeItem(i);
+			var w = getItemWidth(item);
+			if (w > width) {
+				continue;
+			}
+			items.push(item);
+			width -= w + shelf_item_spacing;
+			break;
 		}
 	}
 	return items;
-}
-function get_shelf_width(items) {
-	var width = 0;
-	width += shelf.w1 + shelf.w3;
-	for (var i = 0; i < items.length; i++) {
-		if (i > 0) {
-			width += shelf_item_spacing;
-		}
-
-		var item = items[i].item;
-		var tag = images.get(items[i].tag);
-		if (item == "empty") {
-			item = "box1";
-		}
-		var img = images.get(item);
-		if (tag.width > img.width) {
-			width += tag.width;
-		} else {
-			width += img.width;
-		}
-	}
-	return width;
 }
 function draw_tag_price(context, item, tagx, tagy) {
 	var price = item.price;
@@ -342,7 +345,7 @@ function draw_tag_price(context, item, tagx, tagy) {
 	context.font = "36px pixelade";
 	context.fillText(price, tagx + 70, tagy + 65);
 }
-function draw_shelf_item(context, item,	x, y) {
+function draw_shelf_item(context, item, x, y) {
 	if (item.item == "empty") {
 		return images.get("box1").width;
 	}
@@ -375,16 +378,17 @@ function draw_shelf_items(context, items, x, y) {
 	}
 }
 
-function make_shelf(x) {
+function make_shelf(x, width, drawBackground) {
 	var y = -((canvas.height / 4) + (Math.random() * (canvas.height / 2)));
-	var items = x == 0 ? get_shelf_items(6) : get_shelf_items();
-	var width = get_shelf_width(items);
+	var items = getShelfItems(width - shelf.w1 - shelf.w3);
 
 	var spacing = (shelf_bkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
 	var img = drawCanvas(width, height + 50, function(ctx) {
 		var bkgdh = (shelf_bkgd.img.height - 1) * 3;
-		shelf_bkgd.draw(ctx, 0, 0, width, bkgdh);
+		if (drawBackground) {
+			shelf_bkgd.draw(ctx, 0, 0, width, bkgdh);
+		}
 		shelf.draw(ctx, 0, bkgdh, width, shelf.img.height - 1);
 		draw_shelf_items(ctx, items, 0, bkgdh);
 	});
@@ -423,18 +427,22 @@ function makeShelfBottom(template) {
 function populate_shelves(cameraX) {
 	while (need_shelves(cameraX)) {
 		var x = getNextShelfX();
+		var width = x == 0 ? 600 : getRandomArbitrary(400, 1000) |0;
 
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
-		var template = make_shelf(x);
+		var s = make_shelf(x, width, true);
 
-		shelves.push(makeShelfBottom(template));
+		shelves.push(makeShelfBottom(s));
+		shelves.push(s);
+		var y = s.y - height;
 
 		for (var n = 0; n < 3; n++) {
-			var s = template.copy();
+			s = make_shelf(x, width, n != 2);
+			s.y = y;
 			shelves.push(s);
-			template.y -= height;
+			y -= height;
 		}
 	}
 }
