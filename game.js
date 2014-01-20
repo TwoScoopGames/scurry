@@ -401,27 +401,35 @@ function first_shelf_is_invisible(cameraX) {
 	return shelves.length > 0 && shelves[0].x + shelves[0].width < cameraX;
 }
 
+function getNextShelfX() {
+	if (shelves.length > 0) {
+		var last = shelves[shelves.length - 1];
+		return last.x + last.width + getRandomArbitrary(150, 400);
+	}
+	return 0;
+}
+
+function makeShelfBottom(template) {
+	var bottom = new Entity(template.x, template.y + template.height, template.width, -(template.y + template.height));
+	bottom.draw = function(ctx) {
+		shelf_bkgd.draw(ctx, this.x, this.y, this.width, this.height);
+	};
+	bottom.collides = function(other) {
+		return false;
+	};
+	return bottom;
+}
+
 function populate_shelves(cameraX) {
 	while (need_shelves(cameraX)) {
-		var x = 0;
-		if (shelves.length > 0) {
-			var last = shelves[shelves.length - 1];
-			x = last.x + last.width + getRandomArbitrary(x + 150, x + 400);
-		}
+		var x = getNextShelfX();
 
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
 		var template = make_shelf(x);
 
-		var bottom = new Entity(x, template.y + template.height, template.width, -(template.y + template.height));
-		bottom.draw = function(ctx) {
-			shelf_bkgd.draw(ctx, this.x, this.y, this.width, this.height);
-		};
-		bottom.collides = function(other) {
-			return false;
-		};
-		shelves.push(bottom);
+		shelves.push(makeShelfBottom(template));
 
 		for (var n = 0; n < 3; n++) {
 			var s = template.copy();
