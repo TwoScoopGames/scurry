@@ -156,6 +156,7 @@ var stateMessages = {
 	"start": clickOrTap() + " TO START",
 	"paused": "PAUSED"
 };
+var gravityAccel = 0.005;
 var jumpSpeed = -1.50;
 var minJump = -0.3;
 
@@ -491,7 +492,7 @@ function simulation(elapsedMillis) {
 	if (keys.isPressed("right")) {
 		player.x += elapsedMillis * 0.70;
 	}
-	var gravityAccel = 0.005;
+
 	player.vy += elapsedMillis * gravityAccel;
 	player.move(elapsedMillis);
 
