@@ -156,6 +156,8 @@ var stateMessages = {
 	"start": clickOrTap() + " TO START",
 	"paused": "PAUSED"
 };
+var jumpSpeed = -1.50;
+var minJump = -0.3;
 
 var bgv = -30;
 var bgx = 0;
@@ -524,10 +526,13 @@ function simulation(elapsedMillis) {
 		beetle_jump.reset();
 	}
 	if ((keys.isPressed("space") || mouse.buttons[0]) && onGround) {
-		player.vy = -1.50;
+		player.vy = jumpSpeed;
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 		sounds.play("jump");
+	}
+	if ((!keys.isPressed("space") && !mouse.buttons[0]) && player.vy < minJump) {
+		player.vy = minJump;
 	}
 
 	bgx += elapsedMillis * bgv;
