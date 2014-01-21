@@ -16,7 +16,7 @@ function setCanvasSize() {
 
 	// console.log(window.innerWidth + "x" + window.innerHeight + " - " + canvas.style.width + "x" + canvas.style.height + " - " + canvas.width + "x" + canvas.height);
 }
-window.onresize = setCanvasSize;
+window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
 var keys = new KeyboardInput({
@@ -254,7 +254,7 @@ function assetsLoaded() {
 	shelf = new NinePatch(images.get("shelf"));
 	shelf_bkgd = new NinePatch(images.get("shelf background"));
 
-	pauseToggle = new ToggleButton(canvas.width - 84, 12, 72, 72, images.get("play"), images.get("pause"), "pause", function(toggled) {
+	pauseToggle = new ToggleButton(0, 12, 72, 72, images.get("play"), images.get("pause"), "pause", function(toggled) {
 		if (state === "dead") {
 			return false;
 		}
@@ -264,9 +264,12 @@ function assetsLoaded() {
 			state = "running";
 		}
 	});
-	soundToggle = new ToggleButton(canvas.width - 84, 108, 72, 72, images.get("sound-on"), images.get("sound-off"), "m", function(toggled) {
+	pauseToggle.attachToRight(canvas, 12);
+
+	soundToggle = new ToggleButton(0, 108, 72, 72, images.get("sound-on"), images.get("sound-off"), "m", function(toggled) {
 		sounds.muted = !toggled;
 	});
+	soundToggle.attachToRight(canvas, 12);
 
 	reset();
 }
@@ -613,6 +616,14 @@ ToggleButton.prototype.toggle = function() {
 		this.toggled = !this.toggled;
 	}
 };
+ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
+	var that = this;
+	var adjustX = function() {
+		that.x = canvas.width - that.width - xOffset;
+	};
+	adjustX();
+	window.addEventListener("resize", adjustX);
+}
 
 function draw(context) {
 	drawStage(game, context);
