@@ -168,6 +168,7 @@ images.load("bg", "images/Scurry-bg-TEST2.png");
 images.load("beetle", "images/scurry-run7f136x80.png", 7);
 images.load("beetle-black", "images/scurry-run7f45x26.png", 7);
 images.load("beetle-jump", "images/scurry-jump-sprite-7f129x124.png", 7);
+images.load("beetle-dead", "images/scurry-dead-1f132x72.png");
 images.load("shelf", "images/shelf.png");
 images.load("shelf background", "images/shelf-bars-spritesheet.png");
 images.load("box1", "images/box1.png");
@@ -482,6 +483,9 @@ function simulation(elapsedMillis) {
 
 	if (state === "dead") {
 		deadTime += elapsedMillis;
+		if (deadTime > 300) {
+			player.sprite = images.get("beetle-dead");
+		}
 		if (deadTime > 1000) {
 			state = "start";
 			reset();
