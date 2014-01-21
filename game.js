@@ -442,8 +442,9 @@ function populate_shelves(cameraX) {
 		shelves.push(s);
 		var y = s.y - height;
 
-		for (var n = 0; n < 3; n++) {
-			s = make_shelf(x, width, n != 2);
+		var shelvesInRack = 3 + (Math.random() * 3) |0;
+		for (var n = 0; n < shelvesInRack; n++) {
+			s = make_shelf(x, width, n < shelvesInRack -1);
 			s.y = y;
 			shelves.push(s);
 			y -= height;
@@ -551,6 +552,10 @@ function simulation(elapsedMillis) {
 	}
 	if ((keys.isPressed("space") || mouse.buttons[0]) && onGround) {
 		player.vy = jumpSpeed;
+		if (keys.isPressed("up")) {
+			player.vy += -1;
+		}
+
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 		sounds.play("jump");
