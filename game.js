@@ -54,7 +54,7 @@ var startScreen = new Game(canvas, function(elapsedMillis) {
 	if (!starting && (keys.consumePressed("space") || mouse.buttons[0])) {
 		starting = true;
 		mouse.buttons[0] = false;
-		sounds.play("lights-on");
+		Splat.sounds.play("lights-on");
 	}
 	move_shelves(elapsedMillis);
 	if (beetleBlack) {
@@ -119,7 +119,7 @@ var lrate = 0.02;
 var lmin = 36;
 var lmax = 46;
 var loading = new Game(canvas, function(elapsedMillis) {
-	if (Splat.images.allLoaded() && sounds.allLoaded()) {
+	if (Splat.images.allLoaded() && Splat.sounds.allLoaded()) {
 		assetsLoaded();
 		loading.stop();
 		startScreen.start();
@@ -186,11 +186,10 @@ Splat.images.load("sound-on", "images/sound-on-icon.png");
 Splat.images.load("play", "images/play-icon.png");
 Splat.images.load("pause", "images/pause-icon.png");
 
-var sounds = new SoundLoader();
-sounds.load("jump", "audio/jump.wav");
-sounds.load("land", "audio/land.wav");
-sounds.load("death", "audio/death.wav");
-sounds.load("lights-on", "audio/lights-on.wav");
+Splat.sounds.load("jump", "audio/jump.wav");
+Splat.sounds.load("land", "audio/land.wav");
+Splat.sounds.load("death", "audio/death.wav");
+Splat.sounds.load("lights-on", "audio/lights-on.wav");
 
 var beetle = new Animation();
 var beetle_black = new Animation();
@@ -267,7 +266,7 @@ function assetsLoaded() {
 	pauseToggle.attachToRight(canvas, 12);
 
 	soundToggle = new ToggleButton(0, 108, 72, 72, Splat.images.get("sound-on"), Splat.images.get("sound-off"), "m", function(toggled) {
-		sounds.muted = !toggled;
+		Splat.sounds.muted = !toggled;
 	});
 	soundToggle.attachToRight(canvas, 12);
 
@@ -525,7 +524,7 @@ function simulation(elapsedMillis) {
 
 	if (player.y > -player.height) {
 		state = "dead";
-		sounds.play("death");
+		Splat.sounds.play("death");
 		return;
 	}
 
@@ -544,7 +543,7 @@ function simulation(elapsedMillis) {
 	if (onGround && player.sprite == beetle_jump) {
 		player.sprite = beetle;
 		beetle.reset();
-		sounds.play("land");
+		Splat.sounds.play("land");
 	}
 	if (!onGround && player.sprite == beetle) {
 		player.sprite = beetle_jump;
@@ -558,7 +557,7 @@ function simulation(elapsedMillis) {
 
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
-		sounds.play("jump");
+		Splat.sounds.play("jump");
 	}
 	if ((!keys.isPressed("space") && !mouse.buttons[0]) && player.vy < minJump) {
 		player.vy = minJump;
