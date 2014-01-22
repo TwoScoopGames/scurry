@@ -40,7 +40,7 @@ Camera.prototype.drawAbsolute = function(context, drawFunc) {
 	context.translate(this.x|0, this.y|0);
 	drawFunc();
 	context.restore();
-}
+};
 
 
 function EntityBoxCamera(entity, width, height, screenCenterX, screenCenterY) {
@@ -123,11 +123,11 @@ function Game(canvas, simulationFunc, drawFunc) {
 	this.start = function() {
 		running = true;
 		window.requestAnimationFrame(mainLoop);
-	}
+	};
 
 	this.stop = function() {
 		running = false;
-	}
+	};
 }
 
 function KeyboardInput(keyMap) {
@@ -139,7 +139,7 @@ function KeyboardInput(keyMap) {
 	}
 	window.addEventListener("keydown", function(event) {
 		if (keyMap.hasOwnProperty(event.keyCode)) {
-			if (that.keys[keyMap[event.keyCode]] == 0) {
+			if (that.keys[keyMap[event.keyCode]] === 0) {
 				that.keys[keyMap[event.keyCode]] = 1;
 			}
 			return false;
@@ -204,7 +204,7 @@ function MouseInput(canvas) {
 	});
 	canvas.addEventListener("touchstart", function(event) {
 		var touch = event.touches[0];
-		var m = relMouseCoords(touch)
+		var m = relMouseCoords(touch);
 		that.x = m.x;
 		that.y = m.y;
 		that.buttons[0] = true;
@@ -215,7 +215,7 @@ function MouseInput(canvas) {
 }
 MouseInput.prototype.supportsTouch = function() {
 	return "ontouchstart" in window || navigator.msMaxTouchPoints;
-}
+};
 
 function Entity(x, y, width, height) {
 	this.x = x;
@@ -232,26 +232,26 @@ Entity.prototype.move = function(elapsedMillis) {
 	this.lastY = this.y;
 	this.x += elapsedMillis * this.vx;
 	this.y += elapsedMillis * this.vy;
-}
+};
 Entity.prototype.overlapsHoriz = function(other) {
 	return this.x + this.width > other.x && this.x < other.x + other.width;
-}
+};
 Entity.prototype.overlapsVert = function(other) {
 	return this.y + this.height > other.y && this.y < other.y + other.height;
-}
+};
 Entity.prototype.collides = function(other) {
 	return this.overlapsHoriz(other) && this.overlapsVert(other);
-}
+};
 
 Entity.prototype.didOverlapHoriz = function(other) {
 	return this.lastX + this.width > other.lastX && this.lastX < other.lastX + other.width;
-}
+};
 Entity.prototype.didOverlapVert = function(other) {
 	return this.lastY + this.height > other.lastY && this.lastY < other.lastY + other.height;
-}
+};
 Entity.prototype.wasAbove = function(other) {
 	return this.lastY + this.height <= other.lastY;
-}
+};
 
 function ImageLoader() {
 	this.images = {};
@@ -264,6 +264,12 @@ ImageLoader.prototype.load = function(name, path, numFrames) {
 	}
 	this.totalImages++;
 
+	function makeFrame(img, frameWidth, f) {
+		return drawCanvas(frameWidth, img.height, function(ctx) {
+			var sx = f * frameWidth;
+			ctx.drawImage(img, sx, 0, frameWidth, img.height, 0, 0, frameWidth, img.height);
+		});
+	}
 	var img = new Image();
 	var that = this;
 	img.addEventListener("load", function() {
@@ -274,11 +280,7 @@ ImageLoader.prototype.load = function(name, path, numFrames) {
 		} else {
 			var frameWidth = img.width / numFrames;
 			for (var f = 0; f < numFrames; f++) {
-				var slice = drawCanvas(frameWidth, img.height, function(ctx) {
-					var sx = f * frameWidth
-					ctx.drawImage(img, sx, 0, frameWidth, img.height, 0, 0, frameWidth, img.height);
-				});
-				that.images[name + f] = slice;
+				that.images[name + f] = makeFrame(img, frameWidth, f);
 			}
 		}
 	});
@@ -303,7 +305,7 @@ function SoundLoader() {
 SoundLoader.prototype.load = function(name, path) {
 	var that = this;
 
-	if (this.totalSounds == 0) {
+	if (this.totalSounds === 0) {
 		// safari on iOS mutes sounds until they're played in response to user input
 		// play a dummy sound on first touch
 		var firstTouchHandler = function(event) {
@@ -338,11 +340,11 @@ SoundLoader.prototype.load = function(name, path) {
 			that.sounds[name] = buffer;
 			that.loadedSounds++;
 		});
-	}
+	};
 	request.send();
 };
 SoundLoader.prototype.allLoaded = function() {
-	return this.totalSounds = this.loadedSounds;
+	return this.totalSounds == this.loadedSounds;
 };
 SoundLoader.prototype.play = function(name) {
 	if (!this.firstPlay) {
@@ -369,7 +371,7 @@ function Animation() {
 }
 Animation.prototype.add = function(img, time) {
 	this.frames.push({img: img, time: time});
-	if (frames.length == 0) {
+	if (frames.length === 0) {
 		this.width = img.width;
 		this.height = img.height;
 	}
@@ -418,7 +420,7 @@ AnimatedEntity.prototype.draw = function(context) {
 };
 AnimatedEntity.prototype.copy = function() {
 	return new AnimatedEntity(this.x, this.y, this.width, this.height, this.sprite, this.spriteOffsetX, this.spriteOffsetY);
-}
+};
 
 function NinePatch(image) {
 	this.img = image;
@@ -426,14 +428,17 @@ function NinePatch(image) {
 	var imgh = image.height - 1;
 
 	var context = get_context_with_image(image);
-	var firstDiv = secondDiv = imgw;
+	var firstDiv = imgw;
+	var secondDiv = imgw;
+	var pixel;
+	var alpha;
 	for (var x = 0; x < imgw; x++) {
-		var pixel = context.getImageData(x, imgh, 1, 1).data;
-		var alpha = pixel[3];
+		pixel = context.getImageData(x, imgh, 1, 1).data;
+		alpha = pixel[3];
 		if (firstDiv == imgw && alpha > 0) {
 			firstDiv = x;
 		}
-		if (firstDiv < imgw && alpha == 0) {
+		if (firstDiv < imgw && alpha === 0) {
 			secondDiv = x;
 			break;
 		}
@@ -444,12 +449,12 @@ function NinePatch(image) {
 
 	firstDiv = secondDiv = imgh;
 	for (var y = 0; y < imgh; y++) {
-		var pixel = context.getImageData(imgw, y, 1, 1).data;
-		var alpha = pixel[3];
+		pixel = context.getImageData(imgw, y, 1, 1).data;
+		alpha = pixel[3];
 		if (firstDiv == imgh && alpha > 0) {
 			firstDiv = y;
 		}
-		if (firstDiv < imgh && alpha == 0) {
+		if (firstDiv < imgh && alpha === 0) {
 			secondDiv = y;
 			break;
 		}
@@ -463,16 +468,17 @@ NinePatch.prototype.draw = function(context, x, y, width, height) {
 	y = y|0;
 	width = width |0;
 	height = height |0;
+	var cx, cy, w, h;
 
-	for (var cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
-		for (var cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
-			var w = Math.min(this.w2, x + width - this.w3 - cx);
-			var h = Math.min(this.h2, y + height - this.h3 - cy);
+	for (cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
+		for (cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
+			w = Math.min(this.w2, x + width - this.w3 - cx);
+			h = Math.min(this.h2, y + height - this.h3 - cy);
 			context.drawImage(this.img, this.w1, this.h1, w, h, cx, cy, w, h);
 		}
 	}
-	for (var cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
-		var h = Math.min(this.h2, y + height - this.h3 - cy);
+	for (cy = y + this.h1; cy < y + height - this.h3; cy += this.h2) {
+		h = Math.min(this.h2, y + height - this.h3 - cy);
 		if (this.w1 > 0) {
 			context.drawImage(this.img, 0,                 this.h1, this.w1, h, x,                   cy, this.w1, h);
 		}
@@ -480,8 +486,8 @@ NinePatch.prototype.draw = function(context, x, y, width, height) {
 			context.drawImage(this.img, this.w1 + this.w2, this.h1, this.w3, h, x + width - this.w3, cy, this.w3, h);
 		}
 	}
-	for (var cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
-		var w = Math.min(this.w2, x + width - this.w3 - cx);
+	for (cx = x + this.w1; cx < x + width - this.w3; cx += this.w2) {
+		w = Math.min(this.w2, x + width - this.w3 - cx);
 		if (this.h1 > 0) {
 			context.drawImage(this.img, this.w1, 0,                 w, this.h1, cx, y,                    w, this.h1);
 		}

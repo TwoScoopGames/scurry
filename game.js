@@ -313,10 +313,11 @@ function getShelfItems(width) {
 			price: rand_price()
 		};
 	}
+	var i, w;
 	while (width > 0 && possible_items.length > 0) {
 		if (items.length > 0 && Math.random() < same_item_chance) {
-			var i = items[items.length - 1];
-			var w = getItemWidth(i);
+			i = items[items.length - 1];
+			w = getItemWidth(i);
 			if (w < width) {
 				width -= w + shelf_item_spacing;
 				items.push(i);
@@ -325,10 +326,10 @@ function getShelfItems(width) {
 		}
 		while (possible_items.length > 0) {
 			var	n = (Math.random() * possible_items.length) |0;
-			var i = possible_items[n];
+			i = possible_items[n];
 			possible_items.splice(n, 1);
 			var item = makeItem(i);
-			var w = getItemWidth(item);
+			w = getItemWidth(item);
 			if (w > width) {
 				continue;
 			}
@@ -431,7 +432,7 @@ function makeShelfBottom(template) {
 function populate_shelves(cameraX) {
 	while (need_shelves(cameraX)) {
 		var x = getNextShelfX();
-		var width = x == 0 ? 600 : getRandomArbitrary(400, 1000) |0;
+		var width = x === 0 ? 600 : getRandomArbitrary(400, 1000) |0;
 
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
@@ -453,7 +454,7 @@ function populate_shelves(cameraX) {
 }
 
 function need_shelves(cameraX) {
-	return shelves.length == 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
+	return shelves.length === 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
 }
 
 function move_shelves(elapsedMillis) {
@@ -632,7 +633,7 @@ ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
 	};
 	adjustX();
 	window.addEventListener("resize", adjustX);
-}
+};
 
 function draw(context) {
 	drawStage(game, context);
