@@ -414,16 +414,25 @@ function populate_shelves(cameraX) {
 	}
 }
 
+var possiblePowerUps = [
+	{ "name": "superjump", "color": "#ff0000" },
+	{ "name": "superspeed", "color": "#00ff00" },
+];
 function makePowerUp(x, y) {
 	var e = new Splat.Entity(x, y, 50, 50);
 	e.elapsedSec = 0;
+
+	var pnum = Math.random() * possiblePowerUps.length |0;
+	console.log(pnum);
+	var p = possiblePowerUps[pnum];
+	e.name = p.name;
 
 	e.move = function(elapsedSec) {
 		this.elapsedSec += elapsedSec;
 		this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
 	};
 	e.draw = function(context) {
-		context.fillStyle = "#ff0000";
+		context.fillStyle = p.color;
 		context.fillRect(this.x, this.y, this.width, this.height);
 	};
 	return e;
@@ -465,6 +474,9 @@ function simulation(elapsedMillis) {
 	if (game.timer("superjump") > 5000) {
 		game.stopTimer("superjump");
 	}
+	if (game.timer("superspeed") > 5000) {
+		game.stopTimer("superspeed");
+	}
 	if (state === "dead") {
 		if (game.timer("dead") > 300) {
 			player.sprite = scurry.images.get("beetle-dead");
@@ -495,6 +507,9 @@ function simulation(elapsedMillis) {
 	if (scurry.keyboard.isPressed("left")) {
 		player.x -= elapsedMillis * 0.70;
 	}
+	if (game.timer("superspeed") > 0) {
+		player.x += elapsedMillis * 0.70;
+	}
 	if (scurry.keyboard.isPressed("right")) {
 		player.x += elapsedMillis * 0.70;
 	}
@@ -516,7 +531,7 @@ function simulation(elapsedMillis) {
 		var powerUp = powerUps[i];
 		if (powerUp.collides(player)) {
 			powerUps.splice(i, 1);
-			game.startTimer("superjump");
+			game.startTimer(powerUp.name);
 		}
 	}
 
@@ -646,8 +661,13 @@ function draw(context) {
 		dist = Math.round(max_distance / player.width * 100) / 100;
 		context.fillText("Max: " + dist, 300, 40);
 
-		if (game.timer("superjump") > 0) {
+		if (game.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
+			context.font = "48px pixelade";
+			centerText(context, "SUPERSPEED!", 0, canvas.height - 70);
+		}
+		if (game.timer("superjump") > 0) {
+			context.fillStyle = "#ff0000";
 			context.font = "48px pixelade";
 			centerText(context, "SUPERJUMP!", 0, canvas.height - 50);
 		}
