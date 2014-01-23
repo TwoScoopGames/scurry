@@ -21,18 +21,18 @@ setCanvasSize();
 
 var mouse = new MouseInput(canvas);
 
-var game = new Game(canvas, simulation, draw);
+var game = new Splat.Scene(canvas, simulation, draw);
 
 var starting = false;
 var startTime = 0;
 var lightsOn = false;
 var beetleBlack;
-var startScreen = new Game(canvas, function(elapsedMillis) {
+var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 	if (starting) {
 		startTime += elapsedMillis;
 		if (!lightsOn && startTime > 807) {
 			lightsOn = true;
-			beetleBlack = new AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
+			beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
 			beetleBlack.vx = 1.40;
 		}
 		if (startTime > 2300) {
@@ -109,7 +109,7 @@ var ls = 36;
 var lrate = 0.02;
 var lmin = 36;
 var lmax = 46;
-var loading = new Game(canvas, function(elapsedMillis) {
+var loading = new Splat.Scene(canvas, function(elapsedMillis) {
 	if (Splat.images.allLoaded() && Splat.sounds.allLoaded()) {
 		assetsLoaded();
 		loading.stop();
@@ -386,7 +386,7 @@ function make_shelf(x, width, drawBackground) {
 		shelf.draw(ctx, 0, bkgdh, width, shelf.img.height - 1);
 		draw_shelf_items(ctx, items, 0, bkgdh);
 	});
-	return new AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
+	return new Splat.AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
 }
 
 function delete_invisible_shelves(cameraX) {
@@ -408,7 +408,7 @@ function getNextShelfX() {
 }
 
 function makeShelfBottom(template) {
-	var bottom = new Entity(template.x, template.y + template.height, template.width, -(template.y + template.height));
+	var bottom = new Splat.Entity(template.x, template.y + template.height, template.width, -(template.y + template.height));
 	bottom.draw = function(ctx) {
 		shelf_bkgd.draw(ctx, this.x, this.y, this.width, this.height);
 	};
@@ -457,13 +457,13 @@ function reset() {
 	shelves = [];
 	distance = 0;
 	populate_shelves(0);
-	player = new AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
+	player = new Splat.AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
 	player.x = 200;
 	player.y = shelves[2].y - player.height;
 	player.vx = 1;
 	bgv = -0.3;
 	bgx = 0;
-	game.camera = new EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
+	game.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 	deadTime = 0;
 	pauseToggle.toggled = true;
 }

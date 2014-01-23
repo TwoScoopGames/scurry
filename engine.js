@@ -28,108 +28,6 @@ function get_context_with_image(image) {
 	return ctx;
 }
 
-function Camera(x, y, width, height) {
-	Entity.call(this, x, y, width, height);
-}
-Camera.prototype = Object.create(Entity.prototype);
-Camera.prototype.draw = function(context) {
-	context.translate(-(this.x|0), -(this.y|0));
-};
-Camera.prototype.drawAbsolute = function(context, drawFunc) {
-	context.save();
-	context.translate(this.x|0, this.y|0);
-	drawFunc();
-	context.restore();
-};
-
-
-function EntityBoxCamera(entity, width, height, screenCenterX, screenCenterY) {
-	this.entity = entity;
-	this.screenCenterX = screenCenterX;
-	this.screenCenterY = screenCenterY;
-
-	var x = keepPositionInBox(entity.x, entity.width, 0, width, screenCenterX);
-	var y = keepPositionInBox(entity.y, entity.height, 0, height, screenCenterY);
-	Camera.call(this, x, y, width, height);
-}
-EntityBoxCamera.prototype = Object.create(Camera.prototype);
-EntityBoxCamera.prototype.move = function(elapsedMillis) {
-	this.x = keepPositionInBox(this.entity.x, this.entity.width, this.x, this.width, this.screenCenterX);
-	this.y = keepPositionInBox(this.entity.y, this.entity.height, this.y, this.height, this.screenCenterY);
-};
-function keepPositionInBox(entityPos, entitySize, thisPos, thisSize, offset) {
-	var boundsFromCenter = thisSize / 2;
-	if (entityPos < thisPos + offset - boundsFromCenter) {
-		thisPos = entityPos - offset + boundsFromCenter;
-	}
-	if (entityPos + entitySize > thisPos + offset + boundsFromCenter) {
-		thisPos = entityPos + entitySize - offset - boundsFromCenter;
-	}
-	return thisPos;
-}
-
-function Game(canvas, simulationFunc, drawFunc) {
-	var context = canvas.getContext("2d");
-	var lastTimestamp = -1;
-	var running = false;
-	var that = this;
-
-	this.camera = new Camera(0, 0, canvas.width, canvas.height);
-	this.showFrameRate = true;
-
-	function drawFrameRate(elapsedMillis) {
-		var fps = (1000 / elapsedMillis) |0;
-
-		context.font = "24px mono";
-		if (fps < 30) {
-			context.fillStyle = "#ff0000";
-		} else if (fps < 50) {
-			context.fillStyle = "#ffff00";
-		} else {
-			context.fillStyle = "#00ff00";
-		}
-		var msg = fps + " FPS";
-		var w = context.measureText(msg).width;
-		that.camera.drawAbsolute(context, function() {
-			context.fillText(msg, canvas.width - w - 50, 50);
-		});
-	}
-
-	function mainLoop(timestamp) {
-		if (lastTimestamp === -1) {
-			lastTimestamp = timestamp;
-		}
-		var elapsedMillis = timestamp - lastTimestamp;
-		lastTimestamp = timestamp;
-
-		simulationFunc(elapsedMillis);
-		that.camera.move(elapsedMillis);
-
-		context.save();
-		that.camera.draw(context);
-		drawFunc(context);
-
-		if (that.showFrameRate) {
-			drawFrameRate(elapsedMillis);
-		}
-
-		context.restore();
-
-		if (running) {
-			window.requestAnimationFrame(mainLoop);
-		}
-	}
-
-	this.start = function() {
-		running = true;
-		window.requestAnimationFrame(mainLoop);
-	};
-
-	this.stop = function() {
-		running = false;
-	};
-}
-
 function MouseInput(canvas) {
 	var relMouseCoords = function(event) {
 		var x = event.pageX - canvas.offsetLeft + document.body.scrollLeft;
@@ -184,42 +82,6 @@ MouseInput.prototype.supportsTouch = function() {
 	return "ontouchstart" in window || navigator.msMaxTouchPoints;
 };
 
-function Entity(x, y, width, height) {
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.vx = 0;
-	this.vy = 0;
-	this.lastX = x;
-	this.lastY = y;
-}
-Entity.prototype.move = function(elapsedMillis) {
-	this.lastX = this.x;
-	this.lastY = this.y;
-	this.x += elapsedMillis * this.vx;
-	this.y += elapsedMillis * this.vy;
-};
-Entity.prototype.overlapsHoriz = function(other) {
-	return this.x + this.width > other.x && this.x < other.x + other.width;
-};
-Entity.prototype.overlapsVert = function(other) {
-	return this.y + this.height > other.y && this.y < other.y + other.height;
-};
-Entity.prototype.collides = function(other) {
-	return this.overlapsHoriz(other) && this.overlapsVert(other);
-};
-
-Entity.prototype.didOverlapHoriz = function(other) {
-	return this.lastX + this.width > other.lastX && this.lastX < other.lastX + other.width;
-};
-Entity.prototype.didOverlapVert = function(other) {
-	return this.lastY + this.height > other.lastY && this.lastY < other.lastY + other.height;
-};
-Entity.prototype.wasAbove = function(other) {
-	return this.lastY + this.height <= other.lastY;
-};
-
 function Animation() {
 	this.frames = [];
 	this.frame = 0;
@@ -252,33 +114,6 @@ Animation.prototype.draw = function(context, x, y) {
 Animation.prototype.reset = function() {
 	this.frame = 0;
 	this.elapsedMillis = 0;
-};
-
-function AnimatedEntity(x, y, width, height, sprite, spriteOffsetX, spriteOffsetY) {
-	this.sprite = sprite;
-	this.spriteOffsetX = spriteOffsetX;
-	this.spriteOffsetY = spriteOffsetY;
-	Entity.call(this, x, y, width, height);
-}
-AnimatedEntity.prototype = Object.create(Entity.prototype);
-AnimatedEntity.prototype.move = function(elapsedMillis) {
-	Entity.prototype.move.call(this, elapsedMillis);
-	if (typeof this.sprite.move === "function") {
-		this.sprite.move(elapsedMillis);
-	}
-};
-AnimatedEntity.prototype.draw = function(context) {
-	if (typeof this.sprite.draw === "function") {
-		this.sprite.draw(context, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
-	} else {
-		context.drawImage(this.sprite, this.x + this.spriteOffsetX, this.y + this.spriteOffsetY);
-	}
-	// draw bounding boxes
-	// context.strokeStyle = "#ff0000";
-	// context.strokeRect(this.x, this.y, this.width, this.height);
-};
-AnimatedEntity.prototype.copy = function() {
-	return new AnimatedEntity(this.x, this.y, this.width, this.height, this.sprite, this.spriteOffsetX, this.spriteOffsetY);
 };
 
 function NinePatch(image) {
