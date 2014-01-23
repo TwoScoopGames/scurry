@@ -33,15 +33,18 @@ var Splat = (function(splat, window) {
 		return p;
 	};
 
-	splat.keyboard = new KeyboardInput({
-		27: "escape",
-		32: "space",
-		37: "left",
-		38: "up",
-		39: "right",
-		40: "down",
-		77: "m"
-	});
+	splat.keyMap = {
+		"US": {
+			27: "escape",
+			32: "space",
+			37: "left",
+			38: "up",
+			39: "right",
+			40: "down",
+			77: "m"
+		}
+	};
+	splat.KeyboardInput = KeyboardInput;
 	return splat;
 
 }(Splat || {}, window));

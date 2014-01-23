@@ -1,5 +1,39 @@
 var canvas = document.getElementById("game");
 
+var manifest = {
+	"images": {
+		"bg": "images/Scurry-bg-TEST2.png",
+		"beetle": "images/scurry-run7f136x80.png",
+		"beetle-black": "images/scurry-run7f45x26.png",
+		"beetle-jump": "images/scurry-jump-sprite-7f129x124.png",
+		"beetle-dead": "images/scurry-dead-1f132x72.png",
+		"shelf": "images/shelf.png",
+		"shelf background": "images/shelf-bars-spritesheet.png",
+		"box1": "images/box1.png",
+		"box2": "images/box2.png",
+		"box3": "images/box3.png",
+		"can1": "images/can1.png",
+		"can2": "images/can2.png",
+		"syrup": "images/syrup.png",
+		"tag1": "images/price-tag1.png",
+		"tag2": "images/price-tag2.png",
+		"tag3": "images/price-tag-sale.png",
+		"logo-white": "images/scurry-logo-white-10f686x399.png",
+		"logo-black": "images/scurry-logo-black-10f686x399.png",
+		"sound-off": "images/sound-off-icon.png",
+		"sound-on": "images/sound-on-icon.png",
+		"play": "images/play-icon.png",
+		"pause": "images/pause-icon.png",
+	},
+	"sounds": {
+		"jump": "audio/jump.wav",
+		"land": "audio/land.wav",
+		"death": "audio/death.wav",
+		"lights-on": "audio/lights-on.wav",
+	}
+};
+var scurry = new Splat.Game(canvas, manifest);
+
 function setCanvasSize() {
 	var ow = 1136;
 	var oh = 640;
@@ -18,8 +52,6 @@ function setCanvasSize() {
 }
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
-
-var mouse = new MouseInput(canvas);
 
 var game = new Splat.Scene(canvas, simulation, draw);
 
@@ -42,10 +74,10 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 			return;
 		}
 	}
-	if (!starting && (Splat.keyboard.consumePressed("space") || mouse.buttons[0])) {
+	if (!starting && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
 		starting = true;
-		mouse.buttons[0] = false;
-		Splat.sounds.play("lights-on");
+		scurry.mouse.buttons[0] = false;
+		scurry.sounds.play("lights-on");
 	}
 	move_shelves(elapsedMillis);
 	if (beetleBlack) {
@@ -55,7 +87,7 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 	populate_shelves(startScreen.camera.x);
 
 	bgx += elapsedMillis * -0.05;
-	var bg = Splat.images.get("bg");
+	var bg = scurry.images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
@@ -91,7 +123,7 @@ startScreen.camera.vx = 0.2;
 startScreen.camera.y = -800;
 
 function clickOrTap() {
-	if (mouse.supportsTouch()) {
+	if (scurry.mouse.supportsTouch()) {
 		return "TAP";
 	} else {
 		return "CLICK";
@@ -110,7 +142,7 @@ var lrate = 0.02;
 var lmin = 36;
 var lmax = 46;
 var loading = new Splat.Scene(canvas, function(elapsedMillis) {
-	if (Splat.images.allLoaded() && Splat.sounds.allLoaded()) {
+	if (scurry.isLoaded()) {
 		assetsLoaded();
 		loading.stop();
 		startScreen.start();
@@ -154,34 +186,6 @@ var minJump = -0.3;
 var bgv = -30;
 var bgx = 0;
 
-Splat.images.load("bg", "images/Scurry-bg-TEST2.png");
-Splat.images.load("beetle", "images/scurry-run7f136x80.png");
-Splat.images.load("beetle-black", "images/scurry-run7f45x26.png");
-Splat.images.load("beetle-jump", "images/scurry-jump-sprite-7f129x124.png");
-Splat.images.load("beetle-dead", "images/scurry-dead-1f132x72.png");
-Splat.images.load("shelf", "images/shelf.png");
-Splat.images.load("shelf background", "images/shelf-bars-spritesheet.png");
-Splat.images.load("box1", "images/box1.png");
-Splat.images.load("box2", "images/box2.png");
-Splat.images.load("box3", "images/box3.png");
-Splat.images.load("can1", "images/can1.png");
-Splat.images.load("can2", "images/can2.png");
-Splat.images.load("syrup", "images/syrup.png");
-Splat.images.load("tag1", "images/price-tag1.png");
-Splat.images.load("tag2", "images/price-tag2.png");
-Splat.images.load("tag3", "images/price-tag-sale.png");
-Splat.images.load("logo-white", "images/scurry-logo-white-10f686x399.png");
-Splat.images.load("logo-black", "images/scurry-logo-black-10f686x399.png");
-Splat.images.load("sound-off", "images/sound-off-icon.png");
-Splat.images.load("sound-on", "images/sound-on-icon.png");
-Splat.images.load("play", "images/play-icon.png");
-Splat.images.load("pause", "images/pause-icon.png");
-
-Splat.sounds.load("jump", "audio/jump.wav");
-Splat.sounds.load("land", "audio/land.wav");
-Splat.sounds.load("death", "audio/death.wav");
-Splat.sounds.load("lights-on", "audio/lights-on.wav");
-
 var beetle = new Splat.Animation();
 var beetle_black = new Splat.Animation();
 var beetle_jump = new Splat.Animation();
@@ -193,19 +197,19 @@ var soundToggle;
 var pauseToggle;
 
 function assetsLoaded() {
-	beetle = Splat.makeAnimation(Splat.images.get("beetle"), 7, 30);
-	beetle_black = Splat.makeAnimation(Splat.images.get("beetle-black"), 7, 30);
+	beetle = Splat.makeAnimation(scurry.images.get("beetle"), 7, 30);
+	beetle_black = Splat.makeAnimation(scurry.images.get("beetle-black"), 7, 30);
 
-	beetle_jump = Splat.makeAnimation(Splat.images.get("beetle-jump"), 7, 50);
+	beetle_jump = Splat.makeAnimation(scurry.images.get("beetle-jump"), 7, 50);
 	beetle_jump.repeatAt = 4;
 
-	logo_white = Splat.makeAnimation(Splat.images.get("logo-white"), 10, 100);
-	logo_black = Splat.makeAnimation(Splat.images.get("logo-black"), 10, 100);
+	logo_white = Splat.makeAnimation(scurry.images.get("logo-white"), 10, 100);
+	logo_black = Splat.makeAnimation(scurry.images.get("logo-black"), 10, 100);
 
-	shelf = new Splat.NinePatch(Splat.images.get("shelf"));
-	shelf_bkgd = new Splat.NinePatch(Splat.images.get("shelf background"));
+	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
+	shelf_bkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
 
-	pauseToggle = new ToggleButton(0, 12, 72, 72, Splat.images.get("play"), Splat.images.get("pause"), "escape", function(toggled) {
+	pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
 		if (state === "dead") {
 			return false;
 		}
@@ -217,8 +221,8 @@ function assetsLoaded() {
 	});
 	pauseToggle.attachToRight(canvas, 12);
 
-	soundToggle = new ToggleButton(0, 108, 72, 72, Splat.images.get("sound-on"), Splat.images.get("sound-off"), "m", function(toggled) {
-		Splat.sounds.muted = !toggled;
+	soundToggle = new ToggleButton(0, 108, 72, 72, scurry.images.get("sound-on"), scurry.images.get("sound-off"), "m", function(toggled) {
+		scurry.sounds.muted = !toggled;
 	});
 	soundToggle.attachToRight(canvas, 12);
 
@@ -247,8 +251,8 @@ function getShelfItems(width) {
 		if (name == "empty") {
 			name = "box1";
 		}
-		var img = Splat.images.get(name);
-		var tag = Splat.images.get(item.tag);
+		var img = scurry.images.get(name);
+		var tag = scurry.images.get(item.tag);
 		if (tag.width > img.width) {
 			return tag.width;
 		} else {
@@ -302,12 +306,12 @@ function draw_tag_price(context, item, tagx, tagy) {
 }
 function draw_shelf_item(context, item, x, y) {
 	if (item.item == "empty") {
-		return Splat.images.get("box1").width;
+		return scurry.images.get("box1").width;
 	}
-	var img = Splat.images.get(item.item);
+	var img = scurry.images.get(item.item);
 	context.drawImage(img, x, y - img.height);
 
-	var tag = Splat.images.get(item.tag);
+	var tag = scurry.images.get(item.tag);
 	var tagx = x + ((img.width - tag.width) / 2);
 	var tagy = y + 10;
 	context.drawImage(tag, tagx, tagy);
@@ -436,7 +440,7 @@ function simulation(elapsedMillis) {
 	if (state === "dead") {
 		deadTime += elapsedMillis;
 		if (deadTime > 300) {
-			player.sprite = Splat.images.get("beetle-dead");
+			player.sprite = scurry.images.get("beetle-dead");
 		}
 		if (deadTime > 1000) {
 			state = "start";
@@ -445,9 +449,9 @@ function simulation(elapsedMillis) {
 		return;
 	}
 	if (state === "paused" || state === "start") {
-		if (Splat.keyboard.consumePressed("space") || mouse.buttons[0]) {
+		if (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0]) {
 			state = "running";
-			mouse.buttons[0] = false;
+			scurry.mouse.buttons[0] = false;
 			pauseToggle.toggled = false;
 		} else {
 			return;
@@ -461,10 +465,10 @@ function simulation(elapsedMillis) {
 
 	move_shelves(elapsedMillis);
 
-	if (Splat.keyboard.isPressed("left")) {
+	if (scurry.keyboard.isPressed("left")) {
 		player.x -= elapsedMillis * 0.70;
 	}
-	if (Splat.keyboard.isPressed("right")) {
+	if (scurry.keyboard.isPressed("right")) {
 		player.x += elapsedMillis * 0.70;
 	}
 
@@ -476,7 +480,7 @@ function simulation(elapsedMillis) {
 
 	if (player.y > -player.height) {
 		state = "dead";
-		Splat.sounds.play("death");
+		scurry.sounds.play("death");
 		return;
 	}
 
@@ -495,37 +499,37 @@ function simulation(elapsedMillis) {
 	if (onGround && player.sprite == beetle_jump) {
 		player.sprite = beetle;
 		beetle.reset();
-		Splat.sounds.play("land");
+		scurry.sounds.play("land");
 	}
 	if (!onGround && player.sprite == beetle) {
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 	}
-	if ((Splat.keyboard.isPressed("space") || mouse.buttons[0]) && onGround) {
+	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
 		player.vy = jumpSpeed;
-		if (Splat.keyboard.isPressed("up")) {
+		if (scurry.keyboard.isPressed("up")) {
 			player.vy += -1;
 		}
 
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
-		Splat.sounds.play("jump");
+		scurry.sounds.play("jump");
 	}
-	if ((!Splat.keyboard.isPressed("space") && !mouse.buttons[0]) && player.vy < minJump) {
+	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
 		player.vy = minJump;
 	}
 
 	bgx += elapsedMillis * bgv;
-	var bg = Splat.images.get("bg");
+	var bg = scurry.images.get("bg");
 	if (bgx + bg.width < 0) {
 		bgx += bg.width;
 	}
 }
 
-function drawStage(game, context) {
-	var bg = Splat.images.get("bg");
+function drawStage(scene, context) {
+	var bg = scurry.images.get("bg");
 
-	game.camera.drawAbsolute(context, function() {
+	scene.camera.drawAbsolute(context, function() {
 		var x = bgx|0;
 		context.drawImage(bg, x, 0);
 		if (x + bg.width < canvas.width) {
@@ -538,9 +542,9 @@ function drawStage(game, context) {
 	}
 
 	// draw the insta-death floor
-	if (game.camera.y > -canvas.height) {
+	if (scene.camera.y > -canvas.height) {
 		context.fillStyle = "#000000";
-		context.fillRect(game.camera.x|0, 0, canvas.width, canvas.height + game.camera.y + 1|0);
+		context.fillRect(scene.camera.x|0, 0, canvas.width, canvas.height + scene.camera.y + 1|0);
 	}
 }
 
@@ -556,11 +560,11 @@ function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
 	this.onToggle = onToggle;
 }
 ToggleButton.prototype.move = function(elapsedMillis) {
-	if (mouse.buttons[0] && mouse.x >= this.x && mouse.x < this.x + this.width && mouse.y >= this.y && mouse.y < this.y + this.height) {
-		mouse.buttons[0] = false;
+	if (scurry.mouse.buttons[0] && scurry.mouse.x >= this.x && scurry.mouse.x < this.x + this.width && scurry.mouse.y >= this.y && scurry.mouse.y < this.y + this.height) {
+		scurry.mouse.buttons[0] = false;
 		this.toggle();
 	}
-	if (Splat.keyboard.consumePressed(this.key)) {
+	if (scurry.keyboard.consumePressed(this.key)) {
 		this.toggle();
 	}
 };

@@ -68,7 +68,7 @@ var Splat = (function(splat, window) {
 		source.start(0);
 	};
 
-	splat.sounds = new SoundLoader();
+	splat.SoundLoader = SoundLoader;
 	return splat;
 
 }(Splat || {}, window));

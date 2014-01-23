@@ -23,7 +23,7 @@ var Splat = (function(splat, window) {
 		return this.images[name];
 	};
 
-	splat.images = new ImageLoader();
+	splat.ImageLoader = ImageLoader;
 	return splat;
 
 }(Splat || {}, window));
