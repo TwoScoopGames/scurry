@@ -30,7 +30,10 @@ var manifest = {
 		"land": "audio/land.wav",
 		"death": "audio/death.wav",
 		"lights-on": "audio/lights-on.wav",
-	}
+	},
+	"fonts": [
+		"pixelade"
+	]
 };
 var scurry = new Splat.Game(canvas, manifest);
 

@@ -14,12 +14,16 @@ var Splat = (function(splat, window, document) {
 
 		this.images = new splat.ImageLoader();
 		loadAssets(this.images, manifest.images);
+
 		this.sounds = new splat.SoundLoader();
 		loadAssets(this.sounds, manifest.sounds);
 
+		this.fonts = new splat.FontLoader();
+		this.fonts.load(manifest.fonts);
+
 		var that = this;
 		this.isLoaded = function() {
-			return this.images.allLoaded() && this.sounds.allLoaded();
+			return this.images.allLoaded() && this.sounds.allLoaded() && this.fonts.allLoaded();
 		};
 	}
 
