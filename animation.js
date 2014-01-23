@@ -34,7 +34,23 @@ var Splat = (function(splat, window, document) {
 		this.elapsedMillis = 0;
 	};
 
+	function makeFrame(img, frameWidth, f) {
+		return splat.makeBuffer(frameWidth, img.height, function(ctx) {
+			var sx = f * frameWidth;
+			ctx.drawImage(img, sx, 0, frameWidth, img.height, 0, 0, frameWidth, img.height);
+		});
+	}
+	function makeAnimation(img, numFrames, time) {
+		var a = new Animation();
+		var frameWidth = img.width / numFrames |0;
+		for (var f = 0; f < numFrames; f++) {
+			a.add(makeFrame(img, frameWidth, f), time);
+		}
+		return a;
+	}
+
 	splat.Animation = Animation;
+	splat.makeAnimation = makeAnimation;
 	return splat;
 
 }(Splat || {}, window, document));

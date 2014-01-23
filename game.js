@@ -155,9 +155,9 @@ var bgv = -30;
 var bgx = 0;
 
 Splat.images.load("bg", "images/Scurry-bg-TEST2.png");
-Splat.images.load("beetle", "images/scurry-run7f136x80.png", 7);
-Splat.images.load("beetle-black", "images/scurry-run7f45x26.png", 7);
-Splat.images.load("beetle-jump", "images/scurry-jump-sprite-7f129x124.png", 7);
+Splat.images.load("beetle", "images/scurry-run7f136x80.png");
+Splat.images.load("beetle-black", "images/scurry-run7f45x26.png");
+Splat.images.load("beetle-jump", "images/scurry-jump-sprite-7f129x124.png");
 Splat.images.load("beetle-dead", "images/scurry-dead-1f132x72.png");
 Splat.images.load("shelf", "images/shelf.png");
 Splat.images.load("shelf background", "images/shelf-bars-spritesheet.png");
@@ -170,8 +170,8 @@ Splat.images.load("syrup", "images/syrup.png");
 Splat.images.load("tag1", "images/price-tag1.png");
 Splat.images.load("tag2", "images/price-tag2.png");
 Splat.images.load("tag3", "images/price-tag-sale.png");
-Splat.images.load("logo-white", "images/scurry-logo-white-10f686x399.png", 10);
-Splat.images.load("logo-black", "images/scurry-logo-black-10f686x399.png", 10);
+Splat.images.load("logo-white", "images/scurry-logo-white-10f686x399.png");
+Splat.images.load("logo-black", "images/scurry-logo-black-10f686x399.png");
 Splat.images.load("sound-off", "images/sound-off-icon.png");
 Splat.images.load("sound-on", "images/sound-on-icon.png");
 Splat.images.load("play", "images/play-icon.png");
@@ -193,53 +193,14 @@ var soundToggle;
 var pauseToggle;
 
 function assetsLoaded() {
-	beetle.add(Splat.images.get("beetle0"), 30);
-	beetle.add(Splat.images.get("beetle1"), 30);
-	beetle.add(Splat.images.get("beetle2"), 30);
-	beetle.add(Splat.images.get("beetle3"), 30);
-	beetle.add(Splat.images.get("beetle4"), 30);
-	beetle.add(Splat.images.get("beetle5"), 30);
-	beetle.add(Splat.images.get("beetle6"), 30);
+	beetle = Splat.makeAnimation(Splat.images.get("beetle"), 7, 30);
+	beetle_black = Splat.makeAnimation(Splat.images.get("beetle-black"), 7, 30);
 
-	beetle_black.add(Splat.images.get("beetle-black0"), 30);
-	beetle_black.add(Splat.images.get("beetle-black1"), 30);
-	beetle_black.add(Splat.images.get("beetle-black2"), 30);
-	beetle_black.add(Splat.images.get("beetle-black3"), 30);
-	beetle_black.add(Splat.images.get("beetle-black4"), 30);
-	beetle_black.add(Splat.images.get("beetle-black5"), 30);
-	beetle_black.add(Splat.images.get("beetle-black6"), 30);
-
-	beetle_jump.add(Splat.images.get("beetle-jump0"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump1"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump2"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump3"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump4"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump5"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump6"), 50);
-	beetle_jump.add(Splat.images.get("beetle-jump5"), 50);
+	beetle_jump = Splat.makeAnimation(Splat.images.get("beetle-jump"), 7, 50);
 	beetle_jump.repeatAt = 4;
 
-	logo_white.add(Splat.images.get("logo-white0"), 100);
-	logo_white.add(Splat.images.get("logo-white1"), 100);
-	logo_white.add(Splat.images.get("logo-white2"), 100);
-	logo_white.add(Splat.images.get("logo-white3"), 100);
-	logo_white.add(Splat.images.get("logo-white4"), 100);
-	logo_white.add(Splat.images.get("logo-white5"), 100);
-	logo_white.add(Splat.images.get("logo-white6"), 100);
-	logo_white.add(Splat.images.get("logo-white7"), 100);
-	logo_white.add(Splat.images.get("logo-white8"), 100);
-	logo_white.add(Splat.images.get("logo-white9"), 100);
-
-	logo_black.add(Splat.images.get("logo-black0"), 100);
-	logo_black.add(Splat.images.get("logo-black1"), 100);
-	logo_black.add(Splat.images.get("logo-black2"), 100);
-	logo_black.add(Splat.images.get("logo-black3"), 100);
-	logo_black.add(Splat.images.get("logo-black4"), 100);
-	logo_black.add(Splat.images.get("logo-black5"), 100);
-	logo_black.add(Splat.images.get("logo-black6"), 100);
-	logo_black.add(Splat.images.get("logo-black7"), 100);
-	logo_black.add(Splat.images.get("logo-black8"), 100);
-	logo_black.add(Splat.images.get("logo-black9"), 100);
+	logo_white = Splat.makeAnimation(Splat.images.get("logo-white"), 10, 100);
+	logo_black = Splat.makeAnimation(Splat.images.get("logo-black"), 10, 100);
 
 	shelf = new Splat.NinePatch(Splat.images.get("shelf"));
 	shelf_bkgd = new Splat.NinePatch(Splat.images.get("shelf background"));
