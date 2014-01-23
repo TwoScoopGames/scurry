@@ -182,13 +182,13 @@ Splat.sounds.load("land", "audio/land.wav");
 Splat.sounds.load("death", "audio/death.wav");
 Splat.sounds.load("lights-on", "audio/lights-on.wav");
 
-var beetle = new Animation();
-var beetle_black = new Animation();
-var beetle_jump = new Animation();
+var beetle = new Splat.Animation();
+var beetle_black = new Splat.Animation();
+var beetle_jump = new Splat.Animation();
 var shelf;
 var shelf_bkgd;
-var logo_white = new Animation();
-var logo_black = new Animation();
+var logo_white = new Splat.Animation();
+var logo_black = new Splat.Animation();
 var soundToggle;
 var pauseToggle;
 
