@@ -395,21 +395,20 @@ function populate_shelves(cameraX) {
 		var spacing = (shelf_bkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
-		var s = make_shelf(x, width, true);
-
-		shelves.push(makeShelfBottom(s));
-		shelves.push(s);
-		var y = s.y - height;
-
-		var shelvesInRack = 3 + (Math.random() * 3) |0;
+		var shelvesInRack = 4 + (Math.random() * 3) |0;
 		for (var n = 0; n < shelvesInRack; n++) {
-			s = make_shelf(x, width, n < shelvesInRack -1);
-			s.y = y;
+			var s = make_shelf(x, width, n < shelvesInRack -1);
+			if (n === 0) {
+				shelves.push(makeShelfBottom(s));
+				y = s.y - height;
+			} else {
+				s.y = y;
+				y -= height;
+			}
 			shelves.push(s);
 			if (Math.random() < 0.3) {
 				powerUps.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
 			}
-			y -= height;
 		}
 	}
 }
@@ -423,7 +422,6 @@ function makePowerUp(x, y) {
 	e.elapsedSec = 0;
 
 	var pnum = Math.random() * possiblePowerUps.length |0;
-	console.log(pnum);
 	var p = possiblePowerUps[pnum];
 	e.name = p.name;
 
