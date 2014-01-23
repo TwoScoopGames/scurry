@@ -1,5 +1,14 @@
 var Splat = (function(splat, window, document) {
 
+	function time(f, iters) {
+		var start = window.performance.now();
+		for (var i = 0; i < iters; i++) {
+			f();
+		}
+		var stop = window.performance.now();
+		return stop - start;
+	}
+
 	function Scene(canvas, simulationFunc, drawFunc) {
 		var context = canvas.getContext("2d");
 		var lastTimestamp = -1;
@@ -84,6 +93,7 @@ var Splat = (function(splat, window, document) {
 		};
 	}
 
+	splat.time = time;
 	splat.Scene = Scene;
 	splat.Game = Game;
 	return splat;
