@@ -420,7 +420,7 @@ function makePowerUp(x, y) {
 
 	e.move = function(elapsedSec) {
 		this.elapsedSec += elapsedSec;
-		this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20;
+		this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
 	};
 	e.draw = function(context) {
 		context.fillStyle = "#ff0000";
