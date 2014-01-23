@@ -14,6 +14,7 @@ var Splat = (function(splat, window, document) {
 		var lastTimestamp = -1;
 		var running = false;
 		var that = this;
+		var timers = {};
 
 		this.camera = new Splat.Camera(0, 0, canvas.width, canvas.height);
 		this.showFrameRate = true;
@@ -36,6 +37,14 @@ var Splat = (function(splat, window, document) {
 			});
 		}
 
+		function incrementTimers(elapsedMillis) {
+			for (var i in timers) {
+				if (timers.hasOwnProperty(i)) {
+					timers[i] += elapsedMillis;
+				}
+			}
+		}
+
 		function mainLoop(timestamp) {
 			if (lastTimestamp === -1) {
 				lastTimestamp = timestamp;
@@ -43,6 +52,7 @@ var Splat = (function(splat, window, document) {
 			var elapsedMillis = timestamp - lastTimestamp;
 			lastTimestamp = timestamp;
 
+			incrementTimers(elapsedMillis);
 			simulationFunc(elapsedMillis);
 			that.camera.move(elapsedMillis);
 
@@ -69,6 +79,19 @@ var Splat = (function(splat, window, document) {
 		this.stop = function() {
 			running = false;
 		};
+
+		this.startTimer = function(name) {
+			timers[name] = 0;
+		};
+		this.stopTimer = function(name) {
+			delete timers[name];
+		};
+		this.clearTimers = function(name) {
+			timers = {};
+		};
+		this.timer = function(name) {
+			return timers[name];
+		}
 	}
 
 	splat.time = time;

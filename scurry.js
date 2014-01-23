@@ -56,26 +56,23 @@ setCanvasSize();
 var game = new Splat.Scene(canvas, simulation, draw);
 
 var starting = false;
-var startTime = 0;
 var lightsOn = false;
 var beetleBlack;
 var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
-	if (starting) {
-		startTime += elapsedMillis;
-		if (!lightsOn && startTime > 807) {
-			lightsOn = true;
-			beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
-			beetleBlack.vx = 1.40;
-		}
-		if (startTime > 2300) {
-			startScreen.stop();
-			reset();
-			game.start();
-			return;
-		}
+	if (!lightsOn && startScreen.timer("start") > 807) {
+		lightsOn = true;
+		beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
+		beetleBlack.vx = 1.40;
+	}
+	if (startScreen.timer("start") > 2300) {
+		startScreen.stop();
+		reset();
+		game.start();
+		return;
 	}
 	if (!starting && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
 		starting = true;
+		startScreen.startTimer("start");
 		scurry.mouse.buttons[0] = false;
 		scurry.sounds.play("lights-on");
 	}
@@ -172,6 +169,7 @@ function getRandomArbitrary(min, max) {
 
 var player = {};
 var shelves = [];
+var powerUps = [];
 var distance = 0;
 var max_distance = 0;
 var state = "start";
@@ -355,13 +353,16 @@ function make_shelf(x, width, drawBackground) {
 }
 
 function delete_invisible_shelves(cameraX) {
-	while (first_shelf_is_invisible(cameraX)) {
+	while (firstEntityIsInvisible(shelves, cameraX)) {
 		shelves.shift();
+	}
+	while (firstEntityIsInvisible(powerUps, cameraX)) {
+		powerUps.shift();
 	}
 }
 
-function first_shelf_is_invisible(cameraX) {
-	return shelves.length > 0 && shelves[0].x + shelves[0].width < cameraX;
+function firstEntityIsInvisible(entities, cameraX) {
+	return entities.length > 0 && entities[0].x + entities[0].width < cameraX;
 }
 
 function getNextShelfX() {
@@ -402,9 +403,27 @@ function populate_shelves(cameraX) {
 			s = make_shelf(x, width, n < shelvesInRack -1);
 			s.y = y;
 			shelves.push(s);
+			if (Math.random() < 0.3) {
+				powerUps.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
+			}
 			y -= height;
 		}
 	}
+}
+
+function makePowerUp(x, y) {
+	var e = new Splat.Entity(x, y, 50, 50);
+	e.elapsedSec = 0;
+
+	e.move = function(elapsedSec) {
+		this.elapsedSec += elapsedSec;
+		this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20;
+	};
+	e.draw = function(context) {
+		context.fillStyle = "#ff0000";
+		context.fillRect(this.x, this.y, this.width, this.height);
+	};
+	return e;
 }
 
 function need_shelves(cameraX) {
@@ -415,11 +434,14 @@ function move_shelves(elapsedMillis) {
 	for (var i in shelves) {
 		shelves[i].move(elapsedMillis);
 	}
+	for (var i in powerUps) {
+		powerUps[i].move(elapsedMillis);
+	}
 }
 
-var deadTime = 0;
 function reset() {
 	shelves = [];
+	powerUps = [];
 	distance = 0;
 	populate_shelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
@@ -429,7 +451,7 @@ function reset() {
 	bgv = -0.3;
 	bgx = 0;
 	game.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
-	deadTime = 0;
+	game.clearTimers();
 	pauseToggle.toggled = true;
 }
 
@@ -437,12 +459,14 @@ function simulation(elapsedMillis) {
 	soundToggle.move(elapsedMillis);
 	pauseToggle.move(elapsedMillis);
 
+	if (game.timer("superjump") > 5000) {
+		game.stopTimer("superjump");
+	}
 	if (state === "dead") {
-		deadTime += elapsedMillis;
-		if (deadTime > 300) {
+		if (game.timer("dead") > 300) {
 			player.sprite = scurry.images.get("beetle-dead");
 		}
-		if (deadTime > 1000) {
+		if (game.timer("dead") > 1000) {
 			state = "start";
 			reset();
 		}
@@ -481,7 +505,16 @@ function simulation(elapsedMillis) {
 	if (player.y > -player.height) {
 		state = "dead";
 		scurry.sounds.play("death");
+		game.startTimer("dead");
 		return;
+	}
+
+	for (var i in powerUps) {
+		var powerUp = powerUps[i];
+		if (powerUp.collides(player)) {
+			powerUps.splice(i, 1);
+			game.startTimer("superjump");
+		}
 	}
 
 	var onGround = false;
@@ -507,6 +540,9 @@ function simulation(elapsedMillis) {
 	}
 	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
 		player.vy = jumpSpeed;
+		if (game.timer("superjump") > 0) {
+			player.vy += -1;
+		}
 		if (scurry.keyboard.isPressed("up")) {
 			player.vy += -1;
 		}
@@ -591,6 +627,9 @@ ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
 
 function draw(context) {
 	drawStage(game, context);
+	for (var i in powerUps) {
+		powerUps[i].draw(context);
+	}
 	player.draw(context);
 
 	game.camera.drawAbsolute(context, function() {
@@ -603,6 +642,12 @@ function draw(context) {
 		context.fillText(dist, 20, 40);
 		dist = Math.round(max_distance / player.width * 100) / 100;
 		context.fillText("Max: " + dist, 300, 40);
+
+		if (game.timer("superjump") > 0) {
+			context.fillStyle = "#00ff00";
+			context.font = "48px pixelade";
+			centerText(context, "SUPERJUMP!", 0, canvas.height - 50);
+		}
 
 		if (stateMessages[state]) {
 			context.fillStyle = "rgba(0, 0, 0, 0.7)";
