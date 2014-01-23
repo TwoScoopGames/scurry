@@ -241,8 +241,8 @@ function assetsLoaded() {
 	logo_black.add(Splat.images.get("logo-black8"), 100);
 	logo_black.add(Splat.images.get("logo-black9"), 100);
 
-	shelf = new NinePatch(Splat.images.get("shelf"));
-	shelf_bkgd = new NinePatch(Splat.images.get("shelf background"));
+	shelf = new Splat.NinePatch(Splat.images.get("shelf"));
+	shelf_bkgd = new Splat.NinePatch(Splat.images.get("shelf background"));
 
 	pauseToggle = new ToggleButton(0, 12, 72, 72, Splat.images.get("play"), Splat.images.get("pause"), "escape", function(toggled) {
 		if (state === "dead") {
