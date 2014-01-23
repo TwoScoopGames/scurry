@@ -19,15 +19,6 @@ function setCanvasSize() {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-var keys = new KeyboardInput({
-	27: "pause",
-	32: "space",
-	37: "left",
-	38: "up",
-	39: "right",
-	40: "down",
-	77: "m"
-});
 var mouse = new MouseInput(canvas);
 
 var game = new Game(canvas, simulation, draw);
@@ -51,7 +42,7 @@ var startScreen = new Game(canvas, function(elapsedMillis) {
 			return;
 		}
 	}
-	if (!starting && (keys.consumePressed("space") || mouse.buttons[0])) {
+	if (!starting && (Splat.keyboard.consumePressed("space") || mouse.buttons[0])) {
 		starting = true;
 		mouse.buttons[0] = false;
 		Splat.sounds.play("lights-on");
@@ -253,7 +244,7 @@ function assetsLoaded() {
 	shelf = new NinePatch(Splat.images.get("shelf"));
 	shelf_bkgd = new NinePatch(Splat.images.get("shelf background"));
 
-	pauseToggle = new ToggleButton(0, 12, 72, 72, Splat.images.get("play"), Splat.images.get("pause"), "pause", function(toggled) {
+	pauseToggle = new ToggleButton(0, 12, 72, 72, Splat.images.get("play"), Splat.images.get("pause"), "escape", function(toggled) {
 		if (state === "dead") {
 			return false;
 		}
@@ -493,7 +484,7 @@ function simulation(elapsedMillis) {
 		return;
 	}
 	if (state === "paused" || state === "start") {
-		if (keys.consumePressed("space") || mouse.buttons[0]) {
+		if (Splat.keyboard.consumePressed("space") || mouse.buttons[0]) {
 			state = "running";
 			mouse.buttons[0] = false;
 			pauseToggle.toggled = false;
@@ -509,10 +500,10 @@ function simulation(elapsedMillis) {
 
 	move_shelves(elapsedMillis);
 
-	if (keys.isPressed("left")) {
+	if (Splat.keyboard.isPressed("left")) {
 		player.x -= elapsedMillis * 0.70;
 	}
-	if (keys.isPressed("right")) {
+	if (Splat.keyboard.isPressed("right")) {
 		player.x += elapsedMillis * 0.70;
 	}
 
@@ -549,9 +540,9 @@ function simulation(elapsedMillis) {
 		player.sprite = beetle_jump;
 		beetle_jump.reset();
 	}
-	if ((keys.isPressed("space") || mouse.buttons[0]) && onGround) {
+	if ((Splat.keyboard.isPressed("space") || mouse.buttons[0]) && onGround) {
 		player.vy = jumpSpeed;
-		if (keys.isPressed("up")) {
+		if (Splat.keyboard.isPressed("up")) {
 			player.vy += -1;
 		}
 
@@ -559,7 +550,7 @@ function simulation(elapsedMillis) {
 		beetle_jump.reset();
 		Splat.sounds.play("jump");
 	}
-	if ((!keys.isPressed("space") && !mouse.buttons[0]) && player.vy < minJump) {
+	if ((!Splat.keyboard.isPressed("space") && !mouse.buttons[0]) && player.vy < minJump) {
 		player.vy = minJump;
 	}
 
@@ -608,7 +599,7 @@ ToggleButton.prototype.move = function(elapsedMillis) {
 		mouse.buttons[0] = false;
 		this.toggle();
 	}
-	if (keys.consumePressed(this.key)) {
+	if (Splat.keyboard.consumePressed(this.key)) {
 		this.toggle();
 	}
 };
