@@ -71,12 +71,12 @@ var Splat = (function(splat, window, document) {
 	}
 	function Game(canvas, manifest) {
 		this.mouse = new splat.MouseInput(canvas);
-		this.keyboard = new splat.KeyboardInput(splat.keyMap["US"]);
+		this.keyboard = new splat.KeyboardInput(splat.keyMap.US);
 
 		this.images = new splat.ImageLoader();
-		loadAssets(this.images, manifest["images"]);
+		loadAssets(this.images, manifest.images);
 		this.sounds = new splat.SoundLoader();
-		loadAssets(this.sounds, manifest["sounds"]);
+		loadAssets(this.sounds, manifest.sounds);
 
 		var that = this;
 		this.isLoaded = function() {
