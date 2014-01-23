@@ -7,24 +7,12 @@ function time(f, iters) {
 	return stop - start;
 }
 
-function makeCanvas(width, height) {
-	var c = document.createElement("canvas");
-	c.width = width;
-	c.height = height;
-	return c;
-}
-
-function drawCanvas(width, height, drawFun) {
-	var canvas = makeCanvas(width, height);
-	var ctx = canvas.getContext("2d");
-	drawFun(ctx);
-	return canvas;
-}
-
 function get_context_with_image(image) {
-	var canvas = makeCanvas(image.width, image.height);
-	var ctx = canvas.getContext("2d");
-	ctx.drawImage(image, 0, 0, image.width, image.height);
+	var ctx;
+	var canvas = Splat.makeBuffer(image.width, image.height, function(context) {
+		context.drawImage(image, 0, 0, image.width, image.height);
+		ctx = context;
+	});
 	return ctx;
 }
 

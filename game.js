@@ -378,7 +378,7 @@ function make_shelf(x, width, drawBackground) {
 
 	var spacing = (shelf_bkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
-	var img = drawCanvas(width, height + 50, function(ctx) {
+	var img = Splat.makeBuffer(width, height + 50, function(ctx) {
 		var bkgdh = (shelf_bkgd.img.height - 1) * 3;
 		if (drawBackground) {
 			shelf_bkgd.draw(ctx, 0, 0, width, bkgdh);

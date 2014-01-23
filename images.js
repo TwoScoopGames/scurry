@@ -12,7 +12,7 @@ var Splat = (function(splat, window) {
 		this.totalImages++;
 
 		function makeFrame(img, frameWidth, f) {
-			return drawCanvas(frameWidth, img.height, function(ctx) {
+			return splat.makeBuffer(frameWidth, img.height, function(ctx) {
 				var sx = f * frameWidth;
 				ctx.drawImage(img, sx, 0, frameWidth, img.height, 0, 0, frameWidth, img.height);
 			});
