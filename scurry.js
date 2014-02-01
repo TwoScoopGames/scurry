@@ -25,6 +25,8 @@ var manifest = {
 		"play": "images/play-icon.png",
 		"pause": "images/pause-icon.png",
 		"sugar-cube": "images/sugar-cube-19f.png",
+		"progress-marker": "images/scurry-head.png",
+		"progress": "images/scurry-progress.png",
 	},
 	"sounds": {
 		"jump": "audio/jump.wav",
@@ -658,6 +660,17 @@ ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
 	window.addEventListener("resize", adjustX);
 };
 
+function drawProgress(context, dist, end) {
+	var progress = scurry.images.get("progress");
+	var progressX = (canvas.width / 2) - (progress.width / 2);
+	context.drawImage(progress, progressX, canvas.height - progress.height);
+	var marker = scurry.images.get("progress-marker");
+
+	var pct = Math.min(dist / end, 1.0);
+	var markerX = progressX + ((progress.width - marker.width) * pct) - marker.width;
+	context.drawImage(marker, markerX, canvas.height - marker.height);
+}
+
 function draw(context) {
 	drawStage(game, context);
 	for (var i in powerUps) {
@@ -669,12 +682,15 @@ function draw(context) {
 		soundToggle.draw(context);
 		pauseToggle.draw(context);
 
+
 		context.fillStyle = "#000000";
 		context.font = "36px pixelade";
 		var dist = Math.round(distance / player.width * 100) / 100;
 		context.fillText(dist, 20, 40);
 		dist = Math.round(max_distance / player.width * 100) / 100;
 		context.fillText("Max: " + dist, 300, 40);
+
+		drawProgress(context, dist, 1000);
 
 		if (game.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
