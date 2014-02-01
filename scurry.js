@@ -33,6 +33,7 @@ var manifest = {
 		"land": "audio/land.wav",
 		"death": "audio/death.wav",
 		"lights-on": "audio/lights-on.wav",
+		"powerup": "audio/powerup.wav",
 	},
 	"fonts": [
 		"pixelade"
@@ -549,6 +550,7 @@ function simulation(elapsedMillis) {
 		if (powerUp.collides(player)) {
 			powerUps.splice(i, 1);
 			game.startTimer(powerUp.name);
+			scurry.sounds.play("powerup");
 		}
 	}
 
