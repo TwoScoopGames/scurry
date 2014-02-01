@@ -24,6 +24,7 @@ var manifest = {
 		"sound-on": "images/sound-on-icon.png",
 		"play": "images/play-icon.png",
 		"pause": "images/pause-icon.png",
+		"sugar-cube": "images/sugar-cube-19f.png",
 	},
 	"sounds": {
 		"jump": "audio/jump.wav",
@@ -196,6 +197,7 @@ var logo_white = new Splat.Animation();
 var logo_black = new Splat.Animation();
 var soundToggle;
 var pauseToggle;
+var possiblePowerUps;
 
 function assetsLoaded() {
 	beetle = Splat.makeAnimation(scurry.images.get("beetle"), 7, 30);
@@ -206,6 +208,13 @@ function assetsLoaded() {
 
 	logo_white = Splat.makeAnimation(scurry.images.get("logo-white"), 10, 100);
 	logo_black = Splat.makeAnimation(scurry.images.get("logo-black"), 10, 100);
+
+	var sugarCube = Splat.makeAnimation(scurry.images.get("sugar-cube"), 19, 200);
+
+	possiblePowerUps = [
+		{ "name": "superjump", "animation": sugarCube },
+		{ "name": "superspeed", "color": "#00ff00" },
+	];
 
 	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
 	shelf_bkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
@@ -413,27 +422,35 @@ function populate_shelves(cameraX) {
 	}
 }
 
-var possiblePowerUps = [
-	{ "name": "superjump", "color": "#ff0000" },
-	{ "name": "superspeed", "color": "#00ff00" },
-];
 function makePowerUp(x, y) {
-	var e = new Splat.Entity(x, y, 50, 50);
-	e.elapsedSec = 0;
-
 	var pnum = Math.random() * possiblePowerUps.length |0;
 	var p = possiblePowerUps[pnum];
-	e.name = p.name;
 
-	e.move = function(elapsedSec) {
-		this.elapsedSec += elapsedSec;
-		this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
-	};
-	e.draw = function(context) {
-		context.fillStyle = p.color;
-		context.fillRect(this.x, this.y, this.width, this.height);
-	};
-	return e;
+	if (p.animation !== undefined) {
+		var a = new Splat.AnimatedEntity(x, y, p.animation.width, p.animation.height, p.animation, 0, 0);
+		a.name = p.name;
+		a.elapsedSec = 0;
+		a.move = function(elapsedSec) {
+			this.elapsedSec += elapsedSec;
+			this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
+			Splat.AnimatedEntity.prototype.move.call(this, elapsedSec);
+		};
+		return a;
+	} else {
+		var e = new Splat.Entity(x, y, 50, 50);
+		e.elapsedSec = 0;
+		e.name = p.name;
+
+		e.move = function(elapsedSec) {
+			this.elapsedSec += elapsedSec;
+			this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
+		};
+		e.draw = function(context) {
+			context.fillStyle = p.color;
+			context.fillRect(this.x, this.y, this.width, this.height);
+		};
+		return e;
+	}
 }
 
 function need_shelves(cameraX) {
