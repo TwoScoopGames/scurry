@@ -33,6 +33,16 @@ var Splat = (function(splat, window, document) {
 		this.frame = 0;
 		this.elapsedMillis = 0;
 	};
+	Animation.prototype.flipHorizontally = function() {
+		for (var i = 0; i < this.frames.length; i++) {
+			this.frames[i].img = splat.flipBufferHorizontally(this.frames[i].img);
+		}
+	};
+	Animation.prototype.flipVertically = function() {
+		for (var i = 0; i < this.frames.length; i++) {
+			this.frames[i].img = splat.flipBufferVertically(this.frames[i].img);
+		}
+	};
 
 	function makeFrame(img, frameWidth, f) {
 		return splat.makeBuffer(frameWidth, img.height, function(ctx) {
@@ -57,7 +67,13 @@ var Splat = (function(splat, window, document) {
 					imageLoader.load(key, info.strip);
 				} else if (info.prefix !== undefined) {
 					for (var i = 1; i <= info.frames; i++) {
-						var name = info.prefix + i + info.suffix;
+						var number = "" + i;
+						if (info.padNumberTo > 1) {
+							while (number.length < info.padNumberTo) {
+								number = "0" + number;
+							}
+						}
+						var name = info.prefix + number + info.suffix;
 						imageLoader.load(key + i, name);
 					}
 				}
@@ -84,6 +100,12 @@ var Splat = (function(splat, window, document) {
 		if (manifestEntry.repeatAt !== undefined) {
 			animation.repeatAt = manifestEntry.repeatAt;
 		}
+		if (manifestEntry.flip === "horizontal") {
+			animation.flipHorizontally();
+		}
+		if (manifestEntry.flip === "vertical") {
+			animation.flipVertically();
+		}
 		return animation;
 	}
 	function generateAnimationsFromManifest(images, manifest) {
@@ -107,7 +129,11 @@ var Splat = (function(splat, window, document) {
 		return loaded;
 	};
 	AnimationLoader.prototype.get = function(name) {
-		return this.animations[name];
+		var anim = this.animations[name];
+		if (anim === undefined) {
+			console.log("Unknown animation: " +  name);
+		}
+		return anim;
 	};
 
 	splat.Animation = Animation;
