@@ -156,8 +156,6 @@ function getRandomArbitrary(min, max) {
 var player = {};
 var shelves = [];
 var powerUps = [];
-var distance = 0;
-var max_distance = 0;
 var state = "start";
 var stateMessages = {
 	"start": clickOrTap() + " TO START",
@@ -509,7 +507,6 @@ function drawProgress(context, dist, end) {
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = [];
 	powerUps = [];
-	distance = 0;
 	populate_shelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
@@ -549,11 +546,6 @@ function (elapsedMillis) {
 		} else {
 			return;
 		}
-	}
-
-	distance = player.x;
-	if (distance > max_distance) {
-		max_distance = distance;
 	}
 
 	move_shelves(elapsedMillis);
@@ -646,13 +638,8 @@ function (context) {
 		soundToggle.draw(context);
 		pauseToggle.draw(context);
 
-		context.fillStyle = "#000000";
-		context.font = "36px pixelade";
-		var dist = Math.round(distance / player.width * 100) / 100;
+		var dist = Math.round(player.x / player.width * 100) / 100;
 		drawProgress(context, dist, 1000);
-		context.fillText(dist, 20, 40);
-		dist = Math.round(max_distance / player.width * 100) / 100;
-		context.fillText("Max: " + dist, 300, 40);
 
 
 		if (scene.timer("superspeed") > 0) {
