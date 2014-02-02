@@ -92,12 +92,12 @@ function(elapsedMillis) {
 		scurry.mouse.buttons[0] = false;
 		scurry.sounds.play("lights-on");
 	}
-	move_shelves(elapsedMillis);
+	moveShelves(elapsedMillis);
 	if (beetleBlack) {
 		beetleBlack.move(elapsedMillis);
 	}
-	delete_invisible_shelves(this.camera.x);
-	populate_shelves(this.camera.x);
+	deleteInvisibleShelves(this.camera.x);
+	populateShelves(this.camera.x);
 
 	bgx += elapsedMillis * -0.05;
 	var bg = scurry.images.get("bg");
@@ -169,7 +169,7 @@ var bgv = -30;
 var bgx = 0;
 
 var shelf;
-var shelf_bkgd;
+var shelfBkgd;
 var soundToggle;
 var pauseToggle;
 var possiblePowerUps;
@@ -183,7 +183,7 @@ function assetsLoaded() {
 	];
 
 	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
-	shelf_bkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
+	shelfBkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
 
 	pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
 		if (state === "dead") {
@@ -203,13 +203,13 @@ function assetsLoaded() {
 	soundToggle.attachToRight(canvas, 12);
 }
 
-var shelf_item_spacing = 30;
+var shelfItemSpacing = 30;
 
-var shelf_items = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup"];
-var shelf_tags = ["tag1", "tag2", "tag3"];
-var same_item_chance = 0.50;
+var shelfItems = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup"];
+var shelfTags = ["tag1", "tag2", "tag3"];
+var sameItemChance = 0.50;
 
-function rand_price() {
+function randPrice() {
 	var price = (((Math.random() * 95) |0) + 5) * 10 + 9;
 	price = "" + price;
 	if (price.length == 2) {
@@ -219,7 +219,7 @@ function rand_price() {
 }
 function getShelfItems(width) {
 	var items = [];
-	var possible_items = shelf_items.slice(0);
+	var possibleItems = shelfItems.slice(0);
 	function getItemWidth(item) {
 		var name = item.item;
 		if (name == "empty") {
@@ -234,41 +234,41 @@ function getShelfItems(width) {
 		}
 	}
 	function makeItem(item) {
-		var tag = (Math.random() * shelf_tags.length) |0;
+		var tag = (Math.random() * shelfTags.length) |0;
 		return {
 			item: item,
-			tag: shelf_tags[tag],
-			price: rand_price()
+			tag: shelfTags[tag],
+			price: randPrice()
 		};
 	}
 	var i, w;
-	while (width > 0 && possible_items.length > 0) {
-		if (items.length > 0 && Math.random() < same_item_chance) {
+	while (width > 0 && possibleItems.length > 0) {
+		if (items.length > 0 && Math.random() < sameItemChance) {
 			i = items[items.length - 1];
 			w = getItemWidth(i);
 			if (w < width) {
-				width -= w + shelf_item_spacing;
+				width -= w + shelfItemSpacing;
 				items.push(i);
 				continue;
 			}
 		}
-		while (possible_items.length > 0) {
-			var	n = (Math.random() * possible_items.length) |0;
-			i = possible_items[n];
-			possible_items.splice(n, 1);
+		while (possibleItems.length > 0) {
+			var	n = (Math.random() * possibleItems.length) |0;
+			i = possibleItems[n];
+			possibleItems.splice(n, 1);
 			var item = makeItem(i);
 			w = getItemWidth(item);
 			if (w > width) {
 				continue;
 			}
 			items.push(item);
-			width -= w + shelf_item_spacing;
+			width -= w + shelfItemSpacing;
 			break;
 		}
 	}
 	return items;
 }
-function draw_tag_price(context, item, tagx, tagy) {
+function drawTagPrice(context, item, tagx, tagy) {
 	var price = item.price;
 	if (item.tag == "tag3") {
 		context.fillStyle = "#ff0000";
@@ -278,7 +278,7 @@ function draw_tag_price(context, item, tagx, tagy) {
 	context.font = "36px pixelade";
 	context.fillText(price, tagx + 70, tagy + 65);
 }
-function draw_shelf_item(context, item, x, y) {
+function drawShelfItem(context, item, x, y) {
 	if (item.item == "empty") {
 		return scurry.images.get("box1").width;
 	}
@@ -289,7 +289,7 @@ function draw_shelf_item(context, item, x, y) {
 	var tagx = x + ((img.width - tag.width) / 2);
 	var tagy = y + 10;
 	context.drawImage(tag, tagx, tagy);
-	draw_tag_price(context, item, tagx, tagy);
+	drawTagPrice(context, item, tagx, tagy);
 
 	if (tag.width > img.width) {
 		return tag.width;
@@ -297,38 +297,38 @@ function draw_shelf_item(context, item, x, y) {
 		return img.width;
 	}
 }
-function draw_shelf_items(context, items, x, y) {
+function drawShelfItems(context, items, x, y) {
 	x += shelf.w1;
 	y += 5;
 	for (var i = 0; i < items.length; i++) {
 		if (i > 0) {
-			x += shelf_item_spacing;
+			x += shelfItemSpacing;
 		}
 
 		var item = items[i];
-		var width = draw_shelf_item(context, item, x, y);
+		var width = drawShelfItem(context, item, x, y);
 		x += width;
 	}
 }
 
-function make_shelf(x, width, drawBackground) {
+function makeShelf(x, width, drawBackground) {
 	var y = -((canvas.height / 4) + (Math.random() * (canvas.height / 2)));
 	var items = getShelfItems(width - shelf.w1 - shelf.w3);
 
-	var spacing = (shelf_bkgd.img.height - 1) * 3;
+	var spacing = (shelfBkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
 	var img = Splat.makeBuffer(width, height + 50, function(ctx) {
-		var bkgdh = (shelf_bkgd.img.height - 1) * 3;
+		var bkgdh = (shelfBkgd.img.height - 1) * 3;
 		if (drawBackground) {
-			shelf_bkgd.draw(ctx, 0, 0, width, bkgdh);
+			shelfBkgd.draw(ctx, 0, 0, width, bkgdh);
 		}
 		shelf.draw(ctx, 0, bkgdh, width, shelf.img.height - 1);
-		draw_shelf_items(ctx, items, 0, bkgdh);
+		drawShelfItems(ctx, items, 0, bkgdh);
 	});
-	return new Splat.AnimatedEntity(x, y, width, shelf_bkgd.img.height, img, 0, -spacing);
+	return new Splat.AnimatedEntity(x, y, width, shelfBkgd.img.height, img, 0, -spacing);
 }
 
-function delete_invisible_shelves(cameraX) {
+function deleteInvisibleShelves(cameraX) {
 	while (firstEntityIsInvisible(shelves, cameraX)) {
 		shelves.shift();
 	}
@@ -352,7 +352,7 @@ function getNextShelfX() {
 function makeShelfBottom(template) {
 	var bottom = new Splat.Entity(template.x, template.y + template.height, template.width, -(template.y + template.height));
 	bottom.draw = function(ctx) {
-		shelf_bkgd.draw(ctx, this.x, this.y, this.width, this.height);
+		shelfBkgd.draw(ctx, this.x, this.y, this.width, this.height);
 	};
 	bottom.collides = function(other) {
 		return false;
@@ -360,17 +360,17 @@ function makeShelfBottom(template) {
 	return bottom;
 }
 
-function populate_shelves(cameraX) {
-	while (need_shelves(cameraX)) {
+function populateShelves(cameraX) {
+	while (needShelves(cameraX)) {
 		var x = getNextShelfX();
 		var width = x === 0 ? 600 : getRandomArbitrary(400, 1000) |0;
 
-		var spacing = (shelf_bkgd.img.height - 1) * 3;
+		var spacing = (shelfBkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
 		var shelvesInRack = 4 + (Math.random() * 3) |0;
 		for (var n = 0; n < shelvesInRack; n++) {
-			var s = make_shelf(x, width, n < shelvesInRack -1);
+			var s = makeShelf(x, width, n < shelvesInRack -1);
 			if (n === 0) {
 				shelves.push(makeShelfBottom(s));
 				y = s.y - height;
@@ -417,11 +417,11 @@ function makePowerUp(x, y) {
 	}
 }
 
-function need_shelves(cameraX) {
+function needShelves(cameraX) {
 	return shelves.length === 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
 }
 
-function move_shelves(elapsedMillis) {
+function moveShelves(elapsedMillis) {
 	for (var i in shelves) {
 		shelves[i].move(elapsedMillis);
 	}
@@ -507,7 +507,7 @@ function drawProgress(context, dist, end) {
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = [];
 	powerUps = [];
-	populate_shelves(0);
+	populateShelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
 	player.y = shelves[2].y - player.height;
@@ -548,7 +548,7 @@ function (elapsedMillis) {
 		}
 	}
 
-	move_shelves(elapsedMillis);
+	moveShelves(elapsedMillis);
 
 	if (scurry.keyboard.isPressed("left")) {
 		player.x -= elapsedMillis * 0.70;
@@ -563,8 +563,8 @@ function (elapsedMillis) {
 	player.vy += elapsedMillis * gravityAccel;
 	player.move(elapsedMillis);
 
-	delete_invisible_shelves(this.camera.x);
-	populate_shelves(this.camera.x);
+	deleteInvisibleShelves(this.camera.x);
+	populateShelves(this.camera.x);
 
 	if (player.y > -player.height) {
 		state = "dead";
