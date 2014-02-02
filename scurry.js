@@ -425,7 +425,7 @@ function moveShelves(elapsedMillis) {
 	for (var i in shelves) {
 		shelves[i].move(elapsedMillis);
 	}
-	for (var i in powerUps) {
+	for (i in powerUps) {
 		powerUps[i].move(elapsedMillis);
 	}
 }
@@ -583,7 +583,7 @@ function (elapsedMillis) {
 	}
 
 	var onGround = false;
-	for (var i in shelves) {
+	for (i in shelves) {
 		var shelf = shelves[i];
 		if (shelf.collides(player)) {
 			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
