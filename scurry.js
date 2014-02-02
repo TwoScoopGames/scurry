@@ -55,7 +55,7 @@ var manifest = {
 			"msPerFrame": 100
 		},
 		"logo-black": {
-			"strip": "images/scurry-logo-white-10f686x399.png",
+			"strip": "images/scurry-logo-black-10f686x399.png",
 			"frames": 10,
 			"msPerFrame": 100
 		},
