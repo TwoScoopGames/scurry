@@ -87,39 +87,11 @@ function setCanvasSize() {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-var ls = 36;
-var lrate = 0.02;
-var lmin = 36;
-var lmax = 46;
-scurry.scenes.add("loading", new Splat.Scene(canvas, function() {
-},
-function(elapsedMillis) {
-	if (scurry.isLoaded()) {
-		assetsLoaded();
-		scurry.scenes.switchTo("title");
-		return;
-	}
-	ls += lrate * elapsedMillis;
-	if (ls > lmax) {
-		lrate *= -1;
-		ls = lmax;
-	} else if (ls < lmin) {
-		lrate *= -1;
-		ls = lmin;
-	}
-}, function(context) {
-	context.fillStyle = "#000000";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-
-	context.font = ls + "px mono";
-	context.fillStyle = "#00cc00";
-	context.fillText("Loading...", 100, (canvas.height / 2) - 18);
-}));
-
 var starting = false;
 var lightsOn = false;
 var beetleBlack;
 scurry.scenes.add("title", new Splat.Scene(canvas, function() {
+	assetsLoaded();
 	this.camera.vx = 0.2;
 	this.camera.y = -800;
 },
