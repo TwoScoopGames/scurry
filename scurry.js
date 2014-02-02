@@ -37,7 +37,39 @@ var manifest = {
 	},
 	"fonts": [
 		"pixelade"
-	]
+	],
+	"animations": {
+		"beetle": {
+			"strip": "beetle",
+			"frames": 7,
+			"msPerFrame": 30
+		},
+		"beetle-black": {
+			"strip": "beetle-black",
+			"frames": 7,
+			"msPerFrame": 30
+		},
+		"beetle-jump": {
+			"strip": "beetle-jump",
+			"frames": 7,
+			"msPerFrame": 50
+		},
+		"logo-white": {
+			"strip": "logo-white",
+			"frames": 10,
+			"msPerFrame": 100
+		},
+		"logo-black": {
+			"strip": "logo-black",
+			"frames": 10,
+			"msPerFrame": 100
+		},
+		"sugar-cube": {
+			"strip": "sugar-cube",
+			"frames": 19,
+			"msPerFrame": 200
+		},
+	}
 };
 var scurry = new Splat.Game(canvas, manifest);
 
@@ -68,7 +100,7 @@ var beetleBlack;
 var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 	if (!lightsOn && startScreen.timer("start") > 807) {
 		lightsOn = true;
-		beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, beetle_black, 0, 0);
+		beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, scurry.animations.get("beetle-black"), 0, 0);
 		beetleBlack.vx = 1.40;
 	}
 	if (startScreen.timer("start") > 2300) {
@@ -96,8 +128,8 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 		bgx += bg.width;
 	}
 
-	logo_white.move(elapsedMillis);
-	logo_black.move(elapsedMillis);
+	scurry.animations.get("logo-white").move(elapsedMillis);
+	scurry.animations.get("logo-black").move(elapsedMillis);
 }, function(context) {
 	drawStage(startScreen, context);
 
@@ -105,10 +137,10 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 		var logo;
 		if (lightsOn) {
 			context.fillStyle = "rgba(255, 255, 255, 0.7)";
-			logo = logo_black;
+			logo = scurry.animations.get("logo-black");
 		} else {
 			context.fillStyle = "rgba(0, 0, 0, 0.7)";
-			logo = logo_white;
+			logo = scurry.animations.get("logo-white");
 		}
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		logo.draw(context, (canvas.width / 2) - (logo.width / 2), 0);
@@ -191,28 +223,16 @@ var minJump = -0.3;
 var bgv = -30;
 var bgx = 0;
 
-var beetle = new Splat.Animation();
-var beetle_black = new Splat.Animation();
-var beetle_jump = new Splat.Animation();
 var shelf;
 var shelf_bkgd;
-var logo_white = new Splat.Animation();
-var logo_black = new Splat.Animation();
 var soundToggle;
 var pauseToggle;
 var possiblePowerUps;
 
 function assetsLoaded() {
-	beetle = Splat.makeAnimation(scurry.images.get("beetle"), 7, 30);
-	beetle_black = Splat.makeAnimation(scurry.images.get("beetle-black"), 7, 30);
+	scurry.animations.get("beetle-jump").repeatAt = 4;
 
-	beetle_jump = Splat.makeAnimation(scurry.images.get("beetle-jump"), 7, 50);
-	beetle_jump.repeatAt = 4;
-
-	logo_white = Splat.makeAnimation(scurry.images.get("logo-white"), 10, 100);
-	logo_black = Splat.makeAnimation(scurry.images.get("logo-black"), 10, 100);
-
-	var sugarCube = Splat.makeAnimation(scurry.images.get("sugar-cube"), 19, 200);
+	var sugarCube = scurry.animations.get("sugar-cube");
 
 	possiblePowerUps = [
 		{ "name": "superjump", "animation": sugarCube },
@@ -474,7 +494,7 @@ function reset() {
 	powerUps = [];
 	distance = 0;
 	populate_shelves(0);
-	player = new Splat.AnimatedEntity(200, 50, 120, 40, beetle, -17, -27);
+	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
 	player.y = shelves[2].y - player.height;
 	player.vx = 1;
@@ -566,14 +586,14 @@ function simulation(elapsedMillis) {
 		}
 	}
 
-	if (onGround && player.sprite == beetle_jump) {
-		player.sprite = beetle;
-		beetle.reset();
+	if (onGround && player.sprite == scurry.animations.get("beetle-jump")) {
+		player.sprite = scurry.animations.get("beetle");
+		scurry.animations.get("beetle").reset();
 		scurry.sounds.play("land");
 	}
-	if (!onGround && player.sprite == beetle) {
-		player.sprite = beetle_jump;
-		beetle_jump.reset();
+	if (!onGround && player.sprite == scurry.animations.get("beetle")) {
+		player.sprite = scurry.animations.get("beetle-jump");
+		scurry.animations.get("beetle-jump").reset();
 	}
 	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
 		player.vy = jumpSpeed;
@@ -584,8 +604,8 @@ function simulation(elapsedMillis) {
 			player.vy += -1;
 		}
 
-		player.sprite = beetle_jump;
-		beetle_jump.reset();
+		player.sprite = scurry.animations.get("beetle-jump");
+		scurry.animations.get("beetle-jump").reset();
 		scurry.sounds.play("jump");
 	}
 	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
