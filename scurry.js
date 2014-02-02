@@ -46,7 +46,8 @@ var manifest = {
 		"beetle-jump": {
 			"strip": "images/scurry-jump-sprite-7f129x124.png",
 			"frames": 7,
-			"msPerFrame": 50
+			"msPerFrame": 50,
+			"repeatAt": 4
 		},
 		"logo-white": {
 			"strip": "images/scurry-logo-white-10f686x399.png",
@@ -224,8 +225,6 @@ var pauseToggle;
 var possiblePowerUps;
 
 function assetsLoaded() {
-	scurry.animations.get("beetle-jump").repeatAt = 4;
-
 	var sugarCube = scurry.animations.get("sugar-cube");
 
 	possiblePowerUps = [
