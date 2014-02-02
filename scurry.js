@@ -701,11 +701,11 @@ function draw(context) {
 		context.fillStyle = "#000000";
 		context.font = "36px pixelade";
 		var dist = Math.round(distance / player.width * 100) / 100;
+		drawProgress(context, dist, 1000);
 		context.fillText(dist, 20, 40);
 		dist = Math.round(max_distance / player.width * 100) / 100;
 		context.fillText("Max: " + dist, 300, 40);
 
-		drawProgress(context, dist, 1000);
 
 		if (game.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
