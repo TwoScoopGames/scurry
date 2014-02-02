@@ -87,26 +87,55 @@ function setCanvasSize() {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-var game = new Splat.Scene(canvas, simulation, draw);
+var ls = 36;
+var lrate = 0.02;
+var lmin = 36;
+var lmax = 46;
+scurry.scenes.add("loading", new Splat.Scene(canvas, function() {
+},
+function(elapsedMillis) {
+	if (scurry.isLoaded()) {
+		assetsLoaded();
+		scurry.scenes.switchTo("title");
+		return;
+	}
+	ls += lrate * elapsedMillis;
+	if (ls > lmax) {
+		lrate *= -1;
+		ls = lmax;
+	} else if (ls < lmin) {
+		lrate *= -1;
+		ls = lmin;
+	}
+}, function(context) {
+	context.fillStyle = "#000000";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	context.font = ls + "px mono";
+	context.fillStyle = "#00cc00";
+	context.fillText("Loading...", 100, (canvas.height / 2) - 18);
+}));
 
 var starting = false;
 var lightsOn = false;
 var beetleBlack;
-var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
-	if (!lightsOn && startScreen.timer("start") > 807) {
+scurry.scenes.add("title", new Splat.Scene(canvas, function() {
+	this.camera.vx = 0.2;
+	this.camera.y = -800;
+},
+function(elapsedMillis) {
+	if (!lightsOn && this.timer("start") > 807) {
 		lightsOn = true;
 		beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, scurry.animations.get("beetle-black"), 0, 0);
 		beetleBlack.vx = 1.40;
 	}
-	if (startScreen.timer("start") > 2300) {
-		startScreen.stop();
-		reset();
-		game.start();
+	if (this.timer("start") > 2300) {
+		scurry.scenes.switchTo("level-1");
 		return;
 	}
 	if (!starting && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
 		starting = true;
-		startScreen.startTimer("start");
+		this.startTimer("start");
 		scurry.mouse.buttons[0] = false;
 		scurry.sounds.play("lights-on");
 	}
@@ -114,8 +143,8 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 	if (beetleBlack) {
 		beetleBlack.move(elapsedMillis);
 	}
-	delete_invisible_shelves(startScreen.camera.x);
-	populate_shelves(startScreen.camera.x);
+	delete_invisible_shelves(this.camera.x);
+	populate_shelves(this.camera.x);
 
 	bgx += elapsedMillis * -0.05;
 	var bg = scurry.images.get("bg");
@@ -126,9 +155,9 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 	scurry.animations.get("logo-white").move(elapsedMillis);
 	scurry.animations.get("logo-black").move(elapsedMillis);
 }, function(context) {
-	drawStage(startScreen, context);
+	drawStage(this, context);
 
-	startScreen.camera.drawAbsolute(context, function() {
+	this.camera.drawAbsolute(context, function() {
 		var logo;
 		if (lightsOn) {
 			context.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -149,9 +178,7 @@ var startScreen = new Splat.Scene(canvas, function(elapsedMillis) {
 			centerText(context, clickOrTap() + " TO START", 0, 450);
 		}
 	});
-});
-startScreen.camera.vx = 0.2;
-startScreen.camera.y = -800;
+}));
 
 function clickOrTap() {
 	if (scurry.mouse.supportsTouch()) {
@@ -168,34 +195,6 @@ function centerText(context, text, offsetX, offsetY) {
 	context.fillText(text, x, y);
 }
 
-var ls = 36;
-var lrate = 0.02;
-var lmin = 36;
-var lmax = 46;
-var loading = new Splat.Scene(canvas, function(elapsedMillis) {
-	if (scurry.isLoaded()) {
-		assetsLoaded();
-		loading.stop();
-		startScreen.start();
-		return;
-	}
-	ls += lrate * elapsedMillis;
-	if (ls > lmax) {
-		lrate *= -1;
-		ls = lmax;
-	} else if (ls < lmin) {
-		lrate *= -1;
-		ls = lmin;
-	}
-}, function(context) {
-	context.fillStyle = "#000000";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-
-	context.font = ls + "px mono";
-	context.fillStyle = "#00cc00";
-	context.fillText("Loading...", 100, (canvas.height / 2) - 18);
-});
-loading.start();
 
 function getRandomArbitrary(min, max) {
 	return Math.random() * (max - min) + min;
@@ -251,8 +250,6 @@ function assetsLoaded() {
 		scurry.sounds.muted = !toggled;
 	});
 	soundToggle.attachToRight(canvas, 12);
-
-	reset();
 }
 
 var shelf_item_spacing = 30;
@@ -482,136 +479,6 @@ function move_shelves(elapsedMillis) {
 	}
 }
 
-function reset() {
-	shelves = [];
-	powerUps = [];
-	distance = 0;
-	populate_shelves(0);
-	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
-	player.x = 200;
-	player.y = shelves[2].y - player.height;
-	player.vx = 1;
-	bgv = -0.3;
-	bgx = 0;
-	game.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
-	game.clearTimers();
-	pauseToggle.toggled = true;
-}
-
-function simulation(elapsedMillis) {
-	soundToggle.move(elapsedMillis);
-	pauseToggle.move(elapsedMillis);
-
-	if (game.timer("superjump") > 5000) {
-		game.stopTimer("superjump");
-	}
-	if (game.timer("superspeed") > 5000) {
-		game.stopTimer("superspeed");
-	}
-	if (state === "dead") {
-		if (game.timer("dead") > 300) {
-			player.sprite = scurry.images.get("beetle-dead");
-		}
-		if (game.timer("dead") > 1000) {
-			state = "start";
-			reset();
-		}
-		return;
-	}
-	if (state === "paused" || state === "start") {
-		if (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0]) {
-			state = "running";
-			scurry.mouse.buttons[0] = false;
-			pauseToggle.toggled = false;
-		} else {
-			return;
-		}
-	}
-
-	distance = player.x;
-	if (distance > max_distance) {
-		max_distance = distance;
-	}
-
-	move_shelves(elapsedMillis);
-
-	if (scurry.keyboard.isPressed("left")) {
-		player.x -= elapsedMillis * 0.70;
-	}
-	if (game.timer("superspeed") > 0) {
-		player.x += elapsedMillis * 0.70;
-	}
-	if (scurry.keyboard.isPressed("right")) {
-		player.x += elapsedMillis * 0.70;
-	}
-
-	player.vy += elapsedMillis * gravityAccel;
-	player.move(elapsedMillis);
-
-	delete_invisible_shelves(game.camera.x);
-	populate_shelves(game.camera.x);
-
-	if (player.y > -player.height) {
-		state = "dead";
-		scurry.sounds.play("death");
-		game.startTimer("dead");
-		return;
-	}
-
-	for (var i in powerUps) {
-		var powerUp = powerUps[i];
-		if (powerUp.collides(player)) {
-			powerUps.splice(i, 1);
-			game.startTimer(powerUp.name);
-			scurry.sounds.play("powerup");
-		}
-	}
-
-	var onGround = false;
-	for (var i in shelves) {
-		var shelf = shelves[i];
-		if (shelf.collides(player)) {
-			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
-				player.y = shelf.y - player.height - 0.01;
-				player.vy = 0;
-				onGround = true;
-			}
-		}
-	}
-
-	if (onGround && player.sprite == scurry.animations.get("beetle-jump")) {
-		player.sprite = scurry.animations.get("beetle");
-		scurry.animations.get("beetle").reset();
-		scurry.sounds.play("land");
-	}
-	if (!onGround && player.sprite == scurry.animations.get("beetle")) {
-		player.sprite = scurry.animations.get("beetle-jump");
-		scurry.animations.get("beetle-jump").reset();
-	}
-	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
-		player.vy = jumpSpeed;
-		if (game.timer("superjump") > 0) {
-			player.vy += -1;
-		}
-		if (scurry.keyboard.isPressed("up")) {
-			player.vy += -1;
-		}
-
-		player.sprite = scurry.animations.get("beetle-jump");
-		scurry.animations.get("beetle-jump").reset();
-		scurry.sounds.play("jump");
-	}
-	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
-		player.vy = minJump;
-	}
-
-	bgx += elapsedMillis * bgv;
-	var bg = scurry.images.get("bg");
-	if (bgx + bg.width < 0) {
-		bgx += bg.width;
-	}
-}
-
 function drawStage(scene, context) {
 	var bg = scurry.images.get("bg");
 
@@ -686,17 +553,145 @@ function drawProgress(context, dist, end) {
 	context.drawImage(marker, markerX, canvas.height - marker.height);
 }
 
-function draw(context) {
-	drawStage(game, context);
+scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
+	shelves = [];
+	powerUps = [];
+	distance = 0;
+	populate_shelves(0);
+	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
+	player.x = 200;
+	player.y = shelves[2].y - player.height;
+	player.vx = 1;
+	bgv = -0.3;
+	bgx = 0;
+	this.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
+	this.clearTimers();
+	pauseToggle.toggled = true;
+},
+function (elapsedMillis) {
+	soundToggle.move(elapsedMillis);
+	pauseToggle.move(elapsedMillis);
+
+	if (this.timer("superjump") > 5000) {
+		this.stopTimer("superjump");
+	}
+	if (this.timer("superspeed") > 5000) {
+		this.stopTimer("superspeed");
+	}
+	if (state === "dead") {
+		if (this.timer("dead") > 300) {
+			player.sprite = scurry.images.get("beetle-dead");
+		}
+		if (this.timer("dead") > 1000) {
+			state = "start";
+			scurry.scenes.switchTo("level-1");
+		}
+		return;
+	}
+	if (state === "paused" || state === "start") {
+		if (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0]) {
+			state = "running";
+			scurry.mouse.buttons[0] = false;
+			pauseToggle.toggled = false;
+		} else {
+			return;
+		}
+	}
+
+	distance = player.x;
+	if (distance > max_distance) {
+		max_distance = distance;
+	}
+
+	move_shelves(elapsedMillis);
+
+	if (scurry.keyboard.isPressed("left")) {
+		player.x -= elapsedMillis * 0.70;
+	}
+	if (this.timer("superspeed") > 0) {
+		player.x += elapsedMillis * 0.70;
+	}
+	if (scurry.keyboard.isPressed("right")) {
+		player.x += elapsedMillis * 0.70;
+	}
+
+	player.vy += elapsedMillis * gravityAccel;
+	player.move(elapsedMillis);
+
+	delete_invisible_shelves(this.camera.x);
+	populate_shelves(this.camera.x);
+
+	if (player.y > -player.height) {
+		state = "dead";
+		scurry.sounds.play("death");
+		this.startTimer("dead");
+		return;
+	}
+
+	for (var i in powerUps) {
+		var powerUp = powerUps[i];
+		if (powerUp.collides(player)) {
+			powerUps.splice(i, 1);
+			this.startTimer(powerUp.name);
+			scurry.sounds.play("powerup");
+		}
+	}
+
+	var onGround = false;
+	for (var i in shelves) {
+		var shelf = shelves[i];
+		if (shelf.collides(player)) {
+			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
+				player.y = shelf.y - player.height - 0.01;
+				player.vy = 0;
+				onGround = true;
+			}
+		}
+	}
+
+	if (onGround && player.sprite == scurry.animations.get("beetle-jump")) {
+		player.sprite = scurry.animations.get("beetle");
+		scurry.animations.get("beetle").reset();
+		scurry.sounds.play("land");
+	}
+	if (!onGround && player.sprite == scurry.animations.get("beetle")) {
+		player.sprite = scurry.animations.get("beetle-jump");
+		scurry.animations.get("beetle-jump").reset();
+	}
+	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
+		player.vy = jumpSpeed;
+		if (this.timer("superjump") > 0) {
+			player.vy += -1;
+		}
+		if (scurry.keyboard.isPressed("up")) {
+			player.vy += -1;
+		}
+
+		player.sprite = scurry.animations.get("beetle-jump");
+		scurry.animations.get("beetle-jump").reset();
+		scurry.sounds.play("jump");
+	}
+	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
+		player.vy = minJump;
+	}
+
+	bgx += elapsedMillis * bgv;
+	var bg = scurry.images.get("bg");
+	if (bgx + bg.width < 0) {
+		bgx += bg.width;
+	}
+},
+function (context) {
+	drawStage(this, context);
 	for (var i in powerUps) {
 		powerUps[i].draw(context);
 	}
 	player.draw(context);
 
-	game.camera.drawAbsolute(context, function() {
+	var scene = this;
+	this.camera.drawAbsolute(context, function() {
 		soundToggle.draw(context);
 		pauseToggle.draw(context);
-
 
 		context.fillStyle = "#000000";
 		context.font = "36px pixelade";
@@ -707,12 +702,12 @@ function draw(context) {
 		context.fillText("Max: " + dist, 300, 40);
 
 
-		if (game.timer("superspeed") > 0) {
+		if (scene.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
 			context.font = "48px pixelade";
 			centerText(context, "SUPERSPEED!", 0, canvas.height - 70);
 		}
-		if (game.timer("superjump") > 0) {
+		if (scene.timer("superjump") > 0) {
 			context.fillStyle = "#ff0000";
 			context.font = "48px pixelade";
 			centerText(context, "SUPERJUMP!", 0, canvas.height - 50);
@@ -726,4 +721,4 @@ function draw(context) {
 			centerText(context, stateMessages[state], 0, 450);
 		}
 	});
-}
+}));
