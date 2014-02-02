@@ -662,3 +662,5 @@ function (context) {
 		}
 	});
 }));
+
+scurry.scenes.switchTo("loading");
