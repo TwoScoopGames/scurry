@@ -3,9 +3,6 @@ var canvas = document.getElementById("game");
 var manifest = {
 	"images": {
 		"bg": "images/Scurry-bg-TEST2.png",
-		"beetle": "images/scurry-run7f136x80.png",
-		"beetle-black": "images/scurry-run7f45x26.png",
-		"beetle-jump": "images/scurry-jump-sprite-7f129x124.png",
 		"beetle-dead": "images/scurry-dead-1f132x72.png",
 		"shelf": "images/shelf.png",
 		"shelf background": "images/shelf-bars-spritesheet.png",
@@ -18,13 +15,10 @@ var manifest = {
 		"tag1": "images/price-tag1.png",
 		"tag2": "images/price-tag2.png",
 		"tag3": "images/price-tag-sale.png",
-		"logo-white": "images/scurry-logo-white-10f686x399.png",
-		"logo-black": "images/scurry-logo-black-10f686x399.png",
 		"sound-off": "images/sound-off-icon.png",
 		"sound-on": "images/sound-on-icon.png",
 		"play": "images/play-icon.png",
 		"pause": "images/pause-icon.png",
-		"sugar-cube": "images/sugar-cube-19f.png",
 		"progress-marker": "images/scurry-head.png",
 		"progress": "images/scurry-progress.png",
 	},
@@ -40,32 +34,32 @@ var manifest = {
 	],
 	"animations": {
 		"beetle": {
-			"strip": "beetle",
+			"strip": "images/scurry-run7f136x80.png",
 			"frames": 7,
 			"msPerFrame": 30
 		},
 		"beetle-black": {
-			"strip": "beetle-black",
+			"strip": "images/scurry-run7f45x26.png",
 			"frames": 7,
 			"msPerFrame": 30
 		},
 		"beetle-jump": {
-			"strip": "beetle-jump",
+			"strip": "images/scurry-jump-sprite-7f129x124.png",
 			"frames": 7,
 			"msPerFrame": 50
 		},
 		"logo-white": {
-			"strip": "logo-white",
+			"strip": "images/scurry-logo-white-10f686x399.png",
 			"frames": 10,
 			"msPerFrame": 100
 		},
 		"logo-black": {
-			"strip": "logo-black",
+			"strip": "images/scurry-logo-white-10f686x399.png",
 			"frames": 10,
 			"msPerFrame": 100
 		},
 		"sugar-cube": {
-			"strip": "sugar-cube",
+			"strip": "images/sugar-cube-19f.png",
 			"frames": 19,
 			"msPerFrame": 200
 		},
