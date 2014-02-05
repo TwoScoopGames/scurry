@@ -653,6 +653,7 @@ function (elapsedMillis) {
 	}
 	if (this.timer("roach motel") > 3000) {
 		player.sprite = scurry.animations.get("skeleton-crumble");
+		player.sprite.reset();
 		scurry.sounds.play("death");
 		this.stopTimer("roach motel");
 		this.startTimer("crumble");
