@@ -405,7 +405,7 @@ function makePowerUp(x, y) {
 	var p = possiblePowerUps[pnum];
 
 	if (p.animation !== undefined) {
-		var a = new Splat.AnimatedEntity(x, y, p.animation.width, p.animation.height, p.animation, 0, 0);
+		var a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
 		a.name = p.name;
 		if (p.name != "roach motel") {
 			a.elapsedSec = 0;
