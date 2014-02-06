@@ -26,10 +26,13 @@ var manifest = {
 	},
 	"sounds": {
 		"jump": "audio/jump.wav",
+		"superjump": "audio/superjump.wav",
 		"land": "audio/land.wav",
 		"death": "audio/death.wav",
 		"lights-on": "audio/lights-on.wav",
-		"powerup": "audio/powerup.wav",
+		"powerup-jump": "audio/powerup-jump.wav",
+		"powerup-speed": "audio/powerup-speed.wav",
+		"crumble": "audio/crumble.wav"
 	},
 	"fonts": [
 		"pixelade"
@@ -191,8 +194,8 @@ function assetsLoaded() {
 	var sugarCube = scurry.animations.get("sugar-cube");
 
 	possiblePowerUps = [
-		{ "name": "superjump", "animation": sugarCube },
-		{ "name": "superspeed", "color": "#00ff00" },
+		{ "name": "superjump", "animation": sugarCube, "sound": "powerup-jump" },
+		{ "name": "superspeed", "animation": sugarCube, "sound": "powerup-speed" },
 		{ "name": "roach motel", "animation": scurry.images.get("hotel-back") }
 	];
 
@@ -404,33 +407,18 @@ function makePowerUp(x, y) {
 	var pnum = Math.random() * possiblePowerUps.length |0;
 	var p = possiblePowerUps[pnum];
 
-	if (p.animation !== undefined) {
-		var a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
-		a.name = p.name;
-		if (p.name != "roach motel") {
-			a.elapsedSec = 0;
-			a.move = function(elapsedSec) {
-				this.elapsedSec += elapsedSec;
-				this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
-				Splat.AnimatedEntity.prototype.move.call(this, elapsedSec);
-			};
-		}
-		return a;
-	} else {
-		var e = new Splat.Entity(x, y, 50, 50);
-		e.elapsedSec = 0;
-		e.name = p.name;
-
-		e.move = function(elapsedSec) {
+	var a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
+	a.name = p.name;
+	a.sound = p.sound;
+	if (p.name != "roach motel") {
+		a.elapsedSec = 0;
+		a.move = function(elapsedSec) {
 			this.elapsedSec += elapsedSec;
 			this.y = y + Math.sin(this.elapsedSec / 1000.0 * Math.PI) * 20 |0;
+			Splat.AnimatedEntity.prototype.move.call(this, elapsedSec);
 		};
-		e.draw = function(context) {
-			context.fillStyle = p.color;
-			context.fillRect(this.x, this.y, this.width, this.height);
-		};
-		return e;
 	}
+	return a;
 }
 
 function needShelves(cameraX) {
@@ -596,7 +584,9 @@ function (elapsedMillis) {
 				this.startTimer(powerUp.name);
 				if (powerUp.name != "roach motel") {
 					powerUps.splice(i, 1);
-					scurry.sounds.play("powerup");
+				}
+				if (powerUp.sound) {
+					scurry.sounds.play(powerUp.sound);
 				}
 			}
 		}
@@ -635,6 +625,9 @@ function (elapsedMillis) {
 		player.vy = jumpSpeed;
 		if (this.timer("superjump") > 0) {
 			player.vy += -1;
+			scurry.sounds.play("superjump");
+		} else {
+			scurry.sounds.play("jump");
 		}
 		if (scurry.keyboard.isPressed("up")) {
 			player.vy += -1;
@@ -642,7 +635,6 @@ function (elapsedMillis) {
 
 		player.sprite = scurry.animations.get("beetle-jump");
 		scurry.animations.get("beetle-jump").reset();
-		scurry.sounds.play("jump");
 	}
 	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
 		player.vy = minJump;
@@ -654,7 +646,7 @@ function (elapsedMillis) {
 	if (this.timer("roach motel") > 3000) {
 		player.sprite = scurry.animations.get("skeleton-crumble");
 		player.sprite.reset();
-		scurry.sounds.play("death");
+		scurry.sounds.play("crumble");
 		this.stopTimer("roach motel");
 		this.startTimer("crumble");
 	}
