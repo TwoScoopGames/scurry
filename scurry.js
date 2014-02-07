@@ -54,6 +54,12 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 4
 		},
+		"beetle-fall": {
+			"strip": "images/scurry-fall-9f.png",
+			"frames": 9,
+			"msPerFrame": 50,
+			"repeatAt": 6
+		},
 		"logo-white": {
 			"strip": "images/scurry-logo-white-10f686x399.png",
 			"frames": 10,
@@ -546,8 +552,11 @@ function (elapsedMillis) {
 		this.stopTimer("superspeed");
 	}
 	if (state === "dead") {
-		if (this.timer("dead") > 300 && !this.timer("roach motel") && !this.timer("crumble")) {
-			player.sprite = scurry.images.get("beetle-dead");
+		player.vx = 0.6;
+		player.vy = 0.6;
+		player.move(elapsedMillis);
+		if (this.timer("dead") > 0 && !this.timer("roach motel") && !this.timer("crumble")) {
+			player.sprite = scurry.animations.get("beetle-fall");
 		}
 		if (this.timer("dead") > 1000) {
 			state = "start";
