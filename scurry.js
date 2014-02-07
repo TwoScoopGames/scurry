@@ -456,8 +456,8 @@ function drawStage(scene, context) {
 	}
 
 	// draw the insta-death floor
-	if (scene.camera.y > 100-canvas.height) {
-		linearGradient(context, scene.camera.x, -100, canvas.width, 100, "rgba(0, 0, 0, 0)", "rgba(0, 0, 0, 1)");
+	if (scene.camera.y > 50-canvas.height) {
+		linearGradient(context, scene.camera.x, -50, canvas.width, 50, "rgba(0, 0, 0, 0)", "rgba(0, 0, 0, 1)");
 	}
 	if (scene.camera.y > -canvas.height) {
 		context.fillStyle = "#000000";
