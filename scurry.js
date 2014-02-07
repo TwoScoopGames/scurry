@@ -450,10 +450,23 @@ function drawStage(scene, context) {
 	}
 
 	// draw the insta-death floor
+	if (scene.camera.y > 100-canvas.height) {
+		linearGradient(context, scene.camera.x, -100, canvas.width, 100, "rgba(0, 0, 0, 0)", "rgba(0, 0, 0, 1)");
+	}
 	if (scene.camera.y > -canvas.height) {
 		context.fillStyle = "#000000";
 		context.fillRect(scene.camera.x|0, 0, canvas.width, canvas.height + scene.camera.y + 1|0);
 	}
+}
+
+function linearGradient(context, x, y, width, height, startColor, stopColor) {
+	x = x|0;
+	y = y|0;
+	var grd = context.createLinearGradient(x, y, x, y + height);
+	grd.addColorStop(0, startColor);
+	grd.addColorStop(1, stopColor);
+	context.fillStyle = grd;
+	context.fillRect(x, y, width, height);
 }
 
 function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
