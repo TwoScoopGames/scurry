@@ -12,6 +12,10 @@ var manifest = {
 		"can1": "images/can1.png",
 		"can2": "images/can2.png",
 		"syrup": "images/syrup.png",
+		"butter": "images/butter.png",
+		"milk": "images/milk.png",
+		"milk2": "images/milk2.png",
+		"oj": "images/oj.png",
 		"tag1": "images/price-tag1.png",
 		"tag2": "images/price-tag2.png",
 		"tag3": "images/price-tag-sale.png",
@@ -229,7 +233,7 @@ function assetsLoaded() {
 
 var shelfItemSpacing = 30;
 
-var shelfItems = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup"];
+var shelfItems = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup", "butter", "milk", "milk2", "oj"];
 var shelfTags = ["tag1", "tag2", "tag3"];
 var sameItemChance = 0.50;
 
