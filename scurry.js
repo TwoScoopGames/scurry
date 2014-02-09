@@ -177,6 +177,7 @@ function getRandomArbitrary(min, max) {
 
 var player = {};
 var shelves = [];
+var hotels = [];
 var powerUps = [];
 var state = "start";
 var stateMessages = {
@@ -358,6 +359,9 @@ function deleteInvisibleShelves(cameraX) {
 	while (firstEntityIsInvisible(powerUps, cameraX)) {
 		powerUps.shift();
 	}
+	while (firstEntityIsInvisible(hotels, cameraX)) {
+		hotels.shift();
+	}
 }
 
 function firstEntityIsInvisible(entities, cameraX) {
@@ -413,10 +417,13 @@ function makePowerUp(x, y) {
 	var pnum = Math.random() * possiblePowerUps.length |0;
 	var p = possiblePowerUps[pnum];
 
-	var a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
-	a.name = p.name;
-	a.sound = p.sound;
-	if (p.name != "roach motel") {
+	var a;
+	if (p.name == "roach motel") {
+		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y + 60, 265, 30, p.animation, -25, -60);
+		var fg = scurry.images.get("hotel-front");
+		hotels.push(new Splat.AnimatedEntity(x - (fg.width / 2) - 25, y + 20, fg.width, 95, fg, 0, -20));
+	} else {
+		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
 		a.elapsedSec = 0;
 		a.move = function(elapsedSec) {
 			this.elapsedSec += elapsedSec;
@@ -424,6 +431,8 @@ function makePowerUp(x, y) {
 			Splat.AnimatedEntity.prototype.move.call(this, elapsedSec);
 		};
 	}
+	a.name = p.name;
+	a.sound = p.sound;
 	return a;
 }
 
@@ -527,8 +536,18 @@ function drawProgress(context, dist, end) {
 	context.drawImage(marker, markerX, canvas.height - marker.height);
 }
 
+function drawEntities(context, entities) {
+	entities.sort(function(a, b) {
+		return b.y - a.y;
+	});
+	for (var i in entities) {
+		entities[i].draw(context);
+	}
+}
+
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = [];
+	hotels = [];
 	powerUps = [];
 	populateShelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
@@ -599,10 +618,15 @@ function (elapsedMillis) {
 		return;
 	}
 
-	if (!this.timer("roach motel")) {
-		for (var i in powerUps) {
-			var powerUp = powerUps[i];
-			if (powerUp.collides(player)) {
+	var inHotel = false;
+	for (var i = 0; i < powerUps.length; i++) {
+		var powerUp = powerUps[i];
+		if (powerUp.collides(player)) {
+			if (powerUp.name == "roach motel") {
+				console.log("in hotel");
+				inHotel = true;
+			}
+			if (!this.timer("roach motel")) {
 				this.startTimer(powerUp.name);
 				if (powerUp.name != "roach motel") {
 					powerUps.splice(i, 1);
@@ -615,11 +639,22 @@ function (elapsedMillis) {
 	}
 
 	var onGround = false;
-	for (i in shelves) {
+	for (i = 0; i < shelves.length; i++) {
 		var shelf = shelves[i];
 		if (shelf.collides(player)) {
 			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
 				player.y = shelf.y - player.height - 0.01;
+				player.vy = 0;
+				onGround = true;
+			}
+		}
+	}
+
+	for (i = 0; i < hotels.length; i++) {
+		var hotel = hotels[i];
+		if (hotel.collides(player)) {
+			if (player.didOverlapHoriz(hotel) && player.wasAbove(hotel)) {
+				player.y = hotel.y - player.height - 0.01;
 				player.vy = 0;
 				onGround = true;
 			}
@@ -643,7 +678,7 @@ function (elapsedMillis) {
 		player.sprite = scurry.animations.get("beetle-jump");
 		scurry.animations.get("beetle-jump").reset();
 	}
-	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround) {
+	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround && !inHotel) {
 		player.vy = jumpSpeed;
 		if (this.timer("superjump") > 0) {
 			player.vy += -1;
@@ -684,7 +719,10 @@ function (context) {
 	for (var i in powerUps) {
 		powerUps[i].draw(context);
 	}
-	player.draw(context);
+
+	var toDraw = hotels.slice(0);
+	toDraw.push(player);
+	drawEntities(context, toDraw);
 
 	var scene = this;
 	this.camera.drawAbsolute(context, function() {
@@ -693,7 +731,6 @@ function (context) {
 
 		var dist = Math.round(player.x / player.width * 100) / 100;
 		drawProgress(context, dist, 1000);
-
 
 		if (scene.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
