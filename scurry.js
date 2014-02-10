@@ -658,6 +658,10 @@ function (elapsedMillis) {
 		var powerUp = powerUps[i];
 		if (powerUp.collides(player)) {
 			if (powerUp.name == "roach motel") {
+				if (powerUp.avoided || player.wasBelow(powerUp)) {
+					powerUp.avoided = true;
+					continue;
+				}
 				inHotel = true;
 			}
 			if (!this.timer("roach motel")) {
