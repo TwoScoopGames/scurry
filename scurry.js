@@ -662,6 +662,10 @@ function (elapsedMillis) {
 					powerUp.avoided = true;
 					continue;
 				}
+				// only switch to skeleton when hidden inside motel.
+				if (player.x > powerUp.x + 30) {
+					player.sprite = scurry.animations.get("skeleton");
+				}
 				inHotel = true;
 			}
 			if (!this.timer("roach motel")) {
@@ -704,9 +708,6 @@ function (elapsedMillis) {
 		player.vy = minJump;
 	}
 
-	if (this.timer("roach motel") > 0) {
-		player.sprite = scurry.animations.get("skeleton");
-	}
 	if (this.timer("roach motel") > 3000) {
 		player.sprite = scurry.animations.get("skeleton-crumble");
 		player.sprite.reset();
