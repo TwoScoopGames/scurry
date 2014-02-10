@@ -410,7 +410,7 @@ function populateShelves(cameraX) {
 				y -= height;
 			}
 			shelves.push(s);
-			if (Math.random() < 0.3) {
+			if (x > 3000 && Math.random() < 0.3) {
 				powerUps.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
 			}
 		}
