@@ -622,26 +622,6 @@ function (elapsedMillis) {
 		return;
 	}
 
-	var inHotel = false;
-	for (var i = 0; i < powerUps.length; i++) {
-		var powerUp = powerUps[i];
-		if (powerUp.collides(player)) {
-			if (powerUp.name == "roach motel") {
-				console.log("in hotel");
-				inHotel = true;
-			}
-			if (!this.timer("roach motel")) {
-				this.startTimer(powerUp.name);
-				if (powerUp.name != "roach motel") {
-					powerUps.splice(i, 1);
-				}
-				if (powerUp.sound) {
-					scurry.sounds.play(powerUp.sound);
-				}
-			}
-		}
-	}
-
 	var onGround = false;
 	for (i = 0; i < shelves.length; i++) {
 		var shelf = shelves[i];
@@ -671,6 +651,25 @@ function (elapsedMillis) {
 			scurry.scenes.switchTo("level-1");
 		}
 		return;
+	}
+
+	var inHotel = false;
+	for (var i = 0; i < powerUps.length; i++) {
+		var powerUp = powerUps[i];
+		if (powerUp.collides(player)) {
+			if (powerUp.name == "roach motel") {
+				inHotel = true;
+			}
+			if (!this.timer("roach motel")) {
+				this.startTimer(powerUp.name);
+				if (powerUp.name != "roach motel") {
+					powerUps.splice(i, 1);
+				}
+				if (powerUp.sound) {
+					scurry.sounds.play(powerUp.sound);
+				}
+			}
+		}
 	}
 
 	if (onGround && player.sprite == scurry.animations.get("beetle-jump")) {
