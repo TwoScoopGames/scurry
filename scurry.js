@@ -197,8 +197,6 @@ var bgx = 0;
 
 var shelf;
 var shelfBkgd;
-var soundToggle;
-var pauseToggle;
 var possiblePowerUps;
 
 function assetsLoaded() {
@@ -212,23 +210,6 @@ function assetsLoaded() {
 
 	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
 	shelfBkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
-
-	pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
-		if (state === "dead") {
-			return false;
-		}
-		if (toggled) {
-			state = "paused";
-		} else {
-			state = "running";
-		}
-	});
-	pauseToggle.attachToRight(canvas, 12);
-
-	soundToggle = new ToggleButton(0, 108, 72, 72, scurry.images.get("sound-on"), scurry.images.get("sound-off"), "m", function(toggled) {
-		scurry.sounds.muted = !toggled;
-	});
-	soundToggle.attachToRight(canvas, 12);
 }
 
 var shelfItemSpacing = 30;
@@ -549,6 +530,8 @@ function drawEntities(context, entities) {
 	}
 }
 
+var soundToggle;
+var pauseToggle;
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = [];
 	hotels = [];
@@ -562,7 +545,24 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	bgx = 0;
 	this.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 	this.clearTimers();
+
+	pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
+		if (state === "dead") {
+			return false;
+		}
+		if (toggled) {
+			state = "paused";
+		} else {
+			state = "running";
+		}
+	});
+	pauseToggle.attachToRight(canvas, 12);
 	pauseToggle.toggled = true;
+
+	soundToggle = new ToggleButton(0, 108, 72, 72, scurry.images.get("sound-on"), scurry.images.get("sound-off"), "m", function(toggled) {
+		scurry.sounds.muted = !toggled;
+	});
+	soundToggle.attachToRight(canvas, 12);
 },
 function (elapsedMillis) {
 	soundToggle.move(elapsedMillis);
