@@ -182,7 +182,7 @@ function getRandomArbitrary(min, max) {
 var player = {};
 var shelves = new EntityGroup();
 var hotels = [];
-var powerUps = [];
+var powerUps = new EntityGroup();
 var state = "start";
 var stateMessages = {
 	"start": clickOrTap() + " TO START",
@@ -341,8 +341,8 @@ function deleteInvisibleShelves(cameraX) {
 	while (firstEntityIsInvisible(shelves.entities, cameraX)) {
 		shelves.entities.shift();
 	}
-	while (firstEntityIsInvisible(powerUps, cameraX)) {
-		powerUps.shift();
+	while (firstEntityIsInvisible(powerUps.entities, cameraX)) {
+		powerUps.entities.shift();
 	}
 	while (firstEntityIsInvisible(hotels, cameraX)) {
 		hotels.shift();
@@ -392,7 +392,7 @@ function populateShelves(cameraX) {
 			}
 			shelves.entities.push(s);
 			if (x > 3000 && Math.random() < 0.3) {
-				powerUps.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
+				powerUps.entities.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
 			}
 		}
 	}
@@ -428,9 +428,7 @@ function needShelves(cameraX) {
 
 function moveShelves(elapsedMillis) {
 	shelves.move(elapsedMillis);
-	for (i in powerUps) {
-		powerUps[i].move(elapsedMillis);
-	}
+	powerUps.move(elapsedMillis);
 }
 
 function drawStage(scene, context) {
@@ -554,7 +552,7 @@ var pauseToggle;
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = new EntityGroup();
 	hotels = [];
-	powerUps = [];
+	powerUps = new EntityGroup();
 	populateShelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
@@ -670,31 +668,29 @@ function (elapsedMillis) {
 	}
 
 	var inHotel = false;
-	for (var i = 0; i < powerUps.length; i++) {
-		var powerUp = powerUps[i];
-		if (powerUp.collides(player)) {
-			if (powerUp.name == "roach motel") {
-				if (powerUp.avoided || player.wasBelow(powerUp)) {
-					powerUp.avoided = true;
-					continue;
-				}
-				// only switch to skeleton when hidden inside motel.
-				if (player.x > powerUp.x + 30) {
-					player.sprite = scurry.animations.get("skeleton");
-				}
-				inHotel = true;
+	var scene = this;
+	powerUps.collides(player, function(powerUp) {
+		if (powerUp.name == "roach motel") {
+			if (powerUp.avoided || player.wasBelow(powerUp)) {
+				powerUp.avoided = true;
+				return;
 			}
-			if (!this.timer("roach motel")) {
-				this.startTimer(powerUp.name);
-				if (powerUp.name != "roach motel") {
-					powerUps.splice(i, 1);
-				}
-				if (powerUp.sound) {
-					scurry.sounds.play(powerUp.sound);
-				}
+			// only switch to skeleton when hidden inside motel.
+			if (player.x > powerUp.x + 30) {
+				player.sprite = scurry.animations.get("skeleton");
+			}
+			inHotel = true;
+		}
+		if (!scene.timer("roach motel")) {
+			scene.startTimer(powerUp.name);
+			if (powerUp.name != "roach motel") {
+				powerUps.entities.splice(i, 1);
+			}
+			if (powerUp.sound) {
+				scurry.sounds.play(powerUp.sound);
 			}
 		}
-	}
+	});
 
 	if (onGround && player.sprite == scurry.animations.get("beetle-jump")) {
 		player.sprite = scurry.animations.get("beetle");
@@ -743,9 +739,7 @@ function (elapsedMillis) {
 },
 function (context) {
 	drawStage(this, context);
-	for (var i in powerUps) {
-		powerUps[i].draw(context);
-	}
+	powerUps.draw(context);
 
 	var toDraw = hotels.slice(0);
 	toDraw.push(player);
