@@ -180,7 +180,7 @@ function getRandomArbitrary(min, max) {
 }
 
 var player = {};
-var shelves = [];
+var shelves = new EntityGroup();
 var hotels = [];
 var powerUps = [];
 var state = "start";
@@ -338,8 +338,8 @@ function makeShelf(x, width, drawBackground) {
 }
 
 function deleteInvisibleShelves(cameraX) {
-	while (firstEntityIsInvisible(shelves, cameraX)) {
-		shelves.shift();
+	while (firstEntityIsInvisible(shelves.entities, cameraX)) {
+		shelves.entities.shift();
 	}
 	while (firstEntityIsInvisible(powerUps, cameraX)) {
 		powerUps.shift();
@@ -354,8 +354,8 @@ function firstEntityIsInvisible(entities, cameraX) {
 }
 
 function getNextShelfX() {
-	if (shelves.length > 0) {
-		var last = shelves[shelves.length - 1];
+	if (shelves.entities.length > 0) {
+		var last = shelves.entities[shelves.entities.length - 1];
 		return last.x + last.width + getRandomArbitrary(150, 400);
 	}
 	return 0;
@@ -384,13 +384,13 @@ function populateShelves(cameraX) {
 		for (var n = 0; n < shelvesInRack; n++) {
 			var s = makeShelf(x, width, n < shelvesInRack -1);
 			if (n === 0) {
-				shelves.push(makeShelfBottom(s));
+				shelves.entities.push(makeShelfBottom(s));
 				y = s.y - height;
 			} else {
 				s.y = y;
 				y -= height;
 			}
-			shelves.push(s);
+			shelves.entities.push(s);
 			if (x > 3000 && Math.random() < 0.3) {
 				powerUps.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
 			}
@@ -422,13 +422,12 @@ function makePowerUp(x, y) {
 }
 
 function needShelves(cameraX) {
-	return shelves.length === 0 || shelves[shelves.length - 1].x + shelves[shelves.length - 1].width < cameraX + canvas.width;
+	var e = shelves.entities;
+	return e.length === 0 || e[e.length - 1].x + e[e.length - 1].width < cameraX + canvas.width;
 }
 
 function moveShelves(elapsedMillis) {
-	for (var i in shelves) {
-		shelves[i].move(elapsedMillis);
-	}
+	shelves.move(elapsedMillis);
 	for (i in powerUps) {
 		powerUps[i].move(elapsedMillis);
 	}
@@ -445,9 +444,7 @@ function drawStage(scene, context) {
 		}
 	});
 
-	for (var i in shelves) {
-		shelves[i].draw(context);
-	}
+	shelves.draw(context);
 
 	// draw the insta-death floor
 	if (scene.camera.y > 50-canvas.height) {
@@ -530,16 +527,38 @@ function drawEntities(context, entities) {
 	}
 }
 
+function EntityGroup() {
+	this.entities = [];
+}
+EntityGroup.prototype.move = function(elapsedMillis) {
+	for (var i = 0; i < this.entities.length; i++) {
+		this.entities[i].move(elapsedMillis);
+	}
+};
+EntityGroup.prototype.draw = function(context) {
+	for (var i = 0; i < this.entities.length; i++) {
+		this.entities[i].draw(context);
+	}
+};
+EntityGroup.prototype.collides = function(other, handler) {
+	for (var i = 0; i < this.entities.length; i++) {
+		if (this.entities[i].collides(other)) {
+			handler(this.entities[i]);
+		}
+	}
+};
+
+
 var soundToggle;
 var pauseToggle;
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
-	shelves = [];
+	shelves = new EntityGroup();
 	hotels = [];
 	powerUps = [];
 	populateShelves(0);
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
-	player.y = shelves[2].y - player.height;
+	player.y = shelves.entities[2].y - player.height;
 	player.vx = 1;
 	bgv = -0.3;
 	bgx = 0;
@@ -623,16 +642,13 @@ function (elapsedMillis) {
 	}
 
 	var onGround = false;
-	for (i = 0; i < shelves.length; i++) {
-		var shelf = shelves[i];
-		if (shelf.collides(player)) {
-			if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
-				player.y = shelf.y - player.height - 0.01;
-				player.vy = 0;
-				onGround = true;
-			}
+	shelves.collides(player, function(shelf) {
+		if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
+			player.y = shelf.y - player.height - 0.01;
+			player.vy = 0;
+			onGround = true;
 		}
-	}
+	});
 
 	for (i = 0; i < hotels.length; i++) {
 		var hotel = hotels[i];
