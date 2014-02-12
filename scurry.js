@@ -535,7 +535,8 @@ function EntityGroup() {
 	this.entities = [];
 }
 EntityGroup.prototype.move = function(elapsedMillis) {
-	for (var i = 0; i < this.entities.length; i++) {
+	var e = this.entities.slice(0);
+	for (var i = 0; i < e.length; i++) {
 		this.entities[i].move(elapsedMillis);
 	}
 };
@@ -545,10 +546,17 @@ EntityGroup.prototype.draw = function(context) {
 	}
 };
 EntityGroup.prototype.collides = function(other, handler) {
-	for (var i = 0; i < this.entities.length; i++) {
-		if (this.entities[i].collides(other)) {
-			handler(this.entities[i]);
+	var e = this.entities.slice(0);
+	for (var i = 0; i < e.length; i++) {
+		if (e[i].collides(other)) {
+			handler(e[i]);
 		}
+	}
+};
+EntityGroup.prototype.remove = function(entity) {
+	var i = this.entities.indexOf(entity);
+	if (i > -1) {
+		this.entities.splice(i, 1);
 	}
 };
 
@@ -690,7 +698,7 @@ function (elapsedMillis) {
 		if (!scene.timer("roach motel")) {
 			scene.startTimer(powerUp.name);
 			if (powerUp.name != "roach motel") {
-				powerUps.entities.splice(i, 1);
+				powerUps.remove(powerUp);
 			}
 			if (powerUp.sound) {
 				scurry.sounds.play(powerUp.sound);
