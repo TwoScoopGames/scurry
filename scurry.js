@@ -641,7 +641,7 @@ function (elapsedMillis) {
 
 	var onGround = false;
 	shelves.collides(player, function(shelf) {
-		if (player.didOverlapHoriz(shelf) && player.wasAbove(shelf)) {
+		if (player.wasAbove(shelf)) {
 			player.y = shelf.y - player.height - 0.01;
 			player.vy = 0;
 			onGround = true;
@@ -651,7 +651,7 @@ function (elapsedMillis) {
 	for (i = 0; i < hotels.length; i++) {
 		var hotel = hotels[i];
 		if (hotel.collides(player)) {
-			if (player.didOverlapHoriz(hotel) && player.wasAbove(hotel)) {
+			if (player.wasAbove(hotel)) {
 				player.y = hotel.y - player.height - 0.01;
 				player.vy = 0;
 				onGround = true;
