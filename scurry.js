@@ -64,6 +64,11 @@ var manifest = {
 			"msPerFrame": 50,
 			"repeatAt": 6
 		},
+		"coffee-bean": {
+			"strip": "images/coffee-bean-16f.png",
+			"frames": 16,
+			"msPerFrame": 70
+		},
 		"logo-white": {
 			"strip": "images/scurry-logo-white-10f686x399.png",
 			"frames": 10,
@@ -201,10 +206,11 @@ var possiblePowerUps;
 
 function assetsLoaded() {
 	var sugarCube = scurry.animations.get("sugar-cube");
+	var coffeeBean = scurry.animations.get("coffee-bean");
 
 	possiblePowerUps = [
 		{ "name": "superjump", "animation": sugarCube, "sound": "powerup-jump" },
-		{ "name": "superspeed", "animation": sugarCube, "sound": "powerup-speed" },
+		{ "name": "superspeed", "animation": coffeeBean, "sound": "powerup-speed" },
 		{ "name": "roach motel", "animation": scurry.images.get("hotel-back") }
 	];
 
