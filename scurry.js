@@ -657,7 +657,7 @@ function (elapsedMillis) {
 			player.y = shelf.y - player.height - 0.01;
 			player.vy = 0;
 			onGround = true;
-			if (!shelf.counted) {
+			if (!shelf.counted && player.sprite.name === "beetle") {
 				shelf.counted = true;
 				score++;
 				if (score > bestScore) {
