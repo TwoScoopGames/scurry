@@ -222,7 +222,10 @@ function assetsLoaded() {
 
 var shelfItemSpacing = 30;
 
-var shelfItems = ["empty", "box1", "box2", "box3", "can1", "can2", "syrup", "butter", "milk", "milk2", "oj"];
+var shelfItems = [
+	["empty", "box1", "box2", "box3", "can1", "can2", "syrup"],
+	["empty", "butter", "milk", "milk2", "oj"]
+];
 var shelfTags = ["tag1", "tag2", "tag3"];
 var sameItemChance = 0.50;
 
@@ -235,9 +238,9 @@ function randPrice() {
 	return price[0] + "." + price.substr(1);
 }
 
-function getShelfItems(width) {
+function getShelfItems(width, itemGroup) {
 	var items = [];
-	var possibleItems = shelfItems.slice(0);
+	var possibleItems = itemGroup.slice(0);
 	function getItemWidth(item) {
 		var name = item.item;
 		if (name == "empty") {
@@ -332,9 +335,9 @@ function drawShelfItems(context, items, x, y) {
 	}
 }
 
-function makeShelf(x, width, drawBackground) {
+function makeShelf(x, width, drawBackground, itemGroup) {
 	var y = -((canvas.height / 4) + (Math.random() * (canvas.height / 2)));
-	var items = getShelfItems(width - shelf.w1 - shelf.w3);
+	var items = getShelfItems(width - shelf.w1 - shelf.w3, itemGroup);
 
 	var spacing = (shelfBkgd.img.height - 1) * 3;
 	var height = spacing + shelf.img.height - 1;
@@ -392,9 +395,11 @@ function populateShelves(cameraX) {
 		var spacing = (shelfBkgd.img.height - 1) * 3;
 		var height = spacing + shelf.img.height - 1;
 
+		var itemGroup = shelfItems[(Math.random() * shelfItems.length)|0];
+
 		var shelvesInRack = 4 + (Math.random() * 3) |0;
 		for (var n = 0; n < shelvesInRack; n++) {
-			var s = makeShelf(x, width, n < shelvesInRack -1);
+			var s = makeShelf(x, width, n < shelvesInRack -1, itemGroup);
 			if (n === 0) {
 				shelves.entities.push(makeShelfBottom(s));
 				y = s.y - height;
