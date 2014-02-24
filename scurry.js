@@ -23,8 +23,6 @@ var manifest = {
 		"sound-on": "images/sound-on-icon.png",
 		"play": "images/play-icon.png",
 		"pause": "images/pause-icon.png",
-		"progress-marker": "images/scurry-head.png",
-		"progress": "images/scurry-progress.png",
 		"hotel-front": "images/hotel-front.png",
 		"hotel-back": "images/hotel-bg.png",
 	},
@@ -204,6 +202,10 @@ var shelf;
 var shelfBkgd;
 var possiblePowerUps;
 
+var score = 0;
+var bestScore = 0;
+var newBestScore = false;
+
 function assetsLoaded() {
 	var sugarCube = scurry.animations.get("sugar-cube");
 	var coffeeBean = scurry.animations.get("coffee-bean");
@@ -232,6 +234,7 @@ function randPrice() {
 	}
 	return price[0] + "." + price.substr(1);
 }
+
 function getShelfItems(width) {
 	var items = [];
 	var possibleItems = shelfItems.slice(0);
@@ -283,6 +286,7 @@ function getShelfItems(width) {
 	}
 	return items;
 }
+
 function drawTagPrice(context, item, tagx, tagy) {
 	var price = item.price;
 	if (item.tag == "tag3") {
@@ -293,6 +297,7 @@ function drawTagPrice(context, item, tagx, tagy) {
 	context.font = "36px pixelade";
 	context.fillText(price, tagx + 70, tagy + 65);
 }
+
 function drawShelfItem(context, item, x, y) {
 	if (item.item == "empty") {
 		return scurry.images.get("box1").width;
@@ -312,6 +317,7 @@ function drawShelfItem(context, item, x, y) {
 		return img.width;
 	}
 }
+
 function drawShelfItems(context, items, x, y) {
 	x += shelf.w1;
 	y += 5;
@@ -511,17 +517,6 @@ ToggleButton.prototype.attachToRight = function(canvas, xOffset) {
 	window.addEventListener("resize", adjustX);
 };
 
-function drawProgress(context, dist, end) {
-	var progress = scurry.images.get("progress");
-	var progressX = (canvas.width / 2) - (progress.width / 2);
-	context.drawImage(progress, progressX, canvas.height - progress.height);
-	var marker = scurry.images.get("progress-marker");
-
-	var pct = Math.min(dist / end, 1.0);
-	var markerX = progressX + ((progress.width - marker.width) * pct) - marker.width;
-	context.drawImage(marker, markerX, canvas.height - marker.height);
-}
-
 function drawEntities(context, entities) {
 	entities.sort(function(a, b) {
 		return b.y - a.y;
@@ -571,11 +566,15 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
 	player.y = shelves.entities[2].y - player.height;
+	shelves.entities[2].counted = true;
 	player.vx = 1;
 	bgv = -0.3;
 	bgx = 0;
 	this.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 	this.clearTimers();
+	score = 0;
+	newBestScore = false;
+	state = "start";
 
 	pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
 		if (state === "dead") {
@@ -613,8 +612,7 @@ function (elapsedMillis) {
 			player.sprite = scurry.animations.get("beetle-fall");
 		}
 		if (this.timer("dead") > 1000) {
-			state = "start";
-			scurry.scenes.switchTo("level-1");
+			scurry.scenes.switchTo("score");
 		}
 		return;
 	}
@@ -659,6 +657,14 @@ function (elapsedMillis) {
 			player.y = shelf.y - player.height - 0.01;
 			player.vy = 0;
 			onGround = true;
+			if (!shelf.counted) {
+				shelf.counted = true;
+				score++;
+				if (score > bestScore) {
+					newBestScore = true;
+					bestScore = score;
+				}
+			}
 		}
 	});
 
@@ -676,7 +682,7 @@ function (elapsedMillis) {
 	if (this.timer("crumble") > 0 && onGround) {
 		player.vx *= 0.9;
 		if (this.timer("crumble") > 1000) {
-			scurry.scenes.switchTo("level-1");
+			scurry.scenes.switchTo("score");
 		}
 		return;
 	}
@@ -764,8 +770,9 @@ function (context) {
 		soundToggle.draw(context);
 		pauseToggle.draw(context);
 
-		var dist = Math.round(player.x / player.width * 100) / 100;
-		drawProgress(context, dist, 1000);
+		context.fillStyle = "#000000";
+		context.font = "100px pixelade";
+		centerText(context, score, 0, 70);
 
 		if (scene.timer("superspeed") > 0) {
 			context.fillStyle = "#00ff00";
@@ -786,6 +793,35 @@ function (context) {
 			centerText(context, stateMessages[state], 0, 450);
 		}
 	});
+}));
+
+scurry.scenes.add("score", new Splat.Scene(canvas, function() {
+	this.startTimer("run");
+},
+function(elapsedMillis) {
+	if (this.timer("run") > 1000) {
+		scurry.scenes.switchTo("level-1");
+	}
+},
+function(context) {
+	context.fillStyle = "#000000";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	context.fillStyle = "#ffffff";
+	context.font = "48px pixelade";
+	centerText(context, "SCORE", 0, 200);
+	context.font = "100px pixelade";
+	centerText(context, score, 0, 270);
+
+	var bestText = "HIGH SCORE";
+	if (newBestScore) {
+		context.fillStyle = "#00ff00";
+		bestText = "NEW HIGH SCORE!";
+	}
+	context.font = "48px pixelade";
+	centerText(context, bestText, 0, 400);
+	context.font = "100px pixelade";
+	centerText(context, bestScore, 0, 470);
 }));
 
 scurry.scenes.switchTo("loading");
