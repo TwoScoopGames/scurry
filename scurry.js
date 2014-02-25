@@ -97,27 +97,23 @@ var manifest = {
 };
 var scurry = new Splat.Game(canvas, manifest);
 
-var starting = false;
-var lightsOn = false;
 var beetleBlack;
 scurry.scenes.add("title", new Splat.Scene(canvas, function() {
 	assetsLoaded();
 	this.camera.vx = 0.2;
 	this.camera.y = -800;
-},
-function(elapsedMillis) {
-	if (!lightsOn && this.timer("start") > 807) {
-		lightsOn = true;
+	this.timers.lightsOn = new Splat.Timer(null, 807, function() {
 		beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, scurry.animations.get("beetle-black"), 0, 0);
 		beetleBlack.vx = 1.40;
-	}
-	if (this.timer("start") > 2300) {
+	});
+	this.timers.starting = new Splat.Timer(null, 2300, function() {
 		scurry.scenes.switchTo("level-1");
-		return;
-	}
-	if (!starting && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
-		starting = true;
-		this.startTimer("start");
+	});
+},
+function(elapsedMillis) {
+	if (!this.timers.starting.running && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
+		this.timers.lightsOn.start();
+		this.timers.starting.start();
 		scurry.mouse.buttons[0] = false;
 		scurry.sounds.play("lights-on");
 	}
@@ -139,9 +135,10 @@ function(elapsedMillis) {
 }, function(context) {
 	drawStage(this, context);
 
+	var self = this;
 	this.camera.drawAbsolute(context, function() {
 		var logo;
-		if (lightsOn) {
+		if (self.timers.lightsOn.expired()) {
 			context.fillStyle = "rgba(255, 255, 255, 0.7)";
 			logo = scurry.animations.get("logo-black");
 		} else {
@@ -151,10 +148,10 @@ function(elapsedMillis) {
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		logo.draw(context, (canvas.width / 2) - (logo.width / 2), 0);
 
-		if (lightsOn) {
+		if (self.timers.lightsOn.expired()) {
 			beetleBlack.draw(context);
 		}
-		if (!starting) {
+		if (!self.timers.starting.running) {
 			context.fillStyle = "#ffffff";
 			context.font = "48px pixelade";
 			centerText(context, clickOrTap() + " TO START", 0, 450);
@@ -176,7 +173,6 @@ function centerText(context, text, offsetX, offsetY) {
 	var y = offsetY |0;
 	context.fillText(text, x, y);
 }
-
 
 function getRandomArbitrary(min, max) {
 	return Math.random() * (max - min) + min;
@@ -213,7 +209,7 @@ function assetsLoaded() {
 	possiblePowerUps = [
 		{ "name": "superjump", "animation": sugarCube, "sound": "powerup-jump" },
 		{ "name": "superspeed", "animation": coffeeBean, "sound": "powerup-speed" },
-		{ "name": "roach motel", "animation": scurry.images.get("hotel-back") }
+		{ "name": "roachMotel", "animation": scurry.images.get("hotel-back") }
 	];
 
 	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
@@ -420,7 +416,7 @@ function makePowerUp(x, y) {
 	var p = possiblePowerUps[pnum];
 
 	var a;
-	if (p.name == "roach motel") {
+	if (p.name == "roachMotel") {
 		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y + 60, 265, 30, p.animation, -25, -60);
 		var fg = scurry.images.get("hotel-front");
 		hotels.push(new Splat.AnimatedEntity(x - (fg.width / 2) - 25, y + 20, fg.width, 95, fg, 0, -20));
@@ -537,7 +533,7 @@ function EntityGroup() {
 EntityGroup.prototype.move = function(elapsedMillis) {
 	var e = this.entities.slice(0);
 	for (var i = 0; i < e.length; i++) {
-		this.entities[i].move(elapsedMillis);
+		e[i].move(elapsedMillis);
 	}
 };
 EntityGroup.prototype.draw = function(context) {
@@ -563,6 +559,7 @@ EntityGroup.prototype.remove = function(entity) {
 
 var soundToggle;
 var pauseToggle;
+var onGround = true;
 scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	shelves = new EntityGroup();
 	hotels = [];
@@ -571,12 +568,12 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
 	player.x = 200;
 	player.y = shelves.entities[2].y - player.height;
+	onGround = true;
 	shelves.entities[2].counted = true;
 	player.vx = 1;
 	bgv = -0.3;
 	bgx = 0;
 	this.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
-	this.clearTimers();
 	score = 0;
 	newBestScore = false;
 	state = "start";
@@ -598,27 +595,45 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		scurry.sounds.muted = !toggled;
 	});
 	soundToggle.attachToRight(canvas, 12);
+
+	this.timers.superjump = new Splat.Timer(null, 5000, function() {
+		this.reset();
+	});
+	this.timers.superspeed = new Splat.Timer(function(elapsedMillis) {
+		player.x += elapsedMillis * 0.70;
+	}, 5000, function() {
+		this.reset();
+	});
+	this.timers.dead = new Splat.Timer(function(elapsedMillis) {
+		player.vx = 0.6;
+		player.vy = 0.6;
+		player.move(elapsedMillis);
+	}, 1000, function() {
+		scurry.scenes.switchTo("score");
+	});
+	var self = this;
+	this.timers.roachMotel = new Splat.Timer(null, 5000, function() {
+		if (!onGround) {
+			this.start();
+			return;
+		}
+		player.sprite = scurry.animations.get("skeleton-crumble");
+		player.sprite.reset();
+		scurry.sounds.play("crumble");
+
+		self.timers.crumble.start();
+	});
+	this.timers.crumble = new Splat.Timer(function(elapsedMillis) {
+		player.vx *= 0.9;
+	}, 1000, function() {
+		scurry.scenes.switchTo("score");
+	});
 },
 function (elapsedMillis) {
 	soundToggle.move(elapsedMillis);
 	pauseToggle.move(elapsedMillis);
 
-	if (this.timer("superjump") > 5000) {
-		this.stopTimer("superjump");
-	}
-	if (this.timer("superspeed") > 5000) {
-		this.stopTimer("superspeed");
-	}
 	if (state === "dead") {
-		player.vx = 0.6;
-		player.vy = 0.6;
-		player.move(elapsedMillis);
-		if (this.timer("dead") > 0 && !this.timer("roach motel") && !this.timer("crumble")) {
-			player.sprite = scurry.animations.get("beetle-fall");
-		}
-		if (this.timer("dead") > 1000) {
-			scurry.scenes.switchTo("score");
-		}
 		return;
 	}
 	if (state === "paused" || state === "start") {
@@ -636,9 +651,6 @@ function (elapsedMillis) {
 	if (scurry.keyboard.isPressed("left")) {
 		player.x -= elapsedMillis * 0.70;
 	}
-	if (this.timer("superspeed") > 0) {
-		player.x += elapsedMillis * 0.70;
-	}
 	if (scurry.keyboard.isPressed("right")) {
 		player.x += elapsedMillis * 0.70;
 	}
@@ -652,11 +664,14 @@ function (elapsedMillis) {
 	if (player.y > -player.height) {
 		state = "dead";
 		scurry.sounds.play("death");
-		this.startTimer("dead");
+		this.timers.dead.start();
+		if (!this.timers.roachMotel.running && !this.timers.crumble.running) {
+			player.sprite = scurry.animations.get("beetle-fall");
+		}
 		return;
 	}
 
-	var onGround = false;
+	onGround = false;
 	shelves.collides(player, function(shelf) {
 		if (player.wasAbove(shelf)) {
 			player.y = shelf.y - player.height - 0.01;
@@ -684,18 +699,14 @@ function (elapsedMillis) {
 		}
 	}
 
-	if (this.timer("crumble") > 0 && onGround) {
-		player.vx *= 0.9;
-		if (this.timer("crumble") > 1000) {
-			scurry.scenes.switchTo("score");
-		}
+	if (this.timers.crumble.running > 0 && onGround) {
 		return;
 	}
 
 	var inHotel = false;
 	var scene = this;
 	powerUps.collides(player, function(powerUp) {
-		if (powerUp.name == "roach motel") {
+		if (powerUp.name == "roachMotel") {
 			if (powerUp.avoided || player.wasBelow(powerUp)) {
 				powerUp.avoided = true;
 				return;
@@ -706,9 +717,10 @@ function (elapsedMillis) {
 			}
 			inHotel = true;
 		}
-		if (!scene.timer("roach motel")) {
-			scene.startTimer(powerUp.name);
-			if (powerUp.name != "roach motel") {
+		if (!scene.timers.roachMotel.running) {
+			scene.timers[powerUp.name].reset();
+			scene.timers[powerUp.name].start();
+			if (powerUp.name != "roachMotel") {
 				powerUps.remove(powerUp);
 			}
 			if (powerUp.sound) {
@@ -728,7 +740,7 @@ function (elapsedMillis) {
 	}
 	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround && !inHotel) {
 		player.vy = jumpSpeed;
-		if (this.timer("superjump") > 0) {
+		if (this.timers.superjump.running) {
 			player.vy += -1;
 			scurry.sounds.play("superjump");
 		} else {
@@ -745,15 +757,8 @@ function (elapsedMillis) {
 		player.vy = minJump;
 	}
 
-	if (this.timer("roach motel") > 0 && !inHotel) {
+	if (this.timers.roachMotel.running && !inHotel) {
 		player.sprite = scurry.animations.get("skeleton");
-	}
-	if (this.timer("roach motel") > 3000) {
-		player.sprite = scurry.animations.get("skeleton-crumble");
-		player.sprite.reset();
-		scurry.sounds.play("crumble");
-		this.stopTimer("roach motel");
-		this.startTimer("crumble");
 	}
 
 	bgx += elapsedMillis * bgv;
@@ -779,12 +784,12 @@ function (context) {
 		context.font = "100px pixelade";
 		centerText(context, score, 0, 70);
 
-		if (scene.timer("superspeed") > 0) {
+		if (scene.timers.superspeed.running) {
 			context.fillStyle = "#00ff00";
 			context.font = "48px pixelade";
 			centerText(context, "SUPERSPEED!", 0, canvas.height - 70);
 		}
-		if (scene.timer("superjump") > 0) {
+		if (scene.timers.superjump.running) {
 			context.fillStyle = "#ff0000";
 			context.font = "48px pixelade";
 			centerText(context, "SUPERJUMP!", 0, canvas.height - 50);
@@ -801,12 +806,12 @@ function (context) {
 }));
 
 scurry.scenes.add("score", new Splat.Scene(canvas, function() {
-	this.startTimer("run");
+	this.timers.run = new Splat.Timer(null, 1000, function() {
+		scurry.scenes.switchTo("level-1");
+	});
+	this.timers.run.start();
 },
 function(elapsedMillis) {
-	if (this.timer("run") > 1000) {
-		scurry.scenes.switchTo("level-1");
-	}
 },
 function(context) {
 	context.fillStyle = "#000000";
