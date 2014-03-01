@@ -288,12 +288,12 @@ function getShelfItems(width, itemGroup) {
 function drawTagPrice(context, item, tagx, tagy) {
 	var price = item.price;
 	if (item.tag == "tag3") {
-		context.fillStyle = "#ff0000";
+		context.fillStyle = "#f86b6b";
 	} else {
-		context.fillStyle = "#333333";
+		context.fillStyle = "#666666";
 	}
 	context.font = "36px bebas_neue";
-	context.fillText(price, tagx + 70, tagy + 65);
+	context.fillText(price, tagx + 65, tagy + 65);
 }
 
 function drawShelfItem(context, item, x, y) {
@@ -779,7 +779,7 @@ function (context) {
 
 		context.fillStyle = "#000000";
 		context.font = "100px bebas_neue";
-		centerText(context, score, 0, 70);
+		centerText(context, score, 0, 80);
 
 		if (scene.timers.superspeed.running) {
 			context.fillStyle = "#00ff00";
@@ -816,7 +816,7 @@ function(context) {
 
 	context.fillStyle = "#ffffff";
 	context.font = "48px bebas_neue";
-	centerText(context, "SCORE", 0, 200);
+	centerText(context, "SCORE", 0, 180);
 	context.font = "100px bebas_neue";
 	centerText(context, score, 0, 270);
 
@@ -826,7 +826,7 @@ function(context) {
 		bestText = "NEW HIGH SCORE!";
 	}
 	context.font = "48px bebas_neue";
-	centerText(context, bestText, 0, 400);
+	centerText(context, bestText, 0, 380);
 	context.font = "100px bebas_neue";
 	centerText(context, bestScore, 0, 470);
 }));
