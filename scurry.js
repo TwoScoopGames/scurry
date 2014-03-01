@@ -111,10 +111,9 @@ scurry.scenes.add("title", new Splat.Scene(canvas, function() {
 	});
 },
 function(elapsedMillis) {
-	if (!this.timers.starting.running && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
+	if (!this.timers.starting.running && (scurry.keyboard.consumePressed("space") || scurry.mouse.consumePressed(0))) {
 		this.timers.lightsOn.start();
 		this.timers.starting.start();
-		scurry.mouse.buttons[0] = false;
 		scurry.sounds.play("lights-on");
 	}
 	moveShelves(elapsedMillis);
@@ -489,8 +488,7 @@ function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
 	this.onToggle = onToggle;
 }
 ToggleButton.prototype.move = function(elapsedMillis) {
-	if (scurry.mouse.buttons[0] && scurry.mouse.x >= this.x && scurry.mouse.x < this.x + this.width && scurry.mouse.y >= this.y && scurry.mouse.y < this.y + this.height) {
-		scurry.mouse.buttons[0] = false;
+	if (scurry.mouse.consumePressed(0, this.x, this.y, this.width, this.height)) {
 		this.toggle();
 	}
 	if (scurry.keyboard.consumePressed(this.key)) {
@@ -637,9 +635,8 @@ function (elapsedMillis) {
 		return;
 	}
 	if (state === "paused" || state === "start") {
-		if (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0]) {
+		if (scurry.keyboard.consumePressed("space") || scurry.mouse.consumePressed(0)) {
 			state = "running";
-			scurry.mouse.buttons[0] = false;
 			pauseToggle.toggled = false;
 		} else {
 			return;
@@ -738,7 +735,7 @@ function (elapsedMillis) {
 		player.sprite = scurry.animations.get("beetle-jump");
 		scurry.animations.get("beetle-jump").reset();
 	}
-	if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround && !inHotel) {
+	if ((scurry.keyboard.consumePressed("space") || scurry.mouse.consumePressed(0)) && onGround && !inHotel) {
 		player.vy = jumpSpeed;
 		if (this.timers.superjump.running) {
 			player.vy += -1;
@@ -753,7 +750,7 @@ function (elapsedMillis) {
 		player.sprite = scurry.animations.get("beetle-jump");
 		scurry.animations.get("beetle-jump").reset();
 	}
-	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
+	if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.isPressed(0)) && player.vy < minJump) {
 		player.vy = minJump;
 	}
 
