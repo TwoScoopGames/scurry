@@ -37,7 +37,7 @@ var manifest = {
 		"crumble": "audio/crumble.wav"
 	},
 	"fonts": [
-		"pixelade"
+		"bebas_neue"
 	],
 	"animations": {
 		"beetle": {
@@ -153,7 +153,7 @@ function(elapsedMillis) {
 		}
 		if (!self.timers.starting.running) {
 			context.fillStyle = "#ffffff";
-			context.font = "48px pixelade";
+			context.font = "48px bebas_neue";
 			centerText(context, clickOrTap() + " TO START", 0, 450);
 		}
 	});
@@ -293,7 +293,7 @@ function drawTagPrice(context, item, tagx, tagy) {
 	} else {
 		context.fillStyle = "#333333";
 	}
-	context.font = "36px pixelade";
+	context.font = "36px bebas_neue";
 	context.fillText(price, tagx + 70, tagy + 65);
 }
 
@@ -781,17 +781,17 @@ function (context) {
 		pauseToggle.draw(context);
 
 		context.fillStyle = "#000000";
-		context.font = "100px pixelade";
+		context.font = "100px bebas_neue";
 		centerText(context, score, 0, 70);
 
 		if (scene.timers.superspeed.running) {
 			context.fillStyle = "#00ff00";
-			context.font = "48px pixelade";
+			context.font = "48px bebas_neue";
 			centerText(context, "SUPERSPEED!", 0, canvas.height - 70);
 		}
 		if (scene.timers.superjump.running) {
 			context.fillStyle = "#ff0000";
-			context.font = "48px pixelade";
+			context.font = "48px bebas_neue";
 			centerText(context, "SUPERJUMP!", 0, canvas.height - 50);
 		}
 
@@ -799,7 +799,7 @@ function (context) {
 			context.fillStyle = "rgba(0, 0, 0, 0.7)";
 			context.fillRect(0, 400, canvas.width, 70);
 			context.fillStyle = "#ffffff";
-			context.font = "48px pixelade";
+			context.font = "48px bebas_neue";
 			centerText(context, stateMessages[state], 0, 450);
 		}
 	});
@@ -818,9 +818,9 @@ function(context) {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	context.fillStyle = "#ffffff";
-	context.font = "48px pixelade";
+	context.font = "48px bebas_neue";
 	centerText(context, "SCORE", 0, 200);
-	context.font = "100px pixelade";
+	context.font = "100px bebas_neue";
 	centerText(context, score, 0, 270);
 
 	var bestText = "HIGH SCORE";
@@ -828,9 +828,9 @@ function(context) {
 		context.fillStyle = "#00ff00";
 		bestText = "NEW HIGH SCORE!";
 	}
-	context.font = "48px pixelade";
+	context.font = "48px bebas_neue";
 	centerText(context, bestText, 0, 400);
-	context.font = "100px pixelade";
+	context.font = "100px bebas_neue";
 	centerText(context, bestScore, 0, 470);
 }));
 
