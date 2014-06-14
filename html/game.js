@@ -866,13 +866,13 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			context.font = "100px helvetica";
 			centerText(context, score, 0, 70);
 
-			if (scene.timers.superspeed.running && !scene.timers.superjump.running) {
+			if (!deathPopUpShow && scene.timers.superspeed.running && !scene.timers.superjump.running) {
 				superSpeedAnim.draw(context, (canvas.width - superSpeedAnim.width) - 20, (canvas.height - superSpeedAnim.height) - 20);
 			}
-			if (scene.timers.superjump.running && !scene.timers.superspeed.running) {
+			if (!deathPopUpShow && scene.timers.superjump.running && !scene.timers.superspeed.running) {
 				superJumpAnim.draw(context, (canvas.width - superJumpAnim.width) - 20, (canvas.height - superJumpAnim.height) - 20);
 			}
-			if (scene.timers.superspeed.running && scene.timers.superjump.running) {
+			if (!deathPopUpShow && scene.timers.superspeed.running && scene.timers.superjump.running) {
 				superSpeedAnim.draw(context, 20, (canvas.height - superSpeedAnim.height) - 20);
 				superJumpAnim.draw(context, (canvas.width - superJumpAnim.width) - 20, (canvas.height - superJumpAnim.height) - 20);
 			}
