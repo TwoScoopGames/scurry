@@ -681,7 +681,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			scurry.scenes.switchTo("score");
 		});
 		var self = this;
-		this.timers.roachMotel = new Splat.Timer(null, 5000, function() {
+		this.timers.roachMotel = new Splat.Timer(null, 1000, function() {
 			if (!onGround) {
 				this.start();
 				return;
@@ -844,7 +844,6 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		}
 	},
 	function(context) {
-
 
 		drawStage(this, context);
 		powerUps.draw(context);
