@@ -537,8 +537,7 @@ function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
 	this.onToggle = onToggle;
 }
 ToggleButton.prototype.move = function(elapsedMillis) {
-	if (game.mouse.buttons[0] && game.mouse.x >= this.x && game.mouse.x < this.x + this.width && game.mouse.y >= this.y && game.mouse.y < this.y + this.height) {
-		game.mouse.buttons[0] = false;
+	if (game.mouse.consumePressed(0, this.x, this.y, this.width, this.height)) {
 		this.toggle();
 	}
 	if (game.keyboard.consumePressed(this.key)) {
@@ -640,10 +639,9 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	});
 },
 function(elapsedMillis) {
-	if (!this.timers.starting.running && (game.keyboard.consumePressed("space") || game.mouse.buttons[0])) {
+	if (!this.timers.starting.running && (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0))) {
 		this.timers.lightsOn.start();
 		this.timers.starting.start();
-		game.mouse.buttons[0] = false;
 		game.sounds.play("lights-on");
 	}
 	moveShelves(elapsedMillis);
@@ -712,23 +710,27 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 	state = "start";
 	game.sounds.play("music", true);
 
-	pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
-		if (state === "dead") {
-			return false;
-		}
-		if (toggled) {
-			state = "paused";
-		} else {
-			state = "running";
-		}
-	});
-	pauseToggle.attachToRight(canvas, 12);
-	pauseToggle.toggled = true;
+	if (!pauseToggle) {
+		pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
+			if (state === "dead") {
+				return false;
+			}
+			if (toggled) {
+				state = "paused";
+			} else {
+				state = "running";
+			}
+		});
+		pauseToggle.attachToRight(canvas, 12);
+		pauseToggle.toggled = true;
+	}
 
-	soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
-		game.sounds.muted = !toggled;
-	});
-	soundToggle.attachToRight(canvas, 12);
+	if (!soundToggle) {
+		soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
+			game.sounds.muted = !toggled;
+		});
+		soundToggle.attachToRight(canvas, 12);
+	}
 
 	this.timers.superjump = new Splat.Timer(null, 5000, function() {
 		this.reset();
@@ -777,9 +779,8 @@ function(elapsedMillis) {
 		return;
 	}
 	if (state === "paused" || state === "start") {
-		if (game.keyboard.consumePressed("space") || game.mouse.buttons[0]) {
+		if (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0)) {
 			state = "running";
-			game.mouse.buttons[0] = false;
 			pauseToggle.toggled = false;
 		} else {
 			return;
@@ -883,7 +884,7 @@ function(elapsedMillis) {
 		player.sprite = game.animations.get("beetle-jump");
 		game.animations.get("beetle-jump").reset();
 	}
-	if ((game.keyboard.isPressed("space") || game.mouse.buttons[0]) && onGround && !inHotel) {
+	if ((game.keyboard.isPressed("space") || game.mouse.isPressed(0)) && onGround && !inHotel) {
 		player.vy = jumpSpeed;
 		if (this.timers.superjump.running) {
 
@@ -899,7 +900,7 @@ function(elapsedMillis) {
 		player.sprite = game.animations.get("beetle-jump");
 		game.animations.get("beetle-jump").reset();
 	}
-	if ((!game.keyboard.isPressed("space") && !game.mouse.buttons[0]) && player.vy < minJump) {
+	if ((!game.keyboard.isPressed("space") && !game.mouse.isPressed(0)) && player.vy < minJump) {
 		player.vy = minJump;
 	}
 
