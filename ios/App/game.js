@@ -4,9 +4,9 @@ var canvas = document.getElementById("canvas");
 
 var manifest = {
 	"images": {
-		"bg": "images/Scurry-bg-TEST2.png",
+		"bg": "images/bg2.png",
 		"beetle-dead": "images/scurry-dead-1f132x72.png",
-		"shelf": "images/shelf.png",
+		"shelf": "images/shelf2.png",
 		"shelf background": "images/shelf-bars-spritesheet.png",
 		"box1": "images/box1.png",
 		"box2": "images/box2.png",
@@ -33,15 +33,28 @@ var manifest = {
 		"hotel-back": "images/hotel-bg.png",
 	},
 	"sounds": {
-		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
-		"jump": "audio/jump.wav",
-		"superjump": "audio/superjump.wav",
-		"land": "audio/land.wav",
+		"crumble": "audio/crumble.wav",
 		"death": "audio/death.wav",
+		"death-2": "audio/death-2.wav",
+		"death-3": "audio/death-3.wav",
+		"death-4": "audio/death-4.wav",
+		"death-5": "audio/death-5.wav",
+		"jump": "audio/jump.wav",
+		"jump-2": "audio/jump-2.wav",
+		"jump-3": "audio/jump-3.wav",
+		"land": "audio/land.wav",
 		"lights-on": "audio/lights-on.wav",
+		"point": "audio/point.wav",
+		"point-2": "audio/point-2.wav",
+		"point-3": "audio/point-3.wav",
 		"powerup-jump": "audio/powerup-jump.wav",
 		"powerup-speed": "audio/powerup-speed.wav",
-		"crumble": "audio/crumble.wav"
+		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
+		"superjump": "audio/superjump.wav",
+		"superjump-2": "audio/superjump-2.wav",
+		"trap": "audio/trap.wav",
+		"trap-2": "audio/trap-2.wav"
+
 	},
 	// "fonts": {
 	// 	"helvetica": {
@@ -125,6 +138,21 @@ var manifest = {
 			"strip": "images/death1.png",
 			"frames": 2,
 			"msPerFrame": 150
+		},
+		"tapToJump": {
+			"strip": "images/tap-to-jump-f2.png",
+			"frames": 2,
+			"msPerFrame": 300
+		},
+		"clickOrSpaceToJump": {
+			"strip": "images/click-or-space-to-jump-f2.png",
+			"frames": 2,
+			"msPerFrame": 300
+		},
+		"tapWaves": {
+			"strip": "images/tap-waves.png",
+			"frames": 2,
+			"msPerFrame": 300
 		}
 	}
 };
@@ -137,7 +165,7 @@ var hotels = [];
 var powerUps = new EntityGroup();
 var state = "start";
 var stateMessages = {
-	"start": clickOrTap() + " TO START",
+	"touch": clickOrTap(),
 	"paused": "PAUSED"
 };
 var gravityAccel = 0.005;
@@ -167,11 +195,48 @@ var pauseToggle;
 var onGround = true;
 
 
+
+var deathSounds = ["death", "death-2", "death-3", "death-4", "death-5"];
+
+function deathSound() {
+	var i = Math.random() * deathSounds.length | 0;
+	scurry.sounds.play(deathSounds[i]);
+}
+
+var jumpSounds = ["jump"];
+
+function jumpSound() {
+	var i = Math.random() * jumpSounds.length | 0;
+	scurry.sounds.play(jumpSounds[i]);
+}
+
+var superJumpSounds = ["superjump", "superjump-2"];
+
+function superJumpSound() {
+	var i = Math.random() * superJumpSounds.length | 0;
+	scurry.sounds.play(superJumpSounds[i]);
+}
+
+var pointSounds = ["point", "point-2", "point-3"];
+
+function pointSound() {
+	var i = Math.random() * pointSounds.length | 0;
+	scurry.sounds.play(pointSounds[i]);
+}
+
+var trapSounds = ["trap", "trap-2"];
+
+function trapSound() {
+	var i = Math.random() * trapSounds.length | 0;
+	scurry.sounds.play(trapSounds[i]);
+}
+
+
 function clickOrTap() {
 	if (scurry.mouse.supportsTouch()) {
-		return "TAP";
+		return true;
 	} else {
-		return "CLICK";
+		return false;
 	}
 }
 
@@ -621,8 +686,14 @@ scurry.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			}
 			if (!self.timers.starting.running) {
 				context.fillStyle = "#ffffff";
-				context.font = "48px helvetica";
-				centerText(context, clickOrTap() + " TO START", 0, 450);
+				context.font = "30px helvetica";
+				if (stateMessages.touch) {
+					centerText(context, "TAP TO START", 0, 430);
+				} else {
+					centerText(context, "CLICK OR SPACE TO START", 0, 430);
+				}
+
+
 			}
 		});
 	}));
@@ -645,7 +716,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		score = 0;
 		newBestScore = false;
 		state = "start";
-		scurry.sounds.play("music", true);
+		//scurry.sounds.play("music", true);
 
 		pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
 			if (state === "dead") {
@@ -702,6 +773,9 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		scurry.animations.get("superJumpAnim").move(elapsedMillis);
 		scurry.animations.get("superSpeedAnim").move(elapsedMillis);
 		scurry.animations.get("deathPopUp").move(elapsedMillis);
+		scurry.animations.get("tapToJump").move(elapsedMillis);
+		scurry.animations.get("tapWaves").move(elapsedMillis);
+		scurry.animations.get("clickOrSpaceToJump").move(elapsedMillis);
 		soundToggle.move(elapsedMillis);
 		pauseToggle.move(elapsedMillis);
 
@@ -752,6 +826,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				if (!shelf.counted && player.sprite.name === "beetle") {
 					shelf.counted = true;
 					score++;
+					pointSound();
 					if (score > bestScore) {
 						newBestScore = true;
 						bestScore = score;
@@ -786,6 +861,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				// only switch to skeleton when hidden inside motel.
 				if (player.x > powerUp.x + 30) {
 					deathPopUpShow = true;
+					trapSound();
 					player.sprite = scurry.animations.get("skeleton");
 				} else {
 					deathPopUpShow = false;
@@ -818,9 +894,9 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			if (this.timers.superjump.running) {
 
 				player.vy += -1;
-				scurry.sounds.play("superjump");
+				superJumpSound();
 			} else {
-				scurry.sounds.play("jump");
+				jumpSound();
 			}
 			if (scurry.keyboard.isPressed("up")) {
 				player.vy += -1;
@@ -855,6 +931,9 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		var superJumpAnim = scurry.animations.get("superJumpAnim");
 		var superSpeedAnim = scurry.animations.get("superSpeedAnim");
 		var deathPopUp = scurry.animations.get("deathPopUp");
+		var tapToJump = scurry.animations.get("tapToJump");
+		var clickOrSpaceToJump = scurry.animations.get("clickOrSpaceToJump");
+		var tapWaves = scurry.animations.get("tapWaves");
 
 		var scene = this;
 		this.camera.drawAbsolute(context, function() {
@@ -878,12 +957,19 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			if (deathPopUpShow) {
 				deathPopUp.draw(context, (canvas.width - deathPopUp.width) - 20, (canvas.height - deathPopUp.height) - 20);
 			}
-			if (stateMessages[state]) {
-				context.fillStyle = "rgba(0, 0, 0, 0.7)";
-				context.fillRect(0, 400, canvas.width, 70);
-				context.fillStyle = "#ffffff";
-				context.font = "48px helvetica";
-				centerText(context, stateMessages[state], 0, 450);
+			if (state === "start") {
+
+				context.fillStyle = "rgba(255,255,255, 0.5)";
+				context.fillRect(0, 0, canvas.width, canvas.height);
+
+				if (stateMessages.touch) {
+					tapToJump.draw(context, (canvas.width / 2) - (tapToJump.width / 2), (canvas.height / 2) - (tapToJump.height / 2));
+					tapWaves.draw(context, canvas.width - (tapWaves.width * 2), canvas.height / 2);
+				} else {
+					clickOrSpaceToJump.draw(context, (canvas.width / 2) - (clickOrSpaceToJump.width / 2), (canvas.height / 2) - (clickOrSpaceToJump.height / 2));
+					//tapWaves.draw(context, canvas.width - (tapWaves.width * 2), canvas.height / 2);
+				}
+
 			}
 
 
