@@ -199,36 +199,36 @@ var onGround = true;
 var deathSounds = ["death", "death-2", "death-3", "death-4", "death-5"];
 
 function deathSound() {
-	var i = Math.random() * deathSounds.length | 0;
-	game.sounds.play(deathSounds[i]);
+	playRandomSound(deathSounds);
+}
+
+function playRandomSound(sounds) {
+	var i = Math.floor(Math.random() * sounds.length);
+	game.sounds.play(sounds[i]);
 }
 
 var jumpSounds = ["jump"];
 
 function jumpSound() {
-	var i = Math.random() * jumpSounds.length | 0;
-	game.sounds.play(jumpSounds[i]);
+	playRandomSound(jumpSounds);
 }
 
 var superJumpSounds = ["superjump", "superjump-2"];
 
 function superJumpSound() {
-	var i = Math.random() * superJumpSounds.length | 0;
-	game.sounds.play(superJumpSounds[i]);
+	playRandomSound(superJumpSounds);
 }
 
 var pointSounds = ["point", "point-2", "point-3"];
 
 function pointSound() {
-	var i = Math.random() * pointSounds.length | 0;
-	game.sounds.play(pointSounds[i]);
+	playRandomSound(pointSounds);
 }
 
 var trapSounds = ["trap", "trap-2"];
 
 function trapSound() {
-	var i = Math.random() * trapSounds.length | 0;
-	game.sounds.play(trapSounds[i]);
+	playRandomSound(trapSounds);
 }
 
 
