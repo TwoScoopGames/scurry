@@ -716,7 +716,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		score = 0;
 		newBestScore = false;
 		state = "start";
-		//game.sounds.play("music", true);
+		game.sounds.play("music", true);
 
 		pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
 			if (state === "dead") {
