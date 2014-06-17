@@ -156,7 +156,7 @@ var manifest = {
 		}
 	}
 };
-var scurry = new Splat.Game(canvas, manifest);
+var game = new Splat.Game(canvas, manifest);
 var deathPopUpShow = false;
 var beetleBlack;
 var player = {};
@@ -200,40 +200,40 @@ var deathSounds = ["death", "death-2", "death-3", "death-4", "death-5"];
 
 function deathSound() {
 	var i = Math.random() * deathSounds.length | 0;
-	scurry.sounds.play(deathSounds[i]);
+	game.sounds.play(deathSounds[i]);
 }
 
 var jumpSounds = ["jump"];
 
 function jumpSound() {
 	var i = Math.random() * jumpSounds.length | 0;
-	scurry.sounds.play(jumpSounds[i]);
+	game.sounds.play(jumpSounds[i]);
 }
 
 var superJumpSounds = ["superjump", "superjump-2"];
 
 function superJumpSound() {
 	var i = Math.random() * superJumpSounds.length | 0;
-	scurry.sounds.play(superJumpSounds[i]);
+	game.sounds.play(superJumpSounds[i]);
 }
 
 var pointSounds = ["point", "point-2", "point-3"];
 
 function pointSound() {
 	var i = Math.random() * pointSounds.length | 0;
-	scurry.sounds.play(pointSounds[i]);
+	game.sounds.play(pointSounds[i]);
 }
 
 var trapSounds = ["trap", "trap-2"];
 
 function trapSound() {
 	var i = Math.random() * trapSounds.length | 0;
-	scurry.sounds.play(trapSounds[i]);
+	game.sounds.play(trapSounds[i]);
 }
 
 
 function clickOrTap() {
-	if (scurry.mouse.supportsTouch()) {
+	if (game.mouse.supportsTouch()) {
 		return true;
 	} else {
 		return false;
@@ -252,8 +252,8 @@ function getRandomArbitrary(min, max) {
 }
 
 function assetsLoaded() {
-	var sugarCube = scurry.animations.get("sugar-cube");
-	var coffeeBean = scurry.animations.get("coffee-bean");
+	var sugarCube = game.animations.get("sugar-cube");
+	var coffeeBean = game.animations.get("coffee-bean");
 
 	possiblePowerUps = [{
 		"name": "superjump",
@@ -265,11 +265,11 @@ function assetsLoaded() {
 		"sound": "powerup-speed"
 	}, {
 		"name": "roachMotel",
-		"animation": scurry.images.get("hotel-back")
+		"animation": game.images.get("hotel-back")
 	}];
 
-	shelf = new Splat.NinePatch(scurry.images.get("shelf"));
-	shelfBkgd = new Splat.NinePatch(scurry.images.get("shelf background"));
+	shelf = new Splat.NinePatch(game.images.get("shelf"));
+	shelfBkgd = new Splat.NinePatch(game.images.get("shelf background"));
 }
 
 function randPrice() {
@@ -290,8 +290,8 @@ function getShelfItems(width, itemGroup) {
 		if (name === "empty") {
 			name = "box1";
 		}
-		var img = scurry.images.get(name);
-		var tag = scurry.images.get(item.tag);
+		var img = game.images.get(name);
+		var tag = game.images.get(item.tag);
 		if (tag.width > img.width) {
 			return tag.width;
 		} else {
@@ -348,12 +348,12 @@ function drawTagPrice(context, item, tagx, tagy) {
 
 function drawShelfItem(context, item, x, y) {
 	if (item.item === "empty") {
-		return scurry.images.get("box1").width;
+		return game.images.get("box1").width;
 	}
-	var img = scurry.images.get(item.item);
+	var img = game.images.get(item.item);
 	context.drawImage(img, x, y - img.height);
 
-	var tag = scurry.images.get(item.tag);
+	var tag = game.images.get(item.tag);
 	var tagx = x + ((img.width - tag.width) / 2);
 	var tagy = y + 10;
 	context.drawImage(tag, tagx, tagy);
@@ -468,7 +468,7 @@ function makePowerUp(x, y) {
 	var a;
 	if (p.name === "roachMotel") {
 		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y + 60, 265, 30, p.animation, -25, -60);
-		var fg = scurry.images.get("hotel-front");
+		var fg = game.images.get("hotel-front");
 		hotels.push(new Splat.AnimatedEntity(x - (fg.width / 2) - 25, y + 20, fg.width, 95, fg, 0, -20));
 	} else {
 		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
@@ -495,7 +495,7 @@ function moveShelves(elapsedMillis) {
 }
 
 function drawStage(scene, context) {
-	var bg = scurry.images.get("bg");
+	var bg = game.images.get("bg");
 
 	scene.camera.drawAbsolute(context, function() {
 		var x = bgx | 0;
@@ -540,11 +540,11 @@ function ToggleButton(x, y, width, height, onIcon, offIcon, key, onToggle) {
 }
 
 ToggleButton.prototype.move = function(elapsedMillis) {
-	if (scurry.mouse.buttons[0] && scurry.mouse.x >= this.x && scurry.mouse.x < this.x + this.width && scurry.mouse.y >= this.y && scurry.mouse.y < this.y + this.height) {
-		scurry.mouse.buttons[0] = false;
+	if (game.mouse.buttons[0] && game.mouse.x >= this.x && game.mouse.x < this.x + this.width && game.mouse.y >= this.y && game.mouse.y < this.y + this.height) {
+		game.mouse.buttons[0] = false;
 		this.toggle();
 	}
-	if (scurry.keyboard.consumePressed(this.key)) {
+	if (game.keyboard.consumePressed(this.key)) {
 		this.toggle();
 	}
 };
@@ -613,17 +613,17 @@ EntityGroup.prototype.remove = function(entity) {
 				 Scenes 
 ===========================================*/
 
-scurry.scenes.add("title", new Splat.Scene(canvas, function() {
+game.scenes.add("title", new Splat.Scene(canvas, function() {
 	this.timers.running = new Splat.Timer(null, 1500, function() {
-		scurry.scenes.switchTo("game-title");
+		game.scenes.switchTo("game-title");
 	});
 	this.timers.running.start();
 }, function(elapsedMillis) {
-	scurry.animations.get("two-scoop").move(elapsedMillis);
+	game.animations.get("two-scoop").move(elapsedMillis);
 }, function(context) {
 	context.fillStyle = "#93cbcd";
 	context.fillRect(0, 0, canvas.width, canvas.height);
-	var anim = scurry.animations.get("two-scoop");
+	var anim = game.animations.get("two-scoop");
 	context.fillStyle = "#ffffff";
 	context.font = "50px helvetica";
 	centerText(context, "Two Scoop Games", 0, (canvas.height / 2) + (anim.height / 2) + 30);
@@ -631,24 +631,24 @@ scurry.scenes.add("title", new Splat.Scene(canvas, function() {
 	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
 }));
 
-scurry.scenes.add("game-title", new Splat.Scene(canvas, function() {
+game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		assetsLoaded();
 		this.camera.vx = 0.2;
 		this.camera.y = -800;
 		this.timers.lightsOn = new Splat.Timer(null, 807, function() {
-			beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, scurry.animations.get("beetle-black"), 0, 0);
+			beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, game.animations.get("beetle-black"), 0, 0);
 			beetleBlack.vx = 1.40;
 		});
 		this.timers.starting = new Splat.Timer(null, 2300, function() {
-			scurry.scenes.switchTo("level-1");
+			game.scenes.switchTo("level-1");
 		});
 	},
 	function(elapsedMillis) {
-		if (!this.timers.starting.running && (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0])) {
+		if (!this.timers.starting.running && (game.keyboard.consumePressed("space") || game.mouse.buttons[0])) {
 			this.timers.lightsOn.start();
 			this.timers.starting.start();
-			scurry.mouse.buttons[0] = false;
-			scurry.sounds.play("lights-on");
+			game.mouse.buttons[0] = false;
+			game.sounds.play("lights-on");
 		}
 		moveShelves(elapsedMillis);
 		if (beetleBlack) {
@@ -658,13 +658,13 @@ scurry.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		populateShelves(this.camera.x);
 
 		bgx += elapsedMillis * -0.05;
-		var bg = scurry.images.get("bg");
+		var bg = game.images.get("bg");
 		if (bgx + bg.width < 0) {
 			bgx += bg.width;
 		}
 
-		scurry.animations.get("logo-white").move(elapsedMillis);
-		scurry.animations.get("logo-black").move(elapsedMillis);
+		game.animations.get("logo-white").move(elapsedMillis);
+		game.animations.get("logo-black").move(elapsedMillis);
 	}, function(context) {
 		drawStage(this, context);
 
@@ -673,10 +673,10 @@ scurry.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			var logo;
 			if (self.timers.lightsOn.expired()) {
 				context.fillStyle = "rgba(255, 255, 255, 0.7)";
-				logo = scurry.animations.get("logo-black");
+				logo = game.animations.get("logo-black");
 			} else {
 				context.fillStyle = "rgba(0, 0, 0, 0.7)";
-				logo = scurry.animations.get("logo-white");
+				logo = game.animations.get("logo-white");
 			}
 			context.fillRect(0, 0, canvas.width, canvas.height);
 			logo.draw(context, (canvas.width / 2) - (logo.width / 2), 0);
@@ -698,13 +698,13 @@ scurry.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		});
 	}));
 
-scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
+game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		deathPopUpShow = false;
 		shelves = new EntityGroup();
 		hotels = [];
 		powerUps = new EntityGroup();
 		populateShelves(0);
-		player = new Splat.AnimatedEntity(200, 50, 120, 40, scurry.animations.get("beetle"), -17, -27);
+		player = new Splat.AnimatedEntity(200, 50, 120, 40, game.animations.get("beetle"), -17, -27);
 		player.x = 200;
 		player.y = shelves.entities[2].y - player.height;
 		onGround = true;
@@ -716,9 +716,9 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		score = 0;
 		newBestScore = false;
 		state = "start";
-		//scurry.sounds.play("music", true);
+		//game.sounds.play("music", true);
 
-		pauseToggle = new ToggleButton(0, 12, 72, 72, scurry.images.get("play"), scurry.images.get("pause"), "escape", function(toggled) {
+		pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
 			if (state === "dead") {
 				return false;
 			}
@@ -731,8 +731,8 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		pauseToggle.attachToRight(canvas, 12);
 		pauseToggle.toggled = true;
 
-		soundToggle = new ToggleButton(0, 108, 72, 72, scurry.images.get("sound-on"), scurry.images.get("sound-off"), "m", function(toggled) {
-			scurry.sounds.muted = !toggled;
+		soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
+			game.sounds.muted = !toggled;
 		});
 		soundToggle.attachToRight(canvas, 12);
 
@@ -749,7 +749,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			player.vy = 0.6;
 			player.move(elapsedMillis);
 		}, 1000, function() {
-			scurry.scenes.switchTo("score");
+			game.scenes.switchTo("score");
 		});
 		var self = this;
 		this.timers.roachMotel = new Splat.Timer(null, 1000, function() {
@@ -757,25 +757,25 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				this.start();
 				return;
 			}
-			player.sprite = scurry.animations.get("skeleton-crumble");
+			player.sprite = game.animations.get("skeleton-crumble");
 			player.sprite.reset();
-			scurry.sounds.play("crumble");
+			game.sounds.play("crumble");
 
 			self.timers.crumble.start();
 		});
 		this.timers.crumble = new Splat.Timer(function(elapsedMillis) {
 			player.vx *= 0.9;
 		}, 500, function() {
-			scurry.scenes.switchTo("score");
+			game.scenes.switchTo("score");
 		});
 	},
 	function(elapsedMillis) {
-		scurry.animations.get("superJumpAnim").move(elapsedMillis);
-		scurry.animations.get("superSpeedAnim").move(elapsedMillis);
-		scurry.animations.get("deathPopUp").move(elapsedMillis);
-		scurry.animations.get("tapToJump").move(elapsedMillis);
-		scurry.animations.get("tapWaves").move(elapsedMillis);
-		scurry.animations.get("clickOrSpaceToJump").move(elapsedMillis);
+		game.animations.get("superJumpAnim").move(elapsedMillis);
+		game.animations.get("superSpeedAnim").move(elapsedMillis);
+		game.animations.get("deathPopUp").move(elapsedMillis);
+		game.animations.get("tapToJump").move(elapsedMillis);
+		game.animations.get("tapWaves").move(elapsedMillis);
+		game.animations.get("clickOrSpaceToJump").move(elapsedMillis);
 		soundToggle.move(elapsedMillis);
 		pauseToggle.move(elapsedMillis);
 
@@ -783,9 +783,9 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			return;
 		}
 		if (state === "paused" || state === "start") {
-			if (scurry.keyboard.consumePressed("space") || scurry.mouse.buttons[0]) {
+			if (game.keyboard.consumePressed("space") || game.mouse.buttons[0]) {
 				state = "running";
-				scurry.mouse.buttons[0] = false;
+				game.mouse.buttons[0] = false;
 				pauseToggle.toggled = false;
 			} else {
 				return;
@@ -794,10 +794,10 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 
 		moveShelves(elapsedMillis);
 
-		if (scurry.keyboard.isPressed("left")) {
+		if (game.keyboard.isPressed("left")) {
 			player.x -= elapsedMillis * 0.70;
 		}
-		if (scurry.keyboard.isPressed("right")) {
+		if (game.keyboard.isPressed("right")) {
 			player.x += elapsedMillis * 0.70;
 		}
 
@@ -809,10 +809,10 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 
 		if (player.y > -player.height) {
 			state = "dead";
-			scurry.sounds.play("death");
+			game.sounds.play("death");
 			this.timers.dead.start();
 			if (!this.timers.roachMotel.running && !this.timers.crumble.running) {
-				player.sprite = scurry.animations.get("beetle-fall");
+				player.sprite = game.animations.get("beetle-fall");
 			}
 			return;
 		}
@@ -862,7 +862,7 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				if (player.x > powerUp.x + 30) {
 					deathPopUpShow = true;
 					trapSound();
-					player.sprite = scurry.animations.get("skeleton");
+					player.sprite = game.animations.get("skeleton");
 				} else {
 					deathPopUpShow = false;
 				}
@@ -875,21 +875,21 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 					powerUps.remove(powerUp);
 				}
 				if (powerUp.sound) {
-					scurry.sounds.play(powerUp.sound);
+					game.sounds.play(powerUp.sound);
 				}
 			}
 		});
 
-		if (onGround && player.sprite === scurry.animations.get("beetle-jump")) {
-			player.sprite = scurry.animations.get("beetle");
-			scurry.animations.get("beetle").reset();
-			scurry.sounds.play("land");
+		if (onGround && player.sprite === game.animations.get("beetle-jump")) {
+			player.sprite = game.animations.get("beetle");
+			game.animations.get("beetle").reset();
+			game.sounds.play("land");
 		}
-		if (!onGround && player.sprite === scurry.animations.get("beetle")) {
-			player.sprite = scurry.animations.get("beetle-jump");
-			scurry.animations.get("beetle-jump").reset();
+		if (!onGround && player.sprite === game.animations.get("beetle")) {
+			player.sprite = game.animations.get("beetle-jump");
+			game.animations.get("beetle-jump").reset();
 		}
-		if ((scurry.keyboard.isPressed("space") || scurry.mouse.buttons[0]) && onGround && !inHotel) {
+		if ((game.keyboard.isPressed("space") || game.mouse.buttons[0]) && onGround && !inHotel) {
 			player.vy = jumpSpeed;
 			if (this.timers.superjump.running) {
 
@@ -898,23 +898,23 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			} else {
 				jumpSound();
 			}
-			if (scurry.keyboard.isPressed("up")) {
+			if (game.keyboard.isPressed("up")) {
 				player.vy += -1;
 			}
 
-			player.sprite = scurry.animations.get("beetle-jump");
-			scurry.animations.get("beetle-jump").reset();
+			player.sprite = game.animations.get("beetle-jump");
+			game.animations.get("beetle-jump").reset();
 		}
-		if ((!scurry.keyboard.isPressed("space") && !scurry.mouse.buttons[0]) && player.vy < minJump) {
+		if ((!game.keyboard.isPressed("space") && !game.mouse.buttons[0]) && player.vy < minJump) {
 			player.vy = minJump;
 		}
 
 		if (this.timers.roachMotel.running && !inHotel) {
-			player.sprite = scurry.animations.get("skeleton");
+			player.sprite = game.animations.get("skeleton");
 		}
 
 		bgx += elapsedMillis * bgv;
-		var bg = scurry.images.get("bg");
+		var bg = game.images.get("bg");
 		if (bgx + bg.width < 0) {
 			bgx += bg.width;
 		}
@@ -928,12 +928,12 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		toDraw.push(player);
 		drawEntities(context, toDraw);
 
-		var superJumpAnim = scurry.animations.get("superJumpAnim");
-		var superSpeedAnim = scurry.animations.get("superSpeedAnim");
-		var deathPopUp = scurry.animations.get("deathPopUp");
-		var tapToJump = scurry.animations.get("tapToJump");
-		var clickOrSpaceToJump = scurry.animations.get("clickOrSpaceToJump");
-		var tapWaves = scurry.animations.get("tapWaves");
+		var superJumpAnim = game.animations.get("superJumpAnim");
+		var superSpeedAnim = game.animations.get("superSpeedAnim");
+		var deathPopUp = game.animations.get("deathPopUp");
+		var tapToJump = game.animations.get("tapToJump");
+		var clickOrSpaceToJump = game.animations.get("clickOrSpaceToJump");
+		var tapWaves = game.animations.get("tapWaves");
 
 		var scene = this;
 		this.camera.drawAbsolute(context, function() {
@@ -969,41 +969,36 @@ scurry.scenes.add("level-1", new Splat.Scene(canvas, function() {
 					clickOrSpaceToJump.draw(context, (canvas.width / 2) - (clickOrSpaceToJump.width / 2), (canvas.height / 2) - (clickOrSpaceToJump.height / 2));
 					//tapWaves.draw(context, canvas.width - (tapWaves.width * 2), canvas.height / 2);
 				}
-
 			}
-
-
 		});
-
-
-
 	}));
 
-scurry.scenes.add("score", new Splat.Scene(canvas, function() {
-		this.timers.run = new Splat.Timer(null, 1000, function() {
-			scurry.scenes.switchTo("level-1");
-		});
-		this.timers.run.start();
-	},
-	function(elapsedMillis) {},
-	function(context) {
-		context.fillStyle = "#000000";
-		context.fillRect(0, 0, canvas.width, canvas.height);
+game.scenes.add("score", new Splat.Scene(canvas, function() {
+	this.timers.run = new Splat.Timer(null, 1000, function() {
+		game.scenes.switchTo("level-1");
+	});
+	this.timers.run.start();
+},
+function(elapsedMillis) {},
+function(context) {
+	context.fillStyle = "#000000";
+	context.fillRect(0, 0, canvas.width, canvas.height);
 
-		context.fillStyle = "#ffffff";
-		context.font = "42px helvetica";
-		centerText(context, "SCORE", 0, 200);
-		context.font = "100px helvetica";
-		centerText(context, score, 0, 290);
+	context.fillStyle = "#ffffff";
+	context.font = "42px helvetica";
+	centerText(context, "SCORE", 0, 200);
+	context.font = "100px helvetica";
+	centerText(context, score, 0, 290);
 
-		var bestText = "HIGH SCORE";
-		if (newBestScore) {
-			context.fillStyle = "#6bc255";
-			bestText = "NEW HIGH SCORE!";
-		}
-		context.font = "42px helvetica";
-		centerText(context, bestText, 0, 400);
-		context.font = "100px helvetica";
-		centerText(context, bestScore, 0, 490);
-	}));
-scurry.scenes.switchTo("loading");
+	var bestText = "HIGH SCORE";
+	if (newBestScore) {
+		context.fillStyle = "#6bc255";
+		bestText = "NEW HIGH SCORE!";
+	}
+	context.font = "42px helvetica";
+	centerText(context, bestText, 0, 400);
+	context.font = "100px helvetica";
+	centerText(context, bestScore, 0, 490);
+}));
+
+game.scenes.switchTo("loading");
