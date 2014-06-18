@@ -40,8 +40,6 @@ var manifest = {
 		"death-4": "audio/death-4.wav",
 		"death-5": "audio/death-5.wav",
 		"jump": "audio/jump.wav",
-		"jump-2": "audio/jump-2.wav",
-		"jump-3": "audio/jump-3.wav",
 		"land": "audio/land.wav",
 		"lights-on": "audio/lights-on.wav",
 		"point": "audio/point.wav",
