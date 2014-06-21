@@ -451,13 +451,13 @@ function populateShelves(cameraX) {
 			}
 			shelves.entities.push(s);
 			if (x > 3000 && Math.random() < 0.3) {
-				powerUps.entities.push(makePowerUp(s.x + (s.width / 2) - 25, s.y - 100));
+				powerUps.entities.push(makePowerUp(s, s.x + (s.width / 2) - 25, s.y - 100));
 			}
 		}
 	}
 }
 
-function makePowerUp(x, y) {
+function makePowerUp(shelf, x, y) {
 	var pnum = Math.random() * possiblePowerUps.length | 0;
 	var p = possiblePowerUps[pnum];
 
@@ -465,7 +465,9 @@ function makePowerUp(x, y) {
 	if (p.name === "roachMotel") {
 		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y + 60, 265, 30, p.animation, -25, -60);
 		var fg = game.images.get("hotel-front");
-		hotels.push(new Splat.AnimatedEntity(x - (fg.width / 2) - 25, y + 20, fg.width, 95, fg, 0, -20));
+		var hotel = new Splat.AnimatedEntity(x - (fg.width / 2) - 25, y + 20, fg.width, 95, fg, 0, -20);
+		hotel.shelf = shelf;
+		hotels.push(hotel);
 	} else {
 		a = new Splat.AnimatedEntity(x - (p.animation.width / 2), y, p.animation.width, p.animation.height, p.animation, 0, 0);
 		a.elapsedSec = 0;
@@ -477,6 +479,7 @@ function makePowerUp(x, y) {
 	}
 	a.name = p.name;
 	a.sound = p.sound;
+	a.shelf = shelf;
 	return a;
 }
 
@@ -815,6 +818,15 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			return;
 		}
 
+		function scorePoint() {
+			score++;
+			pointSound();
+			if (score > bestScore) {
+				newBestScore = true;
+				bestScore = score;
+			}
+		}
+
 		onGround = false;
 		shelves.collides(player, function(shelf) {
 			if (player.wasAbove(shelf)) {
@@ -823,12 +835,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				onGround = true;
 				if (!shelf.counted && player.sprite.name === "beetle") {
 					shelf.counted = true;
-					score++;
-					pointSound();
-					if (score > bestScore) {
-						newBestScore = true;
-						bestScore = score;
-					}
+					scorePoint();
 				}
 			}
 		});
@@ -840,6 +847,11 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 					player.y = hotel.y - player.height - 0.01;
 					player.vy = 0;
 					onGround = true;
+					var shelf = hotel.shelf;
+					if (!shelf.counted && player.sprite.name === "beetle") {
+						shelf.counted = true;
+						scorePoint();
+					}
 				}
 			}
 		}
