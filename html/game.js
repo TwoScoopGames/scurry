@@ -35,7 +35,6 @@ var manifest = {
 	"sounds": {
 		"crumble": "audio/crumble.wav",
 		"death": "audio/death.wav",
-		"death-2": "audio/death-2.wav",
 		"death-3": "audio/death-3.wav",
 		"death-4": "audio/death-4.wav",
 		"death-5": "audio/death-5.wav",
@@ -50,9 +49,7 @@ var manifest = {
 		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
 		"superjump": "audio/superjump.wav",
 		"superjump-2": "audio/superjump-2.wav",
-		"trap": "audio/trap.wav",
-		"trap-2": "audio/trap-2.wav"
-
+		"trap": "audio/trap.wav"
 	},
 	"fonts": {
 		"bebasneue": {
@@ -191,12 +188,6 @@ var soundToggle;
 var pauseToggle;
 var onGround = true;
 
-var deathSounds = ["death", "death-2", "death-3", "death-4", "death-5"];
-
-function deathSound() {
-	playRandomSound(deathSounds);
-}
-
 function playRandomSound(sounds) {
 	var i = Math.floor(Math.random() * sounds.length);
 	game.sounds.play(sounds[i]);
@@ -219,13 +210,6 @@ var pointSounds = ["point", "point-2", "point-3"];
 function pointSound() {
 	playRandomSound(pointSounds);
 }
-
-var trapSounds = ["trap", "trap-2"];
-
-function trapSound() {
-	playRandomSound(trapSounds);
-}
-
 
 function clickOrTap() {
 	if (game.mouse.supportsTouch()) {
@@ -260,7 +244,8 @@ function assetsLoaded() {
 		"sound": "powerup-speed"
 	}, {
 		"name": "roachMotel",
-		"animation": game.images.get("hotel-back")
+		"animation": game.images.get("hotel-back"),
+		"sound": "trap"
 	}];
 
 	shelf = new Splat.NinePatch(game.images.get("shelf"));
@@ -867,8 +852,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 					return;
 				}
 				// only switch to skeleton when hidden inside motel.
-				if (player.x > powerUp.x + 30 && player.sprite !== game.animations.get("skeleton")) {
-					trapSound();
+				if (player.x > powerUp.x + 30) {
 					player.sprite = game.animations.get("skeleton");
 				}
 				inHotel = true;
