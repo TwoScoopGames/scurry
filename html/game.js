@@ -14,6 +14,7 @@ var manifest = {
 		"box3": "images/box3.png",
 		"can1": "images/can1.png",
 		"can2": "images/can2.png",
+		"can3": "images/can3.png",
 		"cookies": "images/cookies.png",
 		"bottle": "images/bottle.png",
 		"waffles": "images/waffles.png",
