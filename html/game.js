@@ -1,6 +1,8 @@
 "use strict";
 
 var canvas = document.getElementById("canvas");
+canvas.width = 1136;
+canvas.height = window.innerHeight * (canvas.width / window.innerWidth);
 
 var manifest = {
 	"images": {

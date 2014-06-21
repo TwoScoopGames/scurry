@@ -1,6 +1,6 @@
 /*
 
-Splat 0.1.5
+Splat 0.1.6
 Copyright (c) 2014 Eric Lathrop
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1388,13 +1388,6 @@ function setCanvasSizeScaled(canvas) {
 	}
 }
 
-function setCanvasSizeFullScreen(canvas) {
-	canvas.width = window.innerWidth * window.devicePixelRatio;
-	canvas.height = window.innerHeight * window.devicePixelRatio;
-	canvas.style.width = window.innerWidth + "px";
-	canvas.style.height = window.innerHeight + "px";
-}
-
 /**
  * Represents a whole game. This class contains all the inputs, outputs, and data for the game.
  * @constructor
@@ -1429,12 +1422,8 @@ function setCanvasSizeFullScreen(canvas) {
 	var game = new Splat.Game(canvas, manifest);
  */
 function Game(canvas, manifest) {
-	if (window.ejecta) {
-		setCanvasSizeFullScreen(canvas);
-	} else {
-		window.addEventListener("resize", function() { setCanvasSizeScaled(canvas); });
-		setCanvasSizeScaled(canvas);
-	}
+	window.addEventListener("resize", function() { setCanvasSizeScaled(canvas); });
+	setCanvasSizeScaled(canvas);
 
 	/**
 	 * The mouse input for the game.
