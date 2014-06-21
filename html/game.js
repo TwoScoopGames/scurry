@@ -155,7 +155,6 @@ var manifest = {
 	}
 };
 var game = new Splat.Game(canvas, manifest);
-var deathPopUpShow = false;
 var beetleBlack;
 var player = {};
 var shelves = new EntityGroup();
@@ -692,7 +691,6 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 	}));
 
 game.scenes.add("level-1", new Splat.Scene(canvas, function() {
-		deathPopUpShow = false;
 		shelves = new EntityGroup();
 		hotels = [];
 		powerUps = new EntityGroup();
@@ -869,12 +867,9 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 					return;
 				}
 				// only switch to skeleton when hidden inside motel.
-				if (player.x > powerUp.x + 30) {
-					deathPopUpShow = true;
+				if (player.x > powerUp.x + 30 && player.sprite !== game.animations.get("skeleton")) {
 					trapSound();
 					player.sprite = game.animations.get("skeleton");
-				} else {
-					deathPopUpShow = false;
 				}
 				inHotel = true;
 			}
@@ -954,17 +949,18 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			context.font = "100px bebasneue";
 			centerText(context, score, 0, 70);
 
-			if (!deathPopUpShow && scene.timers.superspeed.running && !scene.timers.superjump.running) {
+			var isSkeleton = scene.timers.roachMotel.running;
+			if (!isSkeleton && scene.timers.superspeed.running && !scene.timers.superjump.running) {
 				superSpeedAnim.draw(context, (canvas.width - superSpeedAnim.width) - 20, (canvas.height - superSpeedAnim.height) - 20);
 			}
-			if (!deathPopUpShow && scene.timers.superjump.running && !scene.timers.superspeed.running) {
+			if (!isSkeleton && scene.timers.superjump.running && !scene.timers.superspeed.running) {
 				superJumpAnim.draw(context, (canvas.width - superJumpAnim.width) - 20, (canvas.height - superJumpAnim.height) - 20);
 			}
-			if (!deathPopUpShow && scene.timers.superspeed.running && scene.timers.superjump.running) {
+			if (!isSkeleton && scene.timers.superspeed.running && scene.timers.superjump.running) {
 				superSpeedAnim.draw(context, 20, (canvas.height - superSpeedAnim.height) - 20);
 				superJumpAnim.draw(context, (canvas.width - superJumpAnim.width) - 20, (canvas.height - superJumpAnim.height) - 20);
 			}
-			if (deathPopUpShow) {
+			if (isSkeleton) {
 				deathPopUp.draw(context, (canvas.width - deathPopUp.width) - 20, (canvas.height - deathPopUp.height) - 20);
 			}
 			if (state === "start") {
