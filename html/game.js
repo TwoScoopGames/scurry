@@ -681,13 +681,16 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			if (self.timers.lightsOn.expired()) {
 				beetleBlack.draw(context);
 			}
+
 			if (!self.timers.starting.running) {
 				context.fillStyle = "#ffffff";
 				context.font = "30px bebasneue";
+				centerText(context, "MUSIC BY ROCCOW", 0, 430);
+
 				if (stateMessages.touch) {
-					centerText(context, "TAP TO START", 0, 430);
+					centerText(context, "TAP TO START", 0, canvas.height - 30);
 				} else {
-					centerText(context, "CLICK OR SPACE TO START", 0, 430);
+					centerText(context, "CLICK OR SPACE TO START", 0, canvas.height - 30);
 				}
 			}
 		});
