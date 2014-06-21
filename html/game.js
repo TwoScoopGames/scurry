@@ -4,7 +4,8 @@ var canvas = document.getElementById("canvas");
 
 var manifest = {
 	"images": {
-		"bg": "images/bg2.png",
+		"bg-far": "images/bg-far.png",
+		"bg-close": "images/bg-close.png",
 		"beetle-dead": "images/scurry-dead-1f132x72.png",
 		"shelf": "images/shelf2.png",
 		"shelf background": "images/shelf-bars-spritesheet.png",
@@ -166,8 +167,10 @@ var gravityAccel = 0.005;
 var jumpSpeed = -1.50;
 var minJump = -0.3;
 
-var bgv = -30;
-var bgx = 0;
+var bgFarV;
+var bgFarX = 0;
+var bgCloseV;
+var bgCloseX = 0;
 
 var shelf;
 var shelfBkgd;
@@ -478,13 +481,21 @@ function moveShelves(elapsedMillis) {
 }
 
 function drawStage(scene, context) {
-	var bg = game.images.get("bg");
+	var bgFar = game.images.get("bg-far");
+	var bgClose = game.images.get("bg-close");
 
 	scene.camera.drawAbsolute(context, function() {
-		var x = bgx | 0;
-		context.drawImage(bg, x, 0);
-		if (x + bg.width < canvas.width) {
-			context.drawImage(bg, x + bg.width, 0);
+		var x = Math.floor(bgFarX);
+		context.drawImage(bgFar, x, 0);
+		if (x + bgFar.width < canvas.width) {
+			context.drawImage(bgFar, x + bgFar.width, 0);
+		}
+
+		x = Math.floor(bgCloseX);
+		var y = canvas.height - bgClose.height;
+		context.drawImage(bgClose, x, y);
+		if (x + bgClose.width < canvas.width) {
+			context.drawImage(bgClose, x + bgClose.width, y);
 		}
 	});
 
@@ -636,10 +647,16 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		deleteInvisibleShelves(this.camera.x);
 		populateShelves(this.camera.x);
 
-		bgx += elapsedMillis * -0.05;
-		var bg = game.images.get("bg");
-		if (bgx + bg.width < 0) {
-			bgx += bg.width;
+		bgFarX += elapsedMillis * -0.025;
+		var bg = game.images.get("bg-far");
+		if (bgFarX + bg.width < 0) {
+			bgFarX += bg.width;
+		}
+
+		bgCloseX += elapsedMillis * -0.05;
+		var bg = game.images.get("bg-close");
+		if (bgCloseX + bg.width < 0) {
+			bgCloseX += bg.width;
 		}
 
 		game.animations.get("logo-white").move(elapsedMillis);
@@ -686,8 +703,10 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		onGround = true;
 		shelves.entities[2].counted = true;
 		player.vx = 1;
-		bgv = -0.3;
-		bgx = 0;
+		bgFarV = -0.15;
+		bgFarX = 0;
+		bgCloseV = -0.2;
+		bgCloseX = 0;
 		this.camera = new Splat.EntityBoxCamera(player, player.width, 200, 200, canvas.height / 2);
 		score = 0;
 		newBestScore = false;
@@ -898,10 +917,16 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			player.sprite = game.animations.get("skeleton");
 		}
 
-		bgx += elapsedMillis * bgv;
-		var bg = game.images.get("bg");
-		if (bgx + bg.width < 0) {
-			bgx += bg.width;
+		bgFarX += elapsedMillis * bgFarV;
+		var bg = game.images.get("bg-far");
+		if (bgFarX + bg.width < 0) {
+			bgFarX += bg.width;
+		}
+
+		bgCloseX += elapsedMillis * bgCloseV;
+		bg = game.images.get("bg-close");
+		if (bgCloseX + bg.width < 0) {
+			bgCloseX += bg.width;
 		}
 	},
 	function(context) {
