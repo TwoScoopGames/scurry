@@ -54,14 +54,14 @@ var manifest = {
 		"trap-2": "audio/trap-2.wav"
 
 	},
-	// "fonts": {
-	// 	"helvetica": {
-	// 		"embedded-opentype": "fonts/bebasneue-webfont.eot",
-	// 		"woff": "fonts/bebasneue-webfont.woff",
-	// 		"truetype": "fonts/bebasneue-webfont.ttf",
-	// 		"svg": "fonts/bebasneue-webfont.svg#helvetica'"
-	// 	}
-	// },
+	"fonts": {
+		"bebasneue": {
+			"embedded-opentype": "fonts/bebasneue-webfont.eot",
+			"woff": "fonts/bebasneue-webfont.woff",
+			"truetype": "fonts/bebasneue-webfont.ttf",
+			"svg": "fonts/bebasneue-webfont.svg#bebas_neueregular"
+		}
+	},
 	"animations": {
 		"two-scoop": {
 			"strip": "images/two-scoop-anim.png",
@@ -338,7 +338,7 @@ function drawTagPrice(context, item, tagx, tagy) {
 	} else {
 		context.fillStyle = "#333333";
 	}
-	context.font = "28px helvetica";
+	context.font = "28px bebasneue";
 	context.fillText(price, tagx + 65, tagy + 65);
 }
 
@@ -618,7 +618,7 @@ game.scenes.add("title", new Splat.Scene(canvas, function() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	var anim = game.animations.get("two-scoop");
 	context.fillStyle = "#ffffff";
-	context.font = "50px helvetica";
+	context.font = "50px bebasneue";
 	centerText(context, "Two Scoop Games", 0, (canvas.height / 2) + (anim.height / 2) + 30);
 
 	anim.draw(context, (canvas.width / 2) - (anim.width / 2), (canvas.height / 2) - (anim.height / 2));
@@ -678,7 +678,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			}
 			if (!self.timers.starting.running) {
 				context.fillStyle = "#ffffff";
-				context.font = "30px helvetica";
+				context.font = "30px bebasneue";
 				if (stateMessages.touch) {
 					centerText(context, "TAP TO START", 0, 430);
 				} else {
@@ -939,7 +939,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			pauseToggle.draw(context);
 
 			context.fillStyle = "#000000";
-			context.font = "100px helvetica";
+			context.font = "100px bebasneue";
 			centerText(context, score, 0, 70);
 
 			if (!deathPopUpShow && scene.timers.superspeed.running && !scene.timers.superjump.running) {
@@ -982,9 +982,9 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		context.fillRect(0, 0, canvas.width, canvas.height);
 
 		context.fillStyle = "#ffffff";
-		context.font = "42px helvetica";
+		context.font = "42px bebasneue";
 		centerText(context, "SCORE", 0, 200);
-		context.font = "100px helvetica";
+		context.font = "100px bebasneue";
 		centerText(context, score, 0, 290);
 
 		var bestText = "HIGH SCORE";
@@ -992,9 +992,9 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 			context.fillStyle = "#6bc255";
 			bestText = "NEW HIGH SCORE!";
 		}
-		context.font = "42px helvetica";
+		context.font = "42px bebasneue";
 		centerText(context, bestText, 0, 400);
-		context.font = "100px helvetica";
+		context.font = "100px bebasneue";
 		centerText(context, bestScore, 0, 490);
 	}));
 

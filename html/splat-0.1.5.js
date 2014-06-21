@@ -1,6 +1,6 @@
 /*
 
-Splat 0.1.4
+Splat 0.1.5
 Copyright (c) 2014 Eric Lathrop
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1197,12 +1197,12 @@ function buildFontFaceRule(family, urls) {
 
 	var css = "\n";
 	css += "@font-face {\n";
-	css += "  font-family: '" + family + "';\n";
-	css += "  src: url('" + eot + "');\n";
-	css += "  src: url('" + eot + "?iefix') format('embedded-opentype'),\n";
-	css += "       url('" + woff + "') format('woff'),\n";
-	css += "       url('" + ttf + "') format('ttf'),\n";
-	css += "       url('" + svg + "') format('svg');\n";
+	css += "  font-family: \"" + family + "\";\n";
+	css += "  src: url(\"" + eot + "\");\n";
+	css += "  src: url(\"" + eot + "?iefix\") format(\"embedded-opentype\"),\n";
+	css += "       url(\"" + woff + "\") format(\"woff\"),\n";
+	css += "       url(\"" + ttf + "\") format(\"ttf\"),\n";
+	css += "       url(\"" + svg + "\") format(\"svg\");\n";
 	css += "}\n";
 	return css;
 }
