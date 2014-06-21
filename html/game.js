@@ -182,8 +182,8 @@ var bestScore = 0;
 var newBestScore = false;
 var shelfItemSpacing = 30;
 var shelfItems = [
-	["empty", "box1", "box2", "box3", "can1", "can2", "syrup", "waffles", "bottle"],
-	["empty", "cookies", "icecream", "butter", "milk", "milk2", "oj"]
+	["empty", "box1", "box2", "box3", "can1", "can2", "can3", "syrup", "cookies", "bottle"],
+	["empty", "waffles", "icecream", "butter", "milk", "milk2", "oj"]
 ];
 var shelfTags = ["tag1", "tag2", "tag3"];
 var sameItemChance = 0.50;
