@@ -726,6 +726,11 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		if (!soundToggle) {
 			soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
 				game.sounds.muted = !toggled;
+				if (game.sounds.muted) {
+					game.sounds.stop("music");
+				} else {
+					game.sounds.play("music", true);
+				}
 			});
 			soundToggle.attachToRight(canvas, 12);
 		}
