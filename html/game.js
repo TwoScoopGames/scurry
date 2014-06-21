@@ -878,17 +878,13 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			player.sprite = game.animations.get("beetle-jump");
 			game.animations.get("beetle-jump").reset();
 		}
-		if ((game.keyboard.isPressed("space") || game.mouse.isPressed(0)) && onGround && !inHotel) {
+		if (onGround && !inHotel && (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0))) {
 			player.vy = jumpSpeed;
 			if (this.timers.superjump.running) {
-
 				player.vy += -1;
 				superJumpSound();
 			} else {
 				jumpSound();
-			}
-			if (game.keyboard.isPressed("up")) {
-				player.vy += -1;
 			}
 
 			player.sprite = game.animations.get("beetle-jump");
