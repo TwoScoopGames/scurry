@@ -713,6 +713,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		state = "start";
 		game.sounds.play("music", true);
 
+		var self = this;
 		if (!pauseToggle) {
 			pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
 				if (state === "dead") {
@@ -720,13 +721,28 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				}
 				if (toggled) {
 					state = "paused";
+					self.pausedTimers = [];
+					for (var timer in self.timers) {
+						if (self.timers.hasOwnProperty(timer)) {
+							if (self.timers[timer].running) {
+								self.pausedTimers.push(self.timers[timer]);
+								self.timers[timer].stop();
+							}
+						}
+					}
 				} else {
 					state = "running";
+					for (var timer in self.pausedTimers) {
+						if (self.pausedTimers.hasOwnProperty(timer)) {
+							self.pausedTimers[timer].start();
+						}
+					}
+					self.pausedTimers = [];
 				}
 			});
 			pauseToggle.attachToRight(canvas, 12);
-			pauseToggle.toggled = true;
 		}
+		pauseToggle.toggled = true;
 
 		if (!soundToggle) {
 			soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
@@ -755,7 +771,6 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		}, 1000, function() {
 			game.scenes.switchTo("score");
 		});
-		var self = this;
 		this.timers.roachMotel = new Splat.Timer(null, 1000, function() {
 			if (!onGround) {
 				this.start();
@@ -788,8 +803,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		}
 		if (state === "paused" || state === "start") {
 			if (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0)) {
-				state = "running";
-				pauseToggle.toggled = false;
+				pauseToggle.toggle();
 			} else {
 				return;
 			}
