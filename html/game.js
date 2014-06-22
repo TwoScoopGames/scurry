@@ -46,8 +46,6 @@ var manifest = {
 		"land": "audio/land.wav",
 		"lights-on": "audio/lights-on.wav",
 		"point": "audio/point.wav",
-		"point-2": "audio/point-2.wav",
-		"point-3": "audio/point-3.wav",
 		"powerup-jump": "audio/powerup-jump.wav",
 		"powerup-speed": "audio/powerup-speed.wav",
 		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
@@ -209,12 +207,6 @@ var superJumpSounds = ["superjump", "superjump-2"];
 
 function superJumpSound() {
 	playRandomSound(superJumpSounds);
-}
-
-var pointSounds = ["point", "point-2", "point-3"];
-
-function pointSound() {
-	playRandomSound(pointSounds);
 }
 
 function clickOrTap() {
@@ -846,7 +838,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 
 		function scorePoint() {
 			score++;
-			pointSound();
+			game.sounds.play("point");
 			if (score > bestScore) {
 				newBestScore = true;
 				bestScore = score;
