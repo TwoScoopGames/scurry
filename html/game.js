@@ -488,14 +488,18 @@ function drawStage(scene, context) {
 	var bgClose = game.images.get("bg-close");
 
 	scene.camera.drawAbsolute(context, function() {
+		context.fillStyle = "#a5a587";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
 		var x = Math.floor(bgFarX);
-		context.drawImage(bgFar, x, 0);
+		var y = canvas.height / 2 - bgFar.height / 2;
+		context.drawImage(bgFar, x, y);
 		if (x + bgFar.width < canvas.width) {
-			context.drawImage(bgFar, x + bgFar.width, 0);
+			context.drawImage(bgFar, x + bgFar.width, y);
 		}
 
 		x = Math.floor(bgCloseX);
-		var y = canvas.height - bgClose.height;
+		y += bgFar.height - bgClose.height;
 		context.drawImage(bgClose, x, y);
 		if (x + bgClose.width < canvas.width) {
 			context.drawImage(bgClose, x + bgClose.width, y);
