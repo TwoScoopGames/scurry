@@ -37,21 +37,18 @@ var manifest = {
 		"hotel-back": "images/hotel-bg.png",
 	},
 	"sounds": {
-		"crumble": "audio/crumble.wav",
-		"death": "audio/death.wav",
-		"death-3": "audio/death-3.wav",
-		"death-4": "audio/death-4.wav",
-		"death-5": "audio/death-5.wav",
-		"jump": "audio/jump.wav",
-		"land": "audio/land.wav",
-		"lights-on": "audio/lights-on.wav",
-		"point": "audio/point.wav",
-		"powerup-jump": "audio/powerup-jump.wav",
-		"powerup-speed": "audio/powerup-speed.wav",
+		"crumble": "audio/crumble.mp3",
+		"death": "audio/death.mp3",
+		"jump": "audio/jump.mp3",
+		"land": "audio/land.mp3",
+		"lights-on": "audio/lights-on.mp3",
+		"point": "audio/point.mp3",
+		"powerup-jump": "audio/powerup-jump.mp3",
+		"powerup-speed": "audio/powerup-speed.mp3",
 		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
-		"superjump": "audio/superjump.wav",
-		"superjump-2": "audio/superjump-2.wav",
-		"trap": "audio/trap.wav"
+		"superjump": "audio/superjump.mp3",
+		"superjump-2": "audio/superjump-2.mp3",
+		"trap": "audio/trap.mp3"
 	},
 	"fonts": {
 		"bebasneue": {
