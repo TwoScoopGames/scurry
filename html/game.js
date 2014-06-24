@@ -192,17 +192,6 @@ var soundToggle;
 var pauseToggle;
 var onGround = true;
 
-function playRandomSound(sounds) {
-	var i = Math.floor(Math.random() * sounds.length);
-	game.sounds.play(sounds[i]);
-}
-
-var jumpSounds = ["jump"];
-
-function jumpSound() {
-	playRandomSound(jumpSounds);
-}
-
 function clickOrTap() {
 	if (game.mouse.supportsTouch()) {
 		return true;
@@ -916,7 +905,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				player.vy += -1;
 				game.sounds.play("superjump");
 			} else {
-				jumpSound();
+				game.sounds.play("jump");
 			}
 
 			player.sprite = game.animations.get("beetle-jump");
