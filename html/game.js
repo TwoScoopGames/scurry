@@ -151,6 +151,10 @@ var manifest = {
 	}
 };
 var game = new Splat.Game(canvas, manifest);
+
+if (window.ejecta) {
+	var adBanner = new Ejecta.AdBanner();
+}
 var beetleBlack;
 var player = {};
 var shelves = new EntityGroup();
@@ -623,12 +627,15 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		this.camera.vx = 0.2;
 		this.camera.y = -800;
 		this.timers.lightsOn = new Splat.Timer(null, 807, function() {
-			beetleBlack = new Splat.AnimatedEntity(0, 420, 0, 0, game.animations.get("beetle-black"), 0, 0);
+			beetleBlack = new Splat.AnimatedEntity(0, 500, 0, 0, game.animations.get("beetle-black"), 0, 0);
 			beetleBlack.vx = 1.40;
 		});
 		this.timers.starting = new Splat.Timer(null, 2300, function() {
 			game.scenes.switchTo("level-1");
 		});
+		if (window.ejecta) {
+			adBanner.show();
+		}
 	},
 	function(elapsedMillis) {
 		if (!this.timers.starting.running && (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0))) {
@@ -671,7 +678,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 				logo = game.animations.get("logo-white");
 			}
 			context.fillRect(0, 0, canvas.width, canvas.height);
-			logo.draw(context, (canvas.width / 2) - (logo.width / 2), 0);
+			logo.draw(context, (canvas.width / 2) - (logo.width / 2), 90);
 
 			if (self.timers.lightsOn.expired()) {
 				beetleBlack.draw(context);
@@ -680,7 +687,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 			if (!self.timers.starting.running) {
 				context.fillStyle = "#ffffff";
 				context.font = "30px bebasneue";
-				centerText(context, "MUSIC BY ROCCOW", 0, 430);
+				centerText(context, "MUSIC BY ROCCOW", 0, 510);
 
 				if (stateMessages.touch) {
 					centerText(context, "TAP TO START", 0, canvas.height - 30);
