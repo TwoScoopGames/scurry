@@ -47,7 +47,6 @@ var manifest = {
 		"powerup-speed": "audio/powerup-speed.mp3",
 		"music": "audio/RoccoW_-_09_-_Weeklybeats_2014_9_-_This_Little_Piggy_Danced.mp3",
 		"superjump": "audio/superjump.mp3",
-		"superjump-2": "audio/superjump-2.mp3",
 		"trap": "audio/trap.mp3"
 	},
 	"fonts": {
@@ -202,12 +201,6 @@ var jumpSounds = ["jump"];
 
 function jumpSound() {
 	playRandomSound(jumpSounds);
-}
-
-var superJumpSounds = ["superjump", "superjump-2"];
-
-function superJumpSound() {
-	playRandomSound(superJumpSounds);
 }
 
 function clickOrTap() {
@@ -921,7 +914,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			player.vy = jumpSpeed;
 			if (this.timers.superjump.running) {
 				player.vy += -1;
-				superJumpSound();
+				game.sounds.play("superjump");
 			} else {
 				jumpSound();
 			}
