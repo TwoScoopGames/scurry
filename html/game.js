@@ -180,6 +180,23 @@ var possiblePowerUps;
 var score = 0;
 var bestScore = 0;
 var newBestScore = false;
+
+function getBest() {
+	Splat.saveData.get("bestScore", function(err, data) {
+		if (!err) {
+			var b = data["bestScore"];
+			if (b) {
+				bestScore = parseInt(b);
+			}
+		}
+	});
+}
+getBest();
+
+function setBest() {
+	Splat.saveData.set({ "bestScore": bestScore }, function(err) { });
+}
+
 var shelfItemSpacing = 30;
 var shelfItems = [
 	["empty", "box1", "box2", "box3", "can1", "can2", "can3", "syrup", "cookies", "bottle"],
@@ -828,6 +845,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 			if (score > bestScore) {
 				newBestScore = true;
 				bestScore = score;
+				setBest();
 			}
 		}
 

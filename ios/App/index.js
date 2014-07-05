@@ -1,2 +1,2 @@
-ejecta.include("splat-0.1.6.js");
+ejecta.include("splat-1.0.0.js");
 ejecta.include("game.js");

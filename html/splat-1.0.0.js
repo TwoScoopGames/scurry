@@ -1,6 +1,6 @@
 /*
 
-Splat 0.1.6
+Splat 1.0.0
 Copyright (c) 2014 Eric Lathrop
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -767,6 +767,8 @@ module.exports = BinaryHeap;
 "use strict";
 /** @module buffer */
 
+var platform = _dereq_("./platform");
+
 /**
  * Make an invisible {@link canvas}.
  * @param {number} width The width of the canvas
@@ -779,7 +781,7 @@ function makeCanvas(width, height) {
 	c.width = width;
 	c.height = height;
 	// when retina support is enabled, context.getImageData() reads from the wrong pixel causing NinePatch to break
-	if (window.ejecta) {
+	if (platform.isEjecta()) {
 		c.retinaResolutionEnabled = false;
 	}
 	return c;
@@ -796,7 +798,7 @@ function makeBuffer(width, height, drawFun) {
 	var canvas = makeCanvas(width, height);
 	var ctx = canvas.getContext("2d");
 	// when image smoothing is enabled, the image gets blurred and the pixel data isn't correct even when the image shouldn't be scaled which breaks NinePatch
-	if (window.ejecta) {
+	if (platform.isEjecta()) {
 		ctx.imageSmoothingEnabled = false;
 	}
 	drawFun(ctx);
@@ -833,7 +835,7 @@ module.exports = {
 	flipBufferVertically: flipBufferVertically
 };
 
-},{}],8:[function(_dereq_,module,exports){
+},{"./platform":20}],8:[function(_dereq_,module,exports){
 "use strict";
 
 var Entity = _dereq_("./entity");
@@ -1188,6 +1190,7 @@ module.exports = EntityBoxCamera;
 "use strict";
 
 _dereq_("../vendor/FontLoader.js");
+var platform = _dereq_("./platform");
 
 function buildFontFaceRule(family, urls) {
 	var eot = urls["embedded-opentype"];
@@ -1307,13 +1310,13 @@ EjectaFontLoader.prototype.allLoaded = function() {
 	return true;
 };
 
-if (window.ejecta) {
+if (platform.isEjecta()) {
 	module.exports = EjectaFontLoader;
 } else {
 	module.exports = FontLoader;
 }
 
-},{"../vendor/FontLoader.js":26}],12:[function(_dereq_,module,exports){
+},{"../vendor/FontLoader.js":27,"./platform":20}],12:[function(_dereq_,module,exports){
 "use strict";
 
 var Scene = _dereq_("./scene");
@@ -1326,6 +1329,7 @@ var SoundLoader = _dereq_("./sound_loader");
 var FontLoader = _dereq_("./font_loader");
 var AnimationLoader = _dereq_("./animation_loader");
 var SceneManager = _dereq_("./scene_manager");
+var platform = _dereq_("./platform");
 
 function loadAssets(assetLoader, assets) {
 	for (var key in assets) {
@@ -1505,12 +1509,12 @@ Game.prototype.percentLoaded = function() {
  * @returns {boolean}
  */
 Game.prototype.isChromeApp = function() {
-	return window.chrome && window.chrome.app && window.chrome.app.runtime;
+	return platform.isChromeApp();
 };
 
 module.exports = Game;
 
-},{"./accelerometer":1,"./animation_loader":4,"./font_loader":11,"./image_loader":13,"./key_map":14,"./keyboard":15,"./mouse":18,"./scene":21,"./scene_manager":22,"./sound_loader":23}],13:[function(_dereq_,module,exports){
+},{"./accelerometer":1,"./animation_loader":4,"./font_loader":11,"./image_loader":13,"./key_map":14,"./keyboard":15,"./mouse":18,"./platform":20,"./scene":22,"./scene_manager":23,"./sound_loader":24}],13:[function(_dereq_,module,exports){
 "use strict";
 
 /**
@@ -1787,7 +1791,7 @@ module.exports = {
 	Timer: _dereq_("./timer"),
 };
 
-},{"./animated_entity":2,"./astar":5,"./binary_heap":6,"./buffer":7,"./camera":8,"./entity":9,"./entity_box_camera":10,"./game":12,"./math":17,"./ninepatch":19,"./save_data":20,"./scene":21,"./timer":24}],17:[function(_dereq_,module,exports){
+},{"./animated_entity":2,"./astar":5,"./binary_heap":6,"./buffer":7,"./camera":8,"./entity":9,"./entity_box_camera":10,"./game":12,"./math":17,"./ninepatch":19,"./save_data":21,"./scene":22,"./timer":25}],17:[function(_dereq_,module,exports){
 "use strict";
 
 /**
@@ -1825,8 +1829,10 @@ var val = rand.random();
 	Random: _dereq_("mersenne-twister")
 };
 
-},{"mersenne-twister":25}],18:[function(_dereq_,module,exports){
+},{"mersenne-twister":26}],18:[function(_dereq_,module,exports){
 "use strict";
+
+var platform = _dereq_("./platform");
 
 // prevent springy scrolling on ios
 document.ontouchmove = function(e) {
@@ -1860,7 +1866,7 @@ function relMouseCoordsEjecta() {
 	return {x:x, y:y};
 }
 
-if (window.ejecta) {
+if (platform.isEjecta()) {
 	relMouseCoords = relMouseCoordsEjecta;
 }
 
@@ -2046,7 +2052,7 @@ Mouse.prototype.consumePressed = function(button, x, y, width, height) {
 
 module.exports = Mouse;
 
-},{}],19:[function(_dereq_,module,exports){
+},{"./platform":20}],19:[function(_dereq_,module,exports){
 "use strict";
 
 var buffer = _dereq_("./buffer");
@@ -2168,11 +2174,30 @@ module.exports = NinePatch;
 },{"./buffer":7}],20:[function(_dereq_,module,exports){
 "use strict";
 
+module.exports = {
+	isChromeApp: function() {
+		return window.chrome && window.chrome.app && window.chrome.app.runtime;
+	},
+	isEjecta: function() {
+		return window.ejecta;
+	}
+};
+
+},{}],21:[function(_dereq_,module,exports){
+"use strict";
+/**
+ * @namespace Splat.saveData
+ */
+
+var platform = _dereq_("./platform");
+
 function cookieGet(name) {
 	var value = "; " + document.cookie;
 	var parts = value.split("; " + name + "=");
 	if (parts.length === 2) {
 		return parts.pop().split(";").shift();
+	} else {
+		throw "cookie " + name + " was not found";
 	}
 }
 
@@ -2183,9 +2208,44 @@ function cookieSet(name, value) {
 	document.cookie = cookie;
 }
 
+function getMultiple(getSingleFunc, keys, callback) {
+	if (typeof keys === "string") {
+		keys = [keys];
+	}
+
+	try
+	{
+		var data = keys.map(function(key) {
+			return [key, getSingleFunc(key)];
+		}).reduce(function(accum, pair) {
+			accum[pair[0]] = pair[1];
+			return accum;
+		}, {});
+
+		callback(undefined, data);
+	}
+	catch (e) {
+		callback(e);
+	}
+}
+
+function setMultiple(setSingleFunc, data, callback) {
+	try {
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				setSingleFunc(key, data[key]);
+			}
+		}
+		callback();
+	}
+	catch (e) {
+		callback(e);
+	}
+}
+
 var cookieSaveData = {
-	"get": cookieGet,
-	"set": cookieSet
+	"get": getMultiple.bind(undefined, cookieGet),
+	"set": setMultiple.bind(undefined, cookieSet)
 };
 
 function localStorageGet(name) {
@@ -2193,21 +2253,67 @@ function localStorageGet(name) {
 }
 
 function localStorageSet(name, value) {
-	return window.localStorage.setItem(name, value.toString());
+	window.localStorage.setItem(name, value.toString());
 }
 
 var localStorageSaveData = {
-	"get": localStorageGet,
-	"set": localStorageSet
+	"get": getMultiple.bind(undefined, localStorageGet),
+	"set": setMultiple.bind(undefined, localStorageSet)
 };
 
-if (window.localStorage) {
+/**
+ * A function that is called when save data has finished being retrieved.
+ * @callback saveDataGetFinished
+ * @param {error} err If defined, err is the error that occurred when retrieving the data.
+ * @param {object} data The key-value pairs of data that were previously saved.
+ */
+/**
+ * Retrieve data previously stored with {@link Splat.saveData.set}.
+ * @alias Splat.saveData.get
+ * @param {string | Array} keys A single key or array of key names of data items to retrieve.
+ * @param {saveDataGetFinished} callback A callback that is called with the data when it has been retrieved.
+ */
+function chromeStorageGet(keys, callback) {
+	window.chrome.storage.sync.get(keys, function(data) {
+		if (window.chrome.runtime.lastError) {
+			callback(window.chrome.runtime.lastError);
+		} else {
+			callback(undefined, data);
+		}
+	});
+}
+
+/**
+ * A function that is called when save data has finished being stored.
+ * @callback saveDataSetFinished
+ * @param {error} err If defined, err is the error that occurred when saving the data.
+ */
+/**
+ * Store data for later.
+ * @alias Splat.saveData.set
+ * @param {object} data An object containing key-value pairs of data to save.
+ * @param {saveDataSetFinished} callback A callback that is called when the data has finished saving.
+ */
+function chromeStorageSet(data, callback) {
+	window.chrome.storage.sync.set(data, function() {
+		callback(window.chrome.runtime.lastError);
+	});
+}
+
+var chromeStorageSaveData = {
+	"get": chromeStorageGet,
+	"set": chromeStorageSet,
+};
+
+if (platform.isChromeApp()) {
+	module.exports = chromeStorageSaveData;
+} else if (window.localStorage) {
 	module.exports = localStorageSaveData;
 } else {
 	module.exports = cookieSaveData;
 }
 
-},{}],21:[function(_dereq_,module,exports){
+},{"./platform":20}],22:[function(_dereq_,module,exports){
 "use strict";
 
 var Camera = _dereq_("./camera");
@@ -2366,7 +2472,7 @@ function drawFrameRate(scene, elapsedMillis) {
 
 module.exports = Scene;
 
-},{"./camera":8}],22:[function(_dereq_,module,exports){
+},{"./camera":8}],23:[function(_dereq_,module,exports){
 "use strict";
 
 /**
@@ -2415,7 +2521,7 @@ SceneManager.prototype.switchTo = function(name) {
 
 module.exports = SceneManager;
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -2644,7 +2750,7 @@ if (window.AudioContext) {
 	module.exports = FakeSoundLoader;
 }
 
-},{}],24:[function(_dereq_,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 "use strict";
 
 /**
@@ -2741,7 +2847,7 @@ Timer.prototype.expired = function() {
 
 module.exports = Timer;
 
-},{}],25:[function(_dereq_,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 /*
   https://github.com/banksean wrapped Makoto Matsumoto and Takuji Nishimura's code in a namespace
   so it's better encapsulated. Now you can have multiple random number generators
@@ -2948,7 +3054,7 @@ MersenneTwister.prototype.random_long = function() {
 
 module.exports = MersenneTwister;
 
-},{}],26:[function(_dereq_,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 (function(namespace) {
 	
 	var isIE = /MSIE/i.test(navigator.userAgent),
