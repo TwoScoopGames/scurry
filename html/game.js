@@ -735,6 +735,9 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 							}
 						}
 					}
+					if (window.ejecta) {
+						adBanner.show();
+					}
 				} else {
 					state = "running";
 					for (var timer in self.pausedTimers) {
@@ -743,6 +746,9 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 						}
 					}
 					self.pausedTimers = [];
+					if (window.ejecta) {
+						adBanner.hide();
+					}
 				}
 			});
 			pauseToggle.attachToRight(canvas, 12);
@@ -1007,6 +1013,9 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		this.timers.run = new Splat.Timer(null, 1000, function() {
 			game.scenes.switchTo("level-1");
 		});
+		if (window.ejecta) {
+			adBanner.show();
+		}
 		this.timers.run.start();
 	},
 	function(elapsedMillis) {},
