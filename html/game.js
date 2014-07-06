@@ -154,9 +154,6 @@ var manifest = {
 };
 var game = new Splat.Game(canvas, manifest);
 
-if (window.ejecta) {
-	var adBanner = new Ejecta.AdBanner();
-}
 var beetleBlack;
 var player = {};
 var shelves = new EntityGroup();
@@ -635,9 +632,7 @@ game.scenes.add("game-title", new Splat.Scene(canvas, function() {
 		this.timers.starting = new Splat.Timer(null, 2300, function() {
 			game.scenes.switchTo("level-1");
 		});
-		if (window.ejecta) {
-			adBanner.show();
-		}
+		Splat.ads.show(false);
 	},
 	function(elapsedMillis) {
 		if (!this.timers.starting.running && (game.keyboard.consumePressed("space") || game.mouse.consumePressed(0))) {
@@ -738,9 +733,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 							}
 						}
 					}
-					if (window.ejecta) {
-						adBanner.show();
-					}
+					Splat.ads.show(false);
 				} else {
 					state = "running";
 					for (var timer in self.pausedTimers) {
@@ -749,9 +742,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 						}
 					}
 					self.pausedTimers = [];
-					if (window.ejecta) {
-						adBanner.hide();
-					}
+					Splat.ads.hide();
 				}
 			});
 			pauseToggle.attachToRight(canvas, 12);
@@ -1015,9 +1006,7 @@ game.scenes.add("score", new Splat.Scene(canvas, function() {
 		this.timers.run = new Splat.Timer(null, 1000, function() {
 			game.scenes.switchTo("level-1");
 		});
-		if (window.ejecta) {
-			adBanner.show();
-		}
+		Splat.ads.show(false);
 		this.timers.run.start();
 	},
 	function(elapsedMillis) {},
