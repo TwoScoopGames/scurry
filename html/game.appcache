@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Version 10
+# Version 11
 
 CACHE:
 audio/land.mp3
@@ -65,7 +65,7 @@ images/scurry-fall-9f.png
 images/sugar-cube-19f.png
 images/bg-close.png
 game.js
-splat-1.0.0.js
+splat-1.0.1.js
 
 NETWORK:
 https://google-analytics.com/ga.js
