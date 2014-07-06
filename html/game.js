@@ -723,7 +723,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 
 		var self = this;
 		if (!pauseToggle) {
-			pauseToggle = new ToggleButton(0, 12, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
+			pauseToggle = new ToggleButton(0, 78, 72, 72, game.images.get("play"), game.images.get("pause"), "escape", function(toggled) {
 				if (state === "dead") {
 					return false;
 				}
@@ -759,7 +759,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 		pauseToggle.toggled = true;
 
 		if (!soundToggle) {
-			soundToggle = new ToggleButton(0, 108, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
+			soundToggle = new ToggleButton(0, 162, 72, 72, game.images.get("sound-on"), game.images.get("sound-off"), "m", function(toggled) {
 				game.sounds.muted = !toggled;
 				if (game.sounds.muted) {
 					game.sounds.stop("music");
@@ -981,7 +981,7 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 
 			context.fillStyle = "#000000";
 			context.font = "100px bebasneue";
-			centerText(context, score, 0, 70);
+			centerText(context, score, 0, 82);
 
 			var isSkeleton = scene.timers.roachMotel.running;
 			if (!isSkeleton && scene.timers.superspeed.running && !scene.timers.superjump.running) {
@@ -998,7 +998,6 @@ game.scenes.add("level-1", new Splat.Scene(canvas, function() {
 				deathPopUp.draw(context, (canvas.width - deathPopUp.width) - 20, (canvas.height - deathPopUp.height) - 20);
 			}
 			if (state === "start") {
-
 				context.fillStyle = "rgba(255,255,255, 0.5)";
 				context.fillRect(0, 0, canvas.width, canvas.height);
 
