@@ -1,8 +1,8 @@
 "use strict";
 
 var canvas = document.getElementById("canvas");
-canvas.width = 1136;
-canvas.height = 640;
+canvas.width = 1145;
+canvas.height = 859;
 if (window.ejecta) {
 	canvas.height = window.innerHeight * (canvas.width / window.innerWidth);
 }
